@@ -170,18 +170,27 @@ def publicar_no_github(req_id):
 
 def atualizar_vitrine_html(req, req_id):
     print("🖥️ Atualizando painel de resultados na página inicial...")
-    raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    caminho_index = os.path.join(raiz_projeto, "docs/index.html")
     
+    raiz_projeto = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..')
+    )
+    
+    caminho_index = os.path.join(
+        raiz_projeto,
+        "docs/index.html"
+    )
+
+    # Dados
     fwd = str(req.get('Primer forward', '')).strip().upper()
     rev = str(req.get('Primer reverse', '')).strip().upper()
     alvo = str(req.get('Região alvo', 'Não informada')).strip()
     banco = str(req.get('Banco de Dados', 'Protozoa')).strip()
     data_hoje = datetime.now().strftime("%d/%m/%Y")
-    
-    # MARCADOR CORRIGIDO
-    marcador_alvo = ""
-    
+
+    # MARCADOR
+    marcador_alvo = "<!-- NOVAS_LINHAS -->"
+
+    # Nova linha da tabela
     nova_linha = f"""
                     <tr>
                         <td><strong>{req_id}</strong></td>
@@ -192,21 +201,44 @@ def atualizar_vitrine_html(req, req_id):
                             <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> {rev}
                         </td>
                         <td>{data_hoje}</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td><a href="reports/{req_id}/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">Ver Relatório</a></td>
+                        <td>
+                            <span class="status-badge">
+                                Concluído
+                            </span>
+                        </td>
+                        <td>
+                            <a href="reports/{req_id}/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a>
+                        </td>
                     </tr>
-                    """ # MARCADOR INSERIDO AQUI TAMBÉM
+                    """
+
     try:
+        # Ler HTML atual
         with open(caminho_index, 'r', encoding='utf-8') as f:
             conteudo = f.read()
-            
+
+        # Verifica se marcador existe
         if marcador_alvo in conteudo:
-            novo_conteudo = conteudo.replace(marcador_alvo, nova_linha)
+
+            # Insere nova linha ANTES do marcador
+            novo_conteudo = conteudo.replace(
+                marcador_alvo,
+                nova_linha + "\n" + marcador_alvo
+            )
+
+            # Salva arquivo atualizado
             with open(caminho_index, 'w', encoding='utf-8') as f:
                 f.write(novo_conteudo)
-            print("   ✅ Vitrine updated com sucesso!")
+
+            print("   ✅ Vitrine atualizada com sucesso!")
+
         else:
-            print("   ⚠️ Marcador invisível não encontrado no index.html!")
+            print("   ⚠️ Marcador não encontrado no index.html!")
+
     except Exception as e:
         print(f"   ⚠️ Erro ao atualizar vitrine: {e}")
 
