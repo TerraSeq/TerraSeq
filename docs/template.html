@@ -75,6 +75,11 @@
         .badge-blue { background: #0ea5e9; }
         .badge-orange { background: #f59e0b; }
         .seq-box { background: #fff; border: 1px solid #e2e8f0; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; max-height: 150px; overflow-y: auto; border-radius: 4px; white-space: pre-wrap;}
+        
+        /* BOTÃO EXPANSÍVEL PARA OS PARÂMETROS */
+        .toggle-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: none !important; padding-bottom: 0 !important; margin-top: 0; transition: color 0.2s; user-select: none; }
+        .toggle-header:hover { color: var(--secondary); }
+        .toggle-icon { font-size: 0.85em; color: var(--text-light); font-weight: normal; background: #f1f5f9; padding: 4px 10px; border-radius: 20px;}
     </style>
 </head>
 <body>
@@ -89,6 +94,25 @@
                 <div class="info-item"><span class="info-label">Usuário</span><span class="info-value" id="sub-by">-</span></div>
                 <div class="info-item"><span class="info-label">Forward (5'->3')</span><span class="info-value" id="fwd" style="color: var(--success);">-</span></div>
                 <div class="info-item"><span class="info-label">Reverse (5'->3')</span><span class="info-value" id="rev" style="color: var(--success);">-</span></div>
+            </div>
+        </div>
+
+        <div class="card" style="border-left: 5px solid var(--accent); padding-bottom: 25px;">
+            <h2 class="toggle-header" onclick="toggleParams()">
+                <span>⚙️ Parâmetros Técnicos do BLAST</span>
+                <span id="params-icon" class="toggle-icon">▼ Mostrar</span>
+            </h2>
+            
+            <div id="params-content" style="display: none; margin-top: 15px; border-top: 2px solid var(--bg-color); padding-top: 15px;">
+                <div class="info-grid">
+                    <div class="info-item" style="border-left-color: var(--accent);"><span class="info-label">Banco de Dados</span><span class="info-value" id="param-banco">-</span></div>
+                    <div class="info-item" style="border-left-color: var(--accent);"><span class="info-label">E-value Máximo</span><span class="info-value" id="param-evalue">-</span></div>
+                    <div class="info-item" style="border-left-color: var(--accent);"><span class="info-label">Mismatches Max (3')</span><span class="info-value" id="param-mismatches">-</span></div>
+                    <div class="info-item" style="border-left-color: var(--accent);"><span class="info-label">Tm Mínima</span><span class="info-value" id="param-tm">-</span></div>
+                    <div class="info-item" style="border-left-color: var(--accent);"><span class="info-label">Janela do Amplicon</span><span class="info-value" id="param-tamanho">-</span></div>
+                    <div class="info-item" style="border-left-color: var(--accent);"><span class="info-label">Cobertura Mínima</span><span class="info-value" id="param-cobertura">-</span></div>
+                    <div class="info-item" style="border-left-color: var(--accent);"><span class="info-label">Limite de Hits</span><span class="info-value" id="param-hits">-</span></div>
+                </div>
             </div>
         </div>
 
@@ -156,6 +180,19 @@
     </div>
 
     <script>
+        // Função para mostrar/ocultar parâmetros
+        function toggleParams() {
+            const content = document.getElementById('params-content');
+            const icon = document.getElementById('params-icon');
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                icon.innerHTML = '▲ Ocultar';
+            } else {
+                content.style.display = 'none';
+                icon.innerHTML = '▼ Mostrar';
+            }
+        }
+
         let fullData = null; let leafMetadata = {}; let globalTotal = 0; let currentPath = [];
         let currentSpecies = ""; let globalPrimers = ""; let globalType = ""; let chartInstance = null;
 
@@ -182,7 +219,6 @@
             document.getElementById('rep-primers').textContent = globalPrimers;
             document.getElementById('rep-type').textContent = globalType;
             
-            // CONFIGURAÇÃO DO NOVO MOTOR GERAL DE BUSCA ASSÍNCRONA (NCBI E-UTILS)
             const btnGenome = document.getElementById('btn-download-genome');
             btnGenome.onclick = async () => {
                 const originalText = btnGenome.innerHTML;
@@ -190,20 +226,17 @@
                     btnGenome.innerHTML = "⏳ Buscando no NCBI...";
                     btnGenome.disabled = true;
                     
-                    // Faz a chamada direta para a API efetch do NCBI usando o Accession Number do organismo
                     const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${speciesData.info.acc}&rettype=fasta&retmode=text`;
                     const response = await fetch(url);
                     
                     if (!response.ok) throw new Error("Falha ao consultar servidor NCBI");
                     const fastaText = await response.text();
                     
-                    // Dispara o download com a sequência de nucleotídeos real e completa!
                     triggerDownloadFasta(`${speciesData.info.acc}_completo.fasta`, fastaText);
                 } catch (err) {
                     console.error(err);
                     alert("Não foi possível extrair a sequência completa automaticamente do NCBI (Verifique sua conexão). Baixando arquivo estruturado de referência.");
                     
-                    // Fallback de segurança: se o NCBI estiver offline ou bloquear, gera o cabeçalho estruturado
                     let fallbackText = `>${speciesData.info.acc} ${speciesData.info.desc} | Length: ${speciesData.info.length} bp\n; Falha na busca automática. Baixe manualmente em: https://www.ncbi.nlm.nih.gov/nuccore/${speciesData.info.acc}\n`;
                     triggerDownloadFasta(`${speciesData.info.acc}_ref.fasta`, fallbackText);
                 } finally {
@@ -395,10 +428,7 @@
             fullData = data.taxonomy_tree; 
             leafMetadata = data.leaf_metadata || {}; 
             
-            // O Total Bruto de Produtos (Para os cartões superiores: ex 182)
             let csvTotalMatches = data.summary.total_matches; 
-            
-            // O Total da Árvore (Para calcular os 100% do gráfico baseados nos 79 organismos)
             globalTotal = fullData.matches > 0 ? fullData.matches : csvTotalMatches;
 
             globalPrimers = `${data.primers.forward} / ${data.primers.reverse}`; 
@@ -413,6 +443,17 @@
             document.getElementById('rev').textContent = data.primers.reverse;
             document.getElementById('est-cov').textContent = formatPercent(data.summary.estimated_coverage);
             document.getElementById('mean-amp').textContent = data.summary.mean_amplicon_size + ' bp';
+
+            // PREENCHIMENTO DOS NOVOS PARÂMETROS TÉCNICOS
+            if(data.metadata) {
+                document.getElementById('param-banco').textContent = data.metadata.database || "Protozoa";
+                document.getElementById('param-evalue').textContent = data.metadata.e_value !== undefined ? data.metadata.e_value : "-";
+                document.getElementById('param-mismatches').textContent = data.metadata.max_mismatches !== undefined ? data.metadata.max_mismatches : "-";
+                document.getElementById('param-tm').textContent = (data.metadata.min_tm !== undefined ? data.metadata.min_tm : "-") + " °C";
+                document.getElementById('param-tamanho').textContent = `${data.metadata.amplicon_min || 0} - ${data.metadata.amplicon_max || 9999} bp`;
+                document.getElementById('param-cobertura').textContent = (data.metadata.min_coverage !== undefined ? data.metadata.min_coverage : "-") + "%";
+                document.getElementById('param-hits').textContent = data.metadata.max_hits !== undefined ? data.metadata.max_hits : "-";
+            }
 
             extractAllTaxa(fullData, 0);
             allTaxaList.sort((a, b) => b.matches - a.matches || a.depth - b.depth);
