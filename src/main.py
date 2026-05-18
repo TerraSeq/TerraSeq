@@ -47,7 +47,7 @@ def enviar_email_notificacao(email_destino, req_id):
     msg['From'] = EMAIL_REMETENTE
     msg['To'] = email_destino
     msg['Subject'] = f"🧬 Análise in silico Concluída ({req_id})"
-    corpo = f"Olá,\n\nSua simulação de PCR foi concluída com sucesso!\nID: {req_id}\n\nAcesse o relatório: {link_pages}\n\nAtt,\nLaboratório de Bioinformática"
+    corpo = f"Olá,\n\nSua simulação de PCR foi concluída com sucesso!\nID: {req_id}\n\nAcesse o relatório: {link_pages}\n\n⚠️ Aviso Importante: O servidor web leva de 1 a 2 minutos para realizar a publicação dos arquivos. Se você acessar o link e esbarrar em um 'Erro 404' (Página não encontrada), não se preocupe! Aguarde alguns instantes e atualize a página (Ctrl + F5).\n\nAtt,\Equipe de Bioinformática"
     msg.attach(MIMEText(corpo, 'plain', 'utf-8'))
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
@@ -154,6 +154,76 @@ def publicar_no_github(req_id):
         print("   🌐 Relatório pushado com sucesso!")
     except Exception as e:
         print(f"   ⚠️ Erro ao empurrar pro Git: {e}")
+        
+        
+def atualizar_vitrine_html(req, req_id):
+    print("🖥️ Atualizando painel de resultados na página inicial...")
+
+    raiz_projeto = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..')
+    )
+
+    caminho_index = os.path.join(
+        raiz_projeto,
+        "docs/index.html"
+    )
+
+    # Dados
+    fwd = str(req.get('Primer forward', '')).strip().upper()
+    rev = str(req.get('Primer reverse', '')).strip().upper()
+    alvo = str(req.get('Região alvo', 'Não informada')).strip()
+    banco = str(req.get('Banco de Dados', 'Protozoa')).strip()
+    data_hoje = datetime.now().strftime("%d/%m/%Y")
+
+    marcador_alvo = "<!-- NOVAS_LINHAS -->"
+
+    nova_linha = f"""
+                    <tr>
+                        <td><strong>{req_id}</strong></td>
+                        <td>{alvo}</td>
+                        <td>{banco}</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> {fwd}<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> {rev}
+                        </td>
+                        <td>{data_hoje}</td>
+                        <td>
+                            <span class="status-badge">
+                                Concluído
+                            </span>
+                        </td>
+                        <td>
+                            <a href="reports/{req_id}/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a>
+                        </td>
+                    </tr>
+                    """
+
+    try:
+        with open(caminho_index, 'r', encoding='utf-8') as f:
+            conteudo = f.read()
+
+        if marcador_alvo in conteudo:
+
+            novo_conteudo = conteudo.replace(
+                marcador_alvo,
+                nova_linha + "\n" + marcador_alvo
+            )
+
+            with open(caminho_index, 'w', encoding='utf-8') as f:
+                f.write(novo_conteudo)
+
+            print("   ✅ Vitrine atualizada com sucesso!")
+
+        else:
+            print("   ⚠️ Marcador não encontrado no index.html!")
+
+    except Exception as e:
+        print(f"   ⚠️ Erro ao atualizar vitrine: {e}")
+
 
 def run_pipeline(req, req_id):
     raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -313,6 +383,8 @@ while True:
                 req_id = f"REQ-{hoje_str}-{linha_planilha:04d}"
                 
                 caminho_relatorio = run_pipeline(req, req_id)
+                
+                atualizar_vitrine_html(req, req_id)
                 
                 planilha.update_cell(linha_planilha, COL_LINK, caminho_relatorio) 
                 planilha.update_cell(linha_planilha, COL_STATUS, 'completed')
