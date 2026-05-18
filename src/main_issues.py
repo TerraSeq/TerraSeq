@@ -26,8 +26,8 @@ EMAIL_SENHA = "huyapitnfjegbsuz"
 
 # --- CONFIGURAÇÕES DA API DO GITHUB ---
 import os
-# Lê o token do arquivo seguro
-caminho_token = os.path.join(os.path.dirname(__file__), '..', 'tokenGitHubIssues.txt')
+# Agora ele lê o token direto da pasta src/ onde o arquivo realmente está!
+caminho_token = os.path.join(os.path.dirname(__file__), 'tokenGitHubIssues.txt')
 with open(caminho_token, "r") as f:
     GITHUB_TOKEN = f.read().strip()
 REPO_OWNER = "tiagogabrielsi"
@@ -179,6 +179,8 @@ def atualizar_vitrine_html(req, req_id):
     banco = str(req.get('Banco de Dados', 'Protozoa')).strip()
     data_hoje = datetime.now().strftime("%d/%m/%Y")
     
+    marcador_alvo = ""
+    
     nova_linha = f"""
                     <tr>
                         <td><strong>{req_id}</strong></td>
@@ -197,11 +199,11 @@ def atualizar_vitrine_html(req, req_id):
         with open(caminho_index, 'r', encoding='utf-8') as f:
             conteudo = f.read()
             
-        if "" in conteudo:
-            novo_conteudo = conteudo.replace("", nova_linha)
+        if marcador_alvo in conteudo:
+            novo_conteudo = conteudo.replace(marcador_alvo, nova_linha)
             with open(caminho_index, 'w', encoding='utf-8') as f:
                 f.write(novo_conteudo)
-            print("   ✅ Vitrine atualizada com sucesso!")
+            print("   ✅ Vitrine updated com sucesso!")
         else:
             print("   ⚠️ Marcador invisível não encontrado no index.html!")
     except Exception as e:
