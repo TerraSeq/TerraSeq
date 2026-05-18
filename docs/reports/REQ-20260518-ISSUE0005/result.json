@@ -1,0 +1,1518 @@
+{
+    "request_id": "REQ-20260518-ISSUE0005",
+    "metadata": {
+        "submitted_by": "Tiago",
+        "email": "tiagogabriel3542@gmail.com",
+        "submitted_at": "18/05/2026 às 11:33",
+        "target_region": "ITS",
+        "organism": "Eukaryota",
+        "max_mismatches": 3,
+        "amplicon_min": 3000,
+        "amplicon_max": 8000
+    },
+    "primers": {
+        "forward": "CCAGCASCYGCGGTAATTCC",
+        "reverse": "RCCACAAGCYARTTATCC"
+    },
+    "summary": {
+        "total_sequences_checked": 150000,
+        "total_matches": 58,
+        "estimated_coverage": 0.00039,
+        "off_target_matches": 0,
+        "mean_amplicon_size": 5838.6
+    },
+    "taxonomy_tree": {
+        "name": "Root",
+        "rank": "root",
+        "matches": 74,
+        "coverage": 1.0,
+        "children": [
+            {
+                "name": "Eukaryota",
+                "rank": "domain",
+                "matches": 58,
+                "coverage": 0.7838,
+                "children": [
+                    {
+                        "name": "Sar",
+                        "rank": "clade",
+                        "matches": 47,
+                        "coverage": 0.6351,
+                        "children": [
+                            {
+                                "name": "Alveolata",
+                                "rank": "clade",
+                                "matches": 44,
+                                "coverage": 0.5946,
+                                "children": [
+                                    {
+                                        "name": "Apicomplexa",
+                                        "rank": "clade",
+                                        "matches": 44,
+                                        "coverage": 0.5946,
+                                        "children": [
+                                            {
+                                                "name": "Aconoidasida",
+                                                "rank": "clade",
+                                                "matches": 43,
+                                                "coverage": 0.5811,
+                                                "children": [
+                                                    {
+                                                        "name": "Piroplasmida",
+                                                        "rank": "clade",
+                                                        "matches": 8,
+                                                        "coverage": 0.1081,
+                                                        "children": [
+                                                            {
+                                                                "name": "Theileriidae",
+                                                                "rank": "family",
+                                                                "matches": 8,
+                                                                "coverage": 0.1081,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Theileria",
+                                                                        "rank": "genus",
+                                                                        "matches": 8,
+                                                                        "coverage": 0.1081,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Theileria parva strain Muguga",
+                                                                                "rank": "species",
+                                                                                "matches": 2,
+                                                                                "coverage": 0.027,
+                                                                                "children": []
+                                                                            },
+                                                                            {
+                                                                                "name": "Theileria annulata",
+                                                                                "rank": "species",
+                                                                                "matches": 2,
+                                                                                "coverage": 0.027,
+                                                                                "children": []
+                                                                            },
+                                                                            {
+                                                                                "name": "Theileria equi strain WA",
+                                                                                "rank": "species",
+                                                                                "matches": 2,
+                                                                                "coverage": 0.027,
+                                                                                "children": []
+                                                                            },
+                                                                            {
+                                                                                "name": "Theileria orientalis strain Shintoku",
+                                                                                "rank": "species",
+                                                                                "matches": 2,
+                                                                                "coverage": 0.027,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "name": "Haemosporida",
+                                                        "rank": "clade",
+                                                        "matches": 35,
+                                                        "coverage": 0.473,
+                                                        "children": [
+                                                            {
+                                                                "name": "Plasmodiidae",
+                                                                "rank": "family",
+                                                                "matches": 35,
+                                                                "coverage": 0.473,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Plasmodium",
+                                                                        "rank": "clade",
+                                                                        "matches": 35,
+                                                                        "coverage": 0.473,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Vinckeia",
+                                                                                "rank": "genus",
+                                                                                "matches": 12,
+                                                                                "coverage": 0.1622,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Plasmodium berghei ANKA",
+                                                                                        "rank": "species",
+                                                                                        "matches": 3,
+                                                                                        "coverage": 0.0405,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium chabaudi chabaudi",
+                                                                                        "rank": "species",
+                                                                                        "matches": 3,
+                                                                                        "coverage": 0.0405,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium vinckei vinckei",
+                                                                                        "rank": "species",
+                                                                                        "matches": 3,
+                                                                                        "coverage": 0.0405,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium yoelii",
+                                                                                        "rank": "species",
+                                                                                        "matches": 3,
+                                                                                        "coverage": 0.0405,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "name": "Plasmodium incertae sedis",
+                                                                                "rank": "genus",
+                                                                                "matches": 2,
+                                                                                "coverage": 0.027,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Plasmodium coatneyi",
+                                                                                        "rank": "species",
+                                                                                        "matches": 2,
+                                                                                        "coverage": 0.027,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "name": "Plasmodium",
+                                                                                "rank": "genus",
+                                                                                "matches": 9,
+                                                                                "coverage": 0.1216,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Plasmodium knowlesi strain H",
+                                                                                        "rank": "species",
+                                                                                        "matches": 2,
+                                                                                        "coverage": 0.027,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium malariae",
+                                                                                        "rank": "species",
+                                                                                        "matches": 2,
+                                                                                        "coverage": 0.027,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium vivax",
+                                                                                        "rank": "species",
+                                                                                        "matches": 3,
+                                                                                        "coverage": 0.0405,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium brasilianum",
+                                                                                        "rank": "species",
+                                                                                        "matches": 2,
+                                                                                        "coverage": 0.027,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "name": "Laverania",
+                                                                                "rank": "genus",
+                                                                                "matches": 11,
+                                                                                "coverage": 0.1486,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Plasmodium adleri (nom. inval.)",
+                                                                                        "rank": "species",
+                                                                                        "matches": 4,
+                                                                                        "coverage": 0.0541,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium falciparum 3D7",
+                                                                                        "rank": "species",
+                                                                                        "matches": 5,
+                                                                                        "coverage": 0.0676,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium gaboni",
+                                                                                        "rank": "species",
+                                                                                        "matches": 1,
+                                                                                        "coverage": 0.0135,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "Plasmodium reichenowi",
+                                                                                        "rank": "species",
+                                                                                        "matches": 1,
+                                                                                        "coverage": 0.0135,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "name": "Haemamoeba",
+                                                                                "rank": "genus",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0135,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Plasmodium gallinaceum",
+                                                                                        "rank": "species",
+                                                                                        "matches": 1,
+                                                                                        "coverage": 0.0135,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "Conoidasida",
+                                                "rank": "clade",
+                                                "matches": 1,
+                                                "coverage": 0.0135,
+                                                "children": [
+                                                    {
+                                                        "name": "Coccidia",
+                                                        "rank": "class",
+                                                        "matches": 1,
+                                                        "coverage": 0.0135,
+                                                        "children": [
+                                                            {
+                                                                "name": "Eucoccidiorida",
+                                                                "rank": "clade",
+                                                                "matches": 1,
+                                                                "coverage": 0.0135,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Eimeriorina",
+                                                                        "rank": "clade",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0135,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Sarcocystidae",
+                                                                                "rank": "family",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0135,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Toxoplasma",
+                                                                                        "rank": "genus",
+                                                                                        "matches": 1,
+                                                                                        "coverage": 0.0135,
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "name": "Toxoplasma gondii ME49",
+                                                                                                "rank": "species",
+                                                                                                "matches": 1,
+                                                                                                "coverage": 0.0135,
+                                                                                                "children": []
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Stramenopiles",
+                                "rank": "clade",
+                                "matches": 3,
+                                "coverage": 0.0405,
+                                "children": [
+                                    {
+                                        "name": "Ochrophyta",
+                                        "rank": "phylum",
+                                        "matches": 1,
+                                        "coverage": 0.0135,
+                                        "children": [
+                                            {
+                                                "name": "Bacillariophyta",
+                                                "rank": "phylum",
+                                                "matches": 1,
+                                                "coverage": 0.0135,
+                                                "children": [
+                                                    {
+                                                        "name": "Coscinodiscophyceae",
+                                                        "rank": "class",
+                                                        "matches": 1,
+                                                        "coverage": 0.0135,
+                                                        "children": [
+                                                            {
+                                                                "name": "Thalassiosirophycidae",
+                                                                "rank": "family",
+                                                                "matches": 1,
+                                                                "coverage": 0.0135,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Thalassiosirales",
+                                                                        "rank": "order",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0135,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Thalassiosiraceae",
+                                                                                "rank": "family",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0135,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Thalassiosira",
+                                                                                        "rank": "genus",
+                                                                                        "matches": 1,
+                                                                                        "coverage": 0.0135,
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "name": "Thalassiosira pseudonana CCMP1335",
+                                                                                                "rank": "species",
+                                                                                                "matches": 1,
+                                                                                                "coverage": 0.0135,
+                                                                                                "children": []
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Oomycota",
+                                        "rank": "phylum",
+                                        "matches": 2,
+                                        "coverage": 0.027,
+                                        "children": [
+                                            {
+                                                "name": "Peronosporomycetes",
+                                                "rank": "class",
+                                                "matches": 2,
+                                                "coverage": 0.027,
+                                                "children": [
+                                                    {
+                                                        "name": "Peronosporales",
+                                                        "rank": "order",
+                                                        "matches": 2,
+                                                        "coverage": 0.027,
+                                                        "children": [
+                                                            {
+                                                                "name": "Peronosporaceae",
+                                                                "rank": "family",
+                                                                "matches": 2,
+                                                                "coverage": 0.027,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Phytophthora",
+                                                                        "rank": "genus",
+                                                                        "matches": 2,
+                                                                        "coverage": 0.027,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Phytophthora ramorum",
+                                                                                "rank": "species",
+                                                                                "matches": 2,
+                                                                                "coverage": 0.027,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Discoba",
+                        "rank": "clade",
+                        "matches": 9,
+                        "coverage": 0.1216,
+                        "children": [
+                            {
+                                "name": "Euglenozoa",
+                                "rank": "clade",
+                                "matches": 9,
+                                "coverage": 0.1216,
+                                "children": [
+                                    {
+                                        "name": "Kinetoplastea",
+                                        "rank": "clade",
+                                        "matches": 9,
+                                        "coverage": 0.1216,
+                                        "children": [
+                                            {
+                                                "name": "Metakinetoplastina",
+                                                "rank": "clade",
+                                                "matches": 9,
+                                                "coverage": 0.1216,
+                                                "children": [
+                                                    {
+                                                        "name": "Trypanosomatida",
+                                                        "rank": "clade",
+                                                        "matches": 9,
+                                                        "coverage": 0.1216,
+                                                        "children": [
+                                                            {
+                                                                "name": "Trypanosomatidae",
+                                                                "rank": "family",
+                                                                "matches": 9,
+                                                                "coverage": 0.1216,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Trypanosoma",
+                                                                        "rank": "genus",
+                                                                        "matches": 8,
+                                                                        "coverage": 0.1081,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Trypanosoma brucei brucei TREU927",
+                                                                                "rank": "species",
+                                                                                "matches": 4,
+                                                                                "coverage": 0.0541,
+                                                                                "children": []
+                                                                            },
+                                                                            {
+                                                                                "name": "Megatrypanum",
+                                                                                "rank": "genus",
+                                                                                "matches": 2,
+                                                                                "coverage": 0.027,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Trypanosoma melophagium",
+                                                                                        "rank": "species",
+                                                                                        "matches": 2,
+                                                                                        "coverage": 0.027,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "name": "Herpetosoma",
+                                                                                "rank": "genus",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0135,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Trypanosoma rangeli",
+                                                                                        "rank": "species",
+                                                                                        "matches": 1,
+                                                                                        "coverage": 0.0135,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "name": "Trypanosoma grayi",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0135,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "name": "Leishmaniinae",
+                                                                        "rank": "clade",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0135,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Porcisia",
+                                                                                "rank": "genus",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0135,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Porcisia hertigi",
+                                                                                        "rank": "species",
+                                                                                        "matches": 1,
+                                                                                        "coverage": 0.0135,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Metamonada",
+                        "rank": "clade",
+                        "matches": 1,
+                        "coverage": 0.0135,
+                        "children": [
+                            {
+                                "name": "Diplomonadida",
+                                "rank": "clade",
+                                "matches": 1,
+                                "coverage": 0.0135,
+                                "children": [
+                                    {
+                                        "name": "Hexamitidae",
+                                        "rank": "family",
+                                        "matches": 1,
+                                        "coverage": 0.0135,
+                                        "children": [
+                                            {
+                                                "name": "Hexamitinae",
+                                                "rank": "clade",
+                                                "matches": 1,
+                                                "coverage": 0.0135,
+                                                "children": [
+                                                    {
+                                                        "name": "Spironucleus",
+                                                        "rank": "genus",
+                                                        "matches": 1,
+                                                        "coverage": 0.0135,
+                                                        "children": [
+                                                            {
+                                                                "name": "Spironucleus salmonicida",
+                                                                "rank": "species",
+                                                                "matches": 1,
+                                                                "coverage": 0.0135,
+                                                                "children": []
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Apusozoa",
+                        "rank": "clade",
+                        "matches": 1,
+                        "coverage": 0.0135,
+                        "children": [
+                            {
+                                "name": "Apusomonadida",
+                                "rank": "clade",
+                                "matches": 1,
+                                "coverage": 0.0135,
+                                "children": [
+                                    {
+                                        "name": "Apusomonadidae",
+                                        "rank": "family",
+                                        "matches": 1,
+                                        "coverage": 0.0135,
+                                        "children": [
+                                            {
+                                                "name": "Thecamonas",
+                                                "rank": "genus",
+                                                "matches": 1,
+                                                "coverage": 0.0135,
+                                                "children": [
+                                                    {
+                                                        "name": "Thecamonas trahens ATCC 50062",
+                                                        "rank": "species",
+                                                        "matches": 1,
+                                                        "coverage": 0.0135,
+                                                        "children": []
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "leaf_metadata": {
+        "Theileria parva strain Muguga": {
+            "info": {
+                "acc": "NC_007344",
+                "desc": "Theileria parva strain Muguga chromosome 1, complete sequence, whole genome shotgun sequence",
+                "length": "2540030"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_007344",
+                    "size": "5099",
+                    "tm": "N/A",
+                    "start": "924184",
+                    "end": "919085",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_876244",
+                    "size": "5099",
+                    "tm": "N/A",
+                    "start": "313973",
+                    "end": "308874",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium berghei ANKA": {
+            "info": {
+                "acc": "NC_036170",
+                "desc": "Plasmodium berghei ANKA genome assembly, chromosome: 12",
+                "length": "1807262"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_036170",
+                    "size": "5493",
+                    "tm": "N/A",
+                    "start": "1735584",
+                    "end": "1741077",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_036163",
+                    "size": "7288",
+                    "tm": "N/A",
+                    "start": "768725",
+                    "end": "776013",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_036165",
+                    "size": "5492",
+                    "tm": "N/A",
+                    "start": "63636",
+                    "end": "69128",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Thalassiosira pseudonana CCMP1335": {
+            "info": {
+                "acc": "NC_012080",
+                "desc": "Thalassiosira pseudonana CCMP1335 chromosome 17, whole genome shotgun sequence",
+                "length": "659924"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_012080",
+                    "size": "4746",
+                    "tm": "N/A",
+                    "start": "651606",
+                    "end": "656352",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Theileria annulata": {
+            "info": {
+                "acc": "NC_011100",
+                "desc": "Theileria annulata chromosome 3, complete sequence, *** SEQUENCING IN PROGRESS ***",
+                "length": "1898942"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_011100",
+                    "size": "4955",
+                    "tm": "N/A",
+                    "start": "1654231",
+                    "end": "1649276",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_011129",
+                    "size": "4946",
+                    "tm": "N/A",
+                    "start": "1688896",
+                    "end": "1693842",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium coatneyi": {
+            "info": {
+                "acc": "NC_033565",
+                "desc": "Plasmodium coatneyi strain Hackeri chromosome 10, complete sequence",
+                "length": "1763958"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_033565",
+                    "size": "5717",
+                    "tm": "N/A",
+                    "start": "170791",
+                    "end": "165074",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_033558",
+                    "size": "5697",
+                    "tm": "N/A",
+                    "start": "97013",
+                    "end": "91316",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium chabaudi chabaudi": {
+            "info": {
+                "acc": "NC_030112",
+                "desc": "Plasmodium chabaudi chabaudi strain AS genome assembly, chromosome: 12",
+                "length": "1766339"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_030112",
+                    "size": "5442",
+                    "tm": "N/A",
+                    "start": "1683362",
+                    "end": "1688804",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_030105",
+                    "size": "7318",
+                    "tm": "N/A",
+                    "start": "763484",
+                    "end": "770802",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_030109",
+                    "size": "5445",
+                    "tm": "N/A",
+                    "start": "1370038",
+                    "end": "1364593",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium knowlesi strain H": {
+            "info": {
+                "acc": "NC_011904",
+                "desc": "Plasmodium knowlesi strain H genome assembly, chromosome: 3",
+                "length": "1030967"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_011904",
+                    "size": "5960",
+                    "tm": "N/A",
+                    "start": "945596",
+                    "end": "951556",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_011911",
+                    "size": "5968",
+                    "tm": "N/A",
+                    "start": "65156",
+                    "end": "59188",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium malariae": {
+            "info": {
+                "acc": "NC_041777",
+                "desc": "Plasmodium malariae genome assembly, chromosome: 3",
+                "length": "1341934"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_041777",
+                    "size": "7235",
+                    "tm": "N/A",
+                    "start": "1104137",
+                    "end": "1111372",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_041784",
+                    "size": "7294",
+                    "tm": "N/A",
+                    "start": "166995",
+                    "end": "159701",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium vinckei vinckei": {
+            "info": {
+                "acc": "NC_051299",
+                "desc": "Plasmodium vinckei vinckei genome assembly, chromosome: PVVCY_07",
+                "length": "748300"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_051299",
+                    "size": "5461",
+                    "tm": "N/A",
+                    "start": "15452",
+                    "end": "20913",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_051297",
+                    "size": "7256",
+                    "tm": "N/A",
+                    "start": "761899",
+                    "end": "769155",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_051304",
+                    "size": "5462",
+                    "tm": "N/A",
+                    "start": "1682135",
+                    "end": "1687597",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium adleri (nom. inval.)": {
+            "info": {
+                "acc": "NC_041697",
+                "desc": "Plasmodium sp. gorilla clade G2 genome assembly, chromosome: 5",
+                "length": "1262043"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_041697",
+                    "size": "5385",
+                    "tm": "N/A",
+                    "start": "1178332",
+                    "end": "1183717",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_041693",
+                    "size": "6326",
+                    "tm": "N/A",
+                    "start": "345187",
+                    "end": "351513",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_041699",
+                    "size": "5378",
+                    "tm": "N/A",
+                    "start": "983804",
+                    "end": "989182",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_021628865",
+                    "size": "5861",
+                    "tm": "N/A",
+                    "start": "9684",
+                    "end": "15545",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium falciparum 3D7": {
+            "info": {
+                "acc": "NC_004325",
+                "desc": "Plasmodium falciparum 3D7 genome assembly, chromosome: 1",
+                "length": "640851"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_004325",
+                    "size": "6336",
+                    "tm": "N/A",
+                    "start": "474307",
+                    "end": "480643",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_004328",
+                    "size": "5427",
+                    "tm": "N/A",
+                    "start": "1084332",
+                    "end": "1089759",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_037282",
+                    "size": "5913",
+                    "tm": "N/A",
+                    "start": "1926563",
+                    "end": "1932476",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_004331",
+                    "size": "5916",
+                    "tm": "N/A",
+                    "start": "2800573",
+                    "end": "2806489",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_004326",
+                    "size": "5429",
+                    "tm": "N/A",
+                    "start": "1290172",
+                    "end": "1295601",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Trypanosoma brucei brucei TREU927": {
+            "info": {
+                "acc": "NC_007276",
+                "desc": "Trypanosoma brucei brucei TREU927 chromosome 3, complete sequence",
+                "length": "1653225"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_007276",
+                    "size": "6304",
+                    "tm": "N/A",
+                    "start": "903499",
+                    "end": "909803",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_007276",
+                    "size": "6304",
+                    "tm": "N/A",
+                    "start": "921861",
+                    "end": "928165",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_007276",
+                    "size": "6304",
+                    "tm": "N/A",
+                    "start": "940216",
+                    "end": "946520",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_007276",
+                    "size": "6316",
+                    "tm": "N/A",
+                    "start": "958578",
+                    "end": "964894",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_007280",
+                    "size": "6302",
+                    "tm": "N/A",
+                    "start": "1951819",
+                    "end": "1958121",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_008409",
+                    "size": "6293",
+                    "tm": "N/A",
+                    "start": "794783",
+                    "end": "801076",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_005063",
+                    "size": "6308",
+                    "tm": "N/A",
+                    "start": "267911",
+                    "end": "261603",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_005063",
+                    "size": "6306",
+                    "tm": "N/A",
+                    "start": "286248",
+                    "end": "279942",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_005063",
+                    "size": "6308",
+                    "tm": "N/A",
+                    "start": "370595",
+                    "end": "376903",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium gaboni": {
+            "info": {
+                "acc": "NC_031487",
+                "desc": "Plasmodium gaboni strain SY75 chromosome 7, whole genome shotgun sequence",
+                "length": "1108057"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_031487",
+                    "size": "5577",
+                    "tm": "N/A",
+                    "start": "829359",
+                    "end": "834936",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Theileria equi strain WA": {
+            "info": {
+                "acc": "NW_004668229",
+                "desc": "Theileria equi strain WA chromosome 4 map unlocalized gcontig_1105316255039, whole genome shotgun sequence",
+                "length": "802252"
+            },
+            "amplicons": [
+                {
+                    "acc": "NW_004668229",
+                    "size": "4809",
+                    "tm": "N/A",
+                    "start": "195649",
+                    "end": "190840",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_021366",
+                    "size": "4810",
+                    "tm": "N/A",
+                    "start": "2592452",
+                    "end": "2597262",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium yoelii": {
+            "info": {
+                "acc": "NC_036184",
+                "desc": "Plasmodium yoelii strain 17X genome assembly, chromosome: 12",
+                "length": "2085115"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_036184",
+                    "size": "5480",
+                    "tm": "N/A",
+                    "start": "1955691",
+                    "end": "1961171",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_036177",
+                    "size": "7901",
+                    "tm": "N/A",
+                    "start": "952186",
+                    "end": "960087",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_036179",
+                    "size": "5457",
+                    "tm": "N/A",
+                    "start": "219689",
+                    "end": "225146",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium vivax": {
+            "info": {
+                "acc": "NC_009915",
+                "desc": "Plasmodium vivax chromosome 10, whole genome shotgun sequence",
+                "length": "1419739"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_009915",
+                    "size": "5607",
+                    "tm": "N/A",
+                    "start": "13429",
+                    "end": "7822",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_009907",
+                    "size": "6983",
+                    "tm": "N/A",
+                    "start": "147650",
+                    "end": "140667",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_009908",
+                    "size": "5609",
+                    "tm": "N/A",
+                    "start": "806533",
+                    "end": "812142",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Spironucleus salmonicida": {
+            "info": {
+                "acc": "NW_027150713",
+                "desc": "Spironucleus salmonicida strain ATCC 50377 chromosome Unknown tig00000001, whole genome shotgun sequence",
+                "length": "33199"
+            },
+            "amplicons": [
+                {
+                    "acc": "NW_027150713",
+                    "size": "3685",
+                    "tm": "N/A",
+                    "start": "5345",
+                    "end": "1660",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Toxoplasma gondii ME49": {
+            "info": {
+                "acc": "NW_017382994",
+                "desc": "Toxoplasma gondii ME49 unplaced genomic scaffold asmbl.111, whole genome shotgun sequence",
+                "length": "6619"
+            },
+            "amplicons": [
+                {
+                    "acc": "NW_017382994",
+                    "size": "5059",
+                    "tm": "N/A",
+                    "start": "5365",
+                    "end": "306",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Trypanosoma melophagium": {
+            "info": {
+                "acc": "NW_027125176",
+                "desc": "Trypanosoma melophagium isolate St. Kilda chromosome Unknown ctg38segment1, whole genome shotgun sequence",
+                "length": "261277"
+            },
+            "amplicons": [
+                {
+                    "acc": "NW_027125176",
+                    "size": "5748",
+                    "tm": "N/A",
+                    "start": "57102",
+                    "end": "51354",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027125176",
+                    "size": "5745",
+                    "tm": "N/A",
+                    "start": "95648",
+                    "end": "89903",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027125181",
+                    "size": "5744",
+                    "tm": "N/A",
+                    "start": "8718",
+                    "end": "2974",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027125181",
+                    "size": "5746",
+                    "tm": "N/A",
+                    "start": "21819",
+                    "end": "16073",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027125181",
+                    "size": "5746",
+                    "tm": "N/A",
+                    "start": "34797",
+                    "end": "29051",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027125181",
+                    "size": "5548",
+                    "tm": "N/A",
+                    "start": "46557",
+                    "end": "41009",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Theileria orientalis strain Shintoku": {
+            "info": {
+                "acc": "NC_025260",
+                "desc": "Theileria orientalis strain Shintoku DNA, chromosome 1, complete genome",
+                "length": "2746313"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_025260",
+                    "size": "6339",
+                    "tm": "N/A",
+                    "start": "908276",
+                    "end": "901937",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_025262",
+                    "size": "6335",
+                    "tm": "N/A",
+                    "start": "231282",
+                    "end": "237617",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium brasilianum": {
+            "info": {
+                "acc": "NC_090123",
+                "desc": "Plasmodium brasilianum strain Bolivian I chromosome 10, whole genome shotgun sequence",
+                "length": "2176485"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_090123",
+                    "size": "7255",
+                    "tm": "N/A",
+                    "start": "135781",
+                    "end": "128526",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_090116",
+                    "size": "7245",
+                    "tm": "N/A",
+                    "start": "1146700",
+                    "end": "1153945",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium gallinaceum": {
+            "info": {
+                "acc": "NW_021628230",
+                "desc": "Plasmodium gallinaceum strain 8A genome assembly, contig: PGAL8A_v1_69, whole genome shotgun sequence",
+                "length": "158542"
+            },
+            "amplicons": [
+                {
+                    "acc": "NW_021628230",
+                    "size": "4459",
+                    "tm": "N/A",
+                    "start": "36767",
+                    "end": "41226",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Phytophthora ramorum": {
+            "info": {
+                "acc": "CM146731",
+                "desc": "Phytophthora ramorum isolate Pr-102 chromosome 6, whole genome shotgun sequence",
+                "length": "4188340"
+            },
+            "amplicons": [
+                {
+                    "acc": "CM146731",
+                    "size": "5186",
+                    "tm": "N/A",
+                    "start": "1327091",
+                    "end": "1332277",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "CM146731",
+                    "size": "5186",
+                    "tm": "N/A",
+                    "start": "4115245",
+                    "end": "4120431",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "CM146731",
+                    "size": "5186",
+                    "tm": "N/A",
+                    "start": "4148869",
+                    "end": "4154055",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "CM146731",
+                    "size": "5186",
+                    "tm": "N/A",
+                    "start": "4174059",
+                    "end": "4179245",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027150648",
+                    "size": "5186",
+                    "tm": "N/A",
+                    "start": "5395324",
+                    "end": "5400510",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027150648",
+                    "size": "5186",
+                    "tm": "N/A",
+                    "start": "5428948",
+                    "end": "5434134",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027150648",
+                    "size": "5186",
+                    "tm": "N/A",
+                    "start": "5454138",
+                    "end": "5459324",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NW_027150648",
+                    "size": "5186",
+                    "tm": "N/A",
+                    "start": "5554005",
+                    "end": "5548819",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Thecamonas trahens ATCC 50062": {
+            "info": {
+                "acc": "NW_013657636",
+                "desc": "Thecamonas trahens ATCC 50062 unplaced genomic scaffold supercont1.44, whole genome shotgun sequence",
+                "length": "310991"
+            },
+            "amplicons": [
+                {
+                    "acc": "NW_013657636",
+                    "size": "4960",
+                    "tm": "N/A",
+                    "start": "11561",
+                    "end": "6601",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Trypanosoma rangeli": {
+            "info": {
+                "acc": "NW_021706163",
+                "desc": "Trypanosoma rangeli strain AM80 chromosome Unknown Tra_15.4_contig_00427, whole genome shotgun sequence",
+                "length": "14701"
+            },
+            "amplicons": [
+                {
+                    "acc": "NW_021706163",
+                    "size": "7783",
+                    "tm": "N/A",
+                    "start": "10546",
+                    "end": "2763",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Trypanosoma grayi": {
+            "info": {
+                "acc": "NW_008826208",
+                "desc": "Trypanosoma grayi strain ANR4 Tgr_589_V1, whole genome shotgun sequence",
+                "length": "10949"
+            },
+            "amplicons": [
+                {
+                    "acc": "NW_008826208",
+                    "size": "5714",
+                    "tm": "N/A",
+                    "start": "8685",
+                    "end": "2971",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Porcisia hertigi": {
+            "info": {
+                "acc": "NC_090582",
+                "desc": "Porcisia hertigi strain C119 chromosome 23, whole genome shotgun sequence",
+                "length": "878396"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_090582",
+                    "size": "6336",
+                    "tm": "N/A",
+                    "start": "744911",
+                    "end": "751247",
+                    "seq": "Sequência indisponível"
+                },
+                {
+                    "acc": "NC_090582",
+                    "size": "7361",
+                    "tm": "N/A",
+                    "start": "744911",
+                    "end": "752272",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        },
+        "Plasmodium reichenowi": {
+            "info": {
+                "acc": "NC_033650",
+                "desc": "Plasmodium reichenowi strain SY57 chromosome 5, whole genome shotgun sequence",
+                "length": "1076571"
+            },
+            "amplicons": [
+                {
+                    "acc": "NC_033650",
+                    "size": "5440",
+                    "tm": "N/A",
+                    "start": "1049904",
+                    "end": "1055344",
+                    "seq": "Sequência indisponível"
+                }
+            ]
+        }
+    },
+    "warnings": [
+        "Cobertura geral baixa. Verifique os filos relevantes.",
+        "Potenciais off-targets (Tolerância a mismatch alta)."
+    ]
+}
