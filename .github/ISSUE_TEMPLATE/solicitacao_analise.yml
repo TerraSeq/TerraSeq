@@ -55,10 +55,21 @@ body:
   - type: dropdown
     id: banco_dados
     attributes:
-      label: Tipo de organismo
+      label: Banco de Dados
       options:
         - "Protozoa"
         - "Fungi"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tipo_organismo
+    attributes:
+      label: Tipo de organismo
+      options:
+        - "Eukaryota"
+        - "Bactérias"
+        - "Arqueias"
     validations:
       required: true
 
