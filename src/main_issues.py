@@ -179,6 +179,7 @@ def atualizar_vitrine_html(req, req_id):
     banco = str(req.get('Banco de Dados', 'Protozoa')).strip()
     data_hoje = datetime.now().strftime("%d/%m/%Y")
     
+    # MARCADOR CORRIGIDO
     marcador_alvo = ""
     
     nova_linha = f"""
@@ -194,7 +195,7 @@ def atualizar_vitrine_html(req, req_id):
                         <td><span class="status-badge">Concluído</span></td>
                         <td><a href="reports/{req_id}/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">Ver Relatório</a></td>
                     </tr>
-                    """
+                    """ # MARCADOR INSERIDO AQUI TAMBÉM
     try:
         with open(caminho_index, 'r', encoding='utf-8') as f:
             conteudo = f.read()
