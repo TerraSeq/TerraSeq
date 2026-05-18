@@ -142,7 +142,7 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
         for child in node["children"]: calc_coverage(child)
     calc_coverage(root)
 
-    return (root["children"][0] if len(root["children"]) == 1 else root), meta_dict
+    return root, meta_dict
 
 def publicar_no_github(req_id):
     print("🚀 Iniciando publicação no GitHub Pages...")
@@ -185,20 +185,19 @@ def run_pipeline(req, req_id):
         "-e", e_value, "--min_size", min_size, "--max_size", max_size,
         "-m", tm_min, "--max_3prime_mismatches", str(mismatches),
         "--qcov_hsp_perc", cobertura, "--max_target_seqs", max_hits,
-	"-t", "8",
-	"--amp_seq"
+	    "-t", "8",
+	    "--amp_seq"
     ]
     
     print(f"\n🔍 Rodando BLAST ({req_id})...")
-    print("🤖 Comando exato que o Maestro montou:")
+    print("🤖 Comando exato que o Script montou:")
     print(" ".join(cmd_blast))
     print("-" * 50)
 	
     print("\n🕵️‍♂️ RAIO-X DA PLANILHA (O que o Python realmente está lendo):")
     for chave, valor in req.items():
         print(f"Coluna: '{chave}' | Valor recebido: '{valor}'")
-        print("-" * 50)
-    
+    print("⚙️ Rodando programa...")
     subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
 
     hits_data_map = {}
@@ -246,7 +245,7 @@ def run_pipeline(req, req_id):
     lista_bacterias = list(bacterias_encontradas)
     
     print("⚙️ Preparando montagem taxonômica...")
-    arvore_real, meta_dict = construir_arvore_aninhada(lista_bacterias, len(lista_bacterias), hits_data_map)
+    arvore_real, meta_dict = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
 
     avisos = []
     cobertura_global = (len(lista_bacterias) / 150000) 
@@ -290,7 +289,7 @@ def run_pipeline(req, req_id):
     shutil.copy(os.path.join(raiz_projeto, "docs/template.html"), os.path.join(pasta_resultado, "index.html"))
     return f"docs/reports/{req_id}"
 
-print("\n✅ MAESTRO ONLINE - Monitorando Planilha...")
+print("\n✅ SCRIPT ONLINE - Monitorando Planilha...")
 try:
     cabecalhos = planilha.row_values(1)
     COL_STATUS = cabecalhos.index('Status') + 1
