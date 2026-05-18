@@ -3,3 +3,4 @@
 data/
 __pycache__/
 src/credentials.json
+src/tokenGitHubIssues.txt
