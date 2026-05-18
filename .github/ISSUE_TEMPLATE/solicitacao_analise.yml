@@ -13,7 +13,6 @@ body:
     id: nome
     attributes:
       label: Nome do Pesquisador
-      placeholder: "Ex: Tiago Marques"
     validations:
       required: true
 
@@ -21,7 +20,7 @@ body:
     id: email
     attributes:
       label: E-mail para Notificação
-      placeholder: "Ex: tiago@exemplo.com"
+      placeholder: "Ex: email@exemplo.com"
     validations:
       required: true
 
@@ -67,7 +66,7 @@ body:
     id: max_mismatches
     attributes:
       label: "Máximo de Mismatches (Extremidade 3')"
-      value: "3"
+      placeholder: "Valores de 0 a 5"
     validations:
       required: true
 
@@ -75,7 +74,6 @@ body:
     id: amp_min
     attributes:
       label: Tamanho Mínimo do Amplicon (bp)
-      value: "3000"
     validations:
       required: true
 
@@ -83,7 +81,6 @@ body:
     id: amp_max
     attributes:
       label: Tamanho Máximo do Amplicon (bp)
-      value: "8000"
     validations:
       required: true
 
@@ -99,7 +96,6 @@ body:
     id: evalue
     attributes:
       label: E-value Máximo
-      value: "10"
     validations:
       required: true
 
@@ -107,7 +103,7 @@ body:
     id: cobertura
     attributes:
       label: Cobertura mínima (%)
-      value: "70"
+      placeholder: "De 0 a 100"
     validations:
       required: true
 
@@ -115,6 +111,5 @@ body:
     id: max_hits
     attributes:
       label: Limite de hits
-      value: "500"
     validations:
       required: true
