@@ -1,0 +1,96 @@
+name: 🧬 Nova Análise de Primers
+description: Submeta seus primers para validação in silico no pipeline
+title: "[Análise] - "
+labels: ["analise-pendente"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Bem-vindo ao Pipeline de Validação de Primers!
+        Preencha os campos abaixo com os parâmetros para a sua simulação de PCR.
+
+  - type: input
+    id: nome
+    attributes:
+      label: Nome do Pesquisador
+      placeholder: Ex: Tiago Marques
+    validations:
+      required: true
+
+  - type: input
+    id: email
+    attributes:
+      label: E-mail para Notificação
+      placeholder: Ex: tiago@exemplo.com
+    validations:
+      required: true
+
+  - type: input
+    id: primer_fwd
+    attributes:
+      label: Primer Forward (5' -> 3')
+      placeholder: Ex: CCAGCASCYGCGGTAATTCC
+    validations:
+      required: true
+
+  - type: input
+    id: primer_rev
+    attributes:
+      label: Primer Reverse (5' -> 3')
+      placeholder: Ex: RCCACAAGCYARTTATCC
+    validations:
+      required: true
+
+  - type: dropdown
+    id: regiao_alvo
+    attributes:
+      label: Região Alvo
+      options:
+        - "16S"
+        - "18S"
+        - "ITS"
+        - "Outra"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: banco_dados
+    attributes:
+      label: Banco de Dados de Referência
+      options:
+        - "Protozoa"
+        - "Fungi"
+    validations:
+      required: true
+
+  - type: input
+    id: max_mismatches
+    attributes:
+      label: Máximo de Mismatches (Extremidade 3')
+      value: "3"
+    validations:
+      required: true
+
+  - type: input
+    id: amp_min
+    attributes:
+      label: Tamanho Mínimo do Amplicon (bp)
+      value: "3000"
+    validations:
+      required: true
+
+  - type: input
+    id: amp_max
+    attributes:
+      label: Tamanho Máximo do Amplicon (bp)
+      value: "8000"
+    validations:
+      required: true
+
+  - type: input
+    id: evalue
+    attributes:
+      label: E-value Máximo
+      value: "10"
+    validations:
+      required: true
