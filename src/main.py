@@ -246,17 +246,30 @@ def run_pipeline(req, req_id):
     max_hits = str(req.get('Limite de hits', 30000) or 30000)
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
-    caminho_genomas = os.path.join(raiz_projeto, "data/refseq/protozoa_all.fasta")
+    # ==========================================
+    # NOVO: SELEÇÃO DINÂMICA DO BANCO DE DADOS
+    # ==========================================
+    # Puxa o valor da nova pergunta do Forms (se o usuário não preencher, assume Protozoa)
+    banco_selecionado = str(req.get('Banco de Dados', 'Protozoa')).strip()
+    
+    if banco_selecionado.lower() == 'fungi':
+        caminho_genomas = os.path.join(raiz_projeto, "data/refseq/fungi_all.fasta")
+        total_sequencias_banco = 500000 # Usado lá embaixo para a % de cobertura
+    else:
+        caminho_genomas = os.path.join(raiz_projeto, "data/refseq/protozoa_all.fasta")
+        total_sequencias_banco = 150000 # Usado lá embaixo para a % de cobertura
+
     prefixo_saida = os.path.join(pasta_resultado, "saida")
     
+    # Repare que mantive suas configurações de processamento intactas (-t 8, etc)
     cmd_blast = [
         sys.executable, "primer_blast_local.py",
         "-g", caminho_genomas, "-p", caminho_primer, "-o", prefixo_saida,
         "-e", e_value, "--min_size", min_size, "--max_size", max_size,
         "-m", tm_min, "--max_3prime_mismatches", str(mismatches),
         "--qcov_hsp_perc", cobertura, "--max_target_seqs", max_hits,
-	    "-t", "8",
-	    "--amp_seq"
+        "-t", "8",
+        "--amp_seq"
     ]
     
     print(f"\n🔍 Rodando BLAST ({req_id})...")
@@ -334,7 +347,13 @@ def run_pipeline(req, req_id):
             "organism": str(req.get('Tipo de organismo', 'Não informado')),
             "max_mismatches": mismatches,
             "amplicon_min": int(min_size),
-            "amplicon_max": int(max_size)
+            "amplicon_max": int(max_size),
+            # --- NOVOS CAMPOS ADICIONADOS PARA A REUNIÃO ---
+            "e_value": float(e_value),
+            "min_coverage": int(cobertura),
+            "max_hits": int(max_hits),
+            "min_tm": float(tm_min),
+            "database": banco_selecionado
         },
         "primers": {
             "forward": fwd,

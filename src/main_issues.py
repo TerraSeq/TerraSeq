@@ -283,8 +283,8 @@ def run_pipeline(req, req_id):
         "-e", e_value, "--min_size", min_size, "--max_size", max_size,
         "-m", tm_min, "--max_3prime_mismatches", str(mismatches),
         "--qcov_hsp_perc", cobertura, "--max_target_seqs", max_hits,
-        "-t", "2"  # Proteção de memória RAM
-        # A flag --amp_seq foi removida por segurança
+        "-t", "2",
+        "--amp_seq"
     ]
     
     print(f"\n🔍 Rodando BLAST ({req_id}) no banco {banco_selecionado}...")
@@ -359,7 +359,13 @@ def run_pipeline(req, req_id):
             "organism": str(req.get('Tipo de organismo', 'Não informado')),
             "max_mismatches": mismatches,
             "amplicon_min": int(min_size),
-            "amplicon_max": int(max_size)
+            "amplicon_max": int(max_size),
+            # --- PARÂMETROS ADICIONADOS AQUI TAMBÉM ---
+            "e_value": float(e_value),
+            "min_coverage": int(cobertura),
+            "max_hits": int(max_hits),
+            "min_tm": float(tm_min),
+            "database": banco_selecionado
         },
         "primers": {
             "forward": fwd,
