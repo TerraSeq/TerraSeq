@@ -478,13 +478,24 @@
         function renderFunctionalSpecies(especiesData, parentMatches, browserRef) {
             while (browserRef.children.length > 2) { browserRef.removeChild(browserRef.lastChild); }
             
+            // ---> A MÁGICA ACONTECE AQUI: Agrupando espécies repetidas <---
+            let especiesAgrupadas = {};
+            especiesData.forEach(esp => {
+                if (!especiesAgrupadas[esp.especie]) {
+                    especiesAgrupadas[esp.especie] = { especie: esp.especie, matches: 0 };
+                }
+                especiesAgrupadas[esp.especie].matches += esp.matches; // Soma os hits
+            });
+            let listaFinal = Object.values(especiesAgrupadas);
+            // ---------------------------------------------------------------
+
             const col3 = document.createElement('div');
             col3.className = 'silva-col';
-            col3.innerHTML = `<div class="silva-col-header">Espécies Afetadas <span>${especiesData.length}</span></div>`;
+            col3.innerHTML = `<div class="silva-col-header">Espécies Afetadas <span>${listaFinal.length}</span></div>`;
             const ul3 = document.createElement('ul');
             ul3.className = 'silva-list';
 
-            especiesData.sort((a,b) => b.matches - a.matches).forEach(esp => {
+            listaFinal.sort((a,b) => b.matches - a.matches).forEach(esp => {
                 const li = document.createElement('li');
                 li.className = 'silva-item';
                 let globPerc = parentMatches > 0 ? formatPercent(esp.matches / parentMatches) : "0.0%";
