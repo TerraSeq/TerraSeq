@@ -124,8 +124,15 @@
         </div>
 
         <div class="card">
-            <h2>Navegador Taxonômico</h2>
+            <h2>Navegador Taxonômico e Funcional</h2>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button id="btn-taxa" class="btn-download" style="background: var(--secondary);" onclick="switchTree('taxa')">🌳 Árvore Filogenética</button>
+                <button id="btn-func" class="btn-download" style="background: #64748b;" onclick="switchTree('func')">♻️ Papel Ecológico (Atlas do Solo)</button>
+            </div>
+
             <div class="silva-browser" id="silva-browser"></div>
+            <div class="silva-browser" id="functional-browser" style="display: none;"></div>
             
             <div id="species-card" class="meta-card">
                 <div class="meta-header">🦠 <span id="meta-title"></span></div>
@@ -195,6 +202,10 @@
 
         let fullData = null; let leafMetadata = {}; let globalTotal = 0; let currentPath = [];
         let currentSpecies = ""; let globalPrimers = ""; let globalType = ""; let chartInstance = null;
+        
+        // NOVAS VARIÁVEIS PARA O MODO FUNCIONAL
+        let functionalData = null;
+        let currentActiveTree = 'taxa'; // pode ser 'taxa' ou 'func'
 
         function formatPercent(value) {
             let p = value * 100;
@@ -290,6 +301,34 @@
             document.getElementById('full-report-overlay').style.display = 'none';
             document.body.style.overflow = 'auto';
         }
+        
+        // NOVO: FUNÇÃO PARA TROCAR ENTRE ÁRVORE TAXONÔMICA E FUNCIONAL
+        function switchTree(type) {
+            currentActiveTree = type;
+            const btnTaxa = document.getElementById('btn-taxa');
+            const btnFunc = document.getElementById('btn-func');
+            const browserTaxa = document.getElementById('silva-browser');
+            const browserFunc = document.getElementById('functional-browser');
+            
+            // Oculta o card de espécie ao trocar de aba
+            document.getElementById('species-card').style.display = 'none';
+            
+            if(type === 'taxa') {
+                btnTaxa.style.background = 'var(--secondary)';
+                btnFunc.style.background = '#64748b';
+                browserTaxa.style.display = 'flex';
+                browserFunc.style.display = 'none';
+                document.getElementById('chart-title').innerHTML = `Composição Taxonômica`;
+                updateChart(fullData); 
+            } else {
+                btnFunc.style.background = 'var(--accent)';
+                btnTaxa.style.background = '#64748b';
+                browserTaxa.style.display = 'none';
+                browserFunc.style.display = 'flex';
+                document.getElementById('chart-title').innerHTML = `Distribuição de Papéis Ecológicos`;
+                renderFunctionalBrowser(); 
+            }
+        }
 
         function renderBrowser() {
             const browser = document.getElementById('silva-browser');
@@ -353,6 +392,113 @@
             });
             col.appendChild(ul);
             return col;
+        }
+        
+        // NOVAS FUNÇÕES: RENDERIZAÇÃO DA ÁRVORE ECOLÓGICA
+        function renderFunctionalBrowser() {
+            const browser = document.getElementById('functional-browser');
+            browser.innerHTML = '';
+            
+            const col1 = document.createElement('div');
+            col1.className = 'silva-col';
+            col1.innerHTML = `<div class="silva-col-header">Papel Ecológico (Cap. 4) <span>${Object.keys(functionalData).length}</span></div>`;
+            const ul1 = document.createElement('ul');
+            ul1.className = 'silva-list';
+            
+            let labelsFunc = [];
+            let dataFunc = [];
+
+            Object.keys(functionalData).forEach(funcao => {
+                const gruposNessaFuncao = functionalData[funcao];
+                let totalMatchesFuncao = 0;
+                
+                Object.values(gruposNessaFuncao).forEach(listaEspecies => {
+                    listaEspecies.forEach(esp => { totalMatchesFuncao += esp.matches; });
+                });
+
+                if(totalMatchesFuncao > 0) {
+                    labelsFunc.push(funcao);
+                    dataFunc.push(totalMatchesFuncao);
+                }
+
+                const li = document.createElement('li');
+                li.className = 'silva-item';
+                if (totalMatchesFuncao === 0) li.classList.add('empty');
+                
+                let globPerc = globalTotal > 0 ? formatPercent(totalMatchesFuncao / globalTotal) : "0.0%";
+                li.innerHTML = `<div class="taxon-name">♻️ ${funcao}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                
+                if (totalMatchesFuncao > 0) {
+                    li.onclick = () => {
+                        renderFunctionalGroups(gruposNessaFuncao, totalMatchesFuncao, browser);
+                        Array.from(ul1.children).forEach(c => c.classList.remove('active'));
+                        li.classList.add('active');
+                        document.getElementById('species-card').style.display = 'none';
+                    };
+                }
+                ul1.appendChild(li);
+            });
+            col1.appendChild(ul1);
+            browser.appendChild(col1);
+            
+            renderPieChart(labelsFunc, dataFunc);
+        }
+
+        function renderFunctionalGroups(gruposData, parentMatches, browserRef) {
+            while (browserRef.children.length > 1) { browserRef.removeChild(browserRef.lastChild); }
+            
+            const col2 = document.createElement('div');
+            col2.className = 'silva-col';
+            col2.innerHTML = `<div class="silva-col-header">Grande Grupo (Cap. 2) <span>${Object.keys(gruposData).length}</span></div>`;
+            const ul2 = document.createElement('ul');
+            ul2.className = 'silva-list';
+
+            Object.keys(gruposData).forEach(grupo => {
+                const especiesData = gruposData[grupo];
+                let totalMatchesGrupo = 0;
+                especiesData.forEach(esp => { totalMatchesGrupo += esp.matches; });
+
+                const li = document.createElement('li');
+                li.className = 'silva-item';
+                let globPerc = parentMatches > 0 ? formatPercent(totalMatchesGrupo / parentMatches) : "0.0%";
+                li.innerHTML = `<div class="taxon-name">📂 ${grupo}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                
+                li.onclick = () => {
+                     renderFunctionalSpecies(especiesData, totalMatchesGrupo, browserRef);
+                     Array.from(ul2.children).forEach(c => c.classList.remove('active'));
+                     li.classList.add('active');
+                     document.getElementById('species-card').style.display = 'none';
+                };
+                ul2.appendChild(li);
+            });
+            col2.appendChild(ul2);
+            browserRef.appendChild(col2);
+        }
+        
+        function renderFunctionalSpecies(especiesData, parentMatches, browserRef) {
+            while (browserRef.children.length > 2) { browserRef.removeChild(browserRef.lastChild); }
+            
+            const col3 = document.createElement('div');
+            col3.className = 'silva-col';
+            col3.innerHTML = `<div class="silva-col-header">Espécies Afetadas <span>${especiesData.length}</span></div>`;
+            const ul3 = document.createElement('ul');
+            ul3.className = 'silva-list';
+
+            especiesData.sort((a,b) => b.matches - a.matches).forEach(esp => {
+                const li = document.createElement('li');
+                li.className = 'silva-item';
+                let globPerc = parentMatches > 0 ? formatPercent(esp.matches / parentMatches) : "0.0%";
+                li.innerHTML = `<div class="taxon-name"><span style="color:#d97706; margin-right:5px;">🦠</span>${esp.especie}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                
+                li.onclick = () => {
+                     showSpeciesCard(esp.especie); 
+                     Array.from(ul3.children).forEach(c => c.classList.remove('active'));
+                     li.classList.add('active');
+                };
+                ul3.appendChild(li);
+            });
+            col3.appendChild(ul3);
+            browserRef.appendChild(col3);
         }
 
         function showSpeciesCard(name) {
@@ -427,6 +573,9 @@
         fetch('result.json').then(r => r.json()).then(data => {
             fullData = data.taxonomy_tree; 
             leafMetadata = data.leaf_metadata || {}; 
+            
+            // INJEÇÃO DA VARIÁVEL DA ÁRVORE ECOLÓGICA
+            functionalData = data.functional_tree; 
             
             let csvTotalMatches = data.summary.total_matches; 
             globalTotal = fullData.matches > 0 ? fullData.matches : csvTotalMatches;
