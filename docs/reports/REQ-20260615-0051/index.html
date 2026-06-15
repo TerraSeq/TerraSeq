@@ -59,7 +59,6 @@
         .search-box { width: 100%; padding: 10px 15px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.9em; box-sizing: border-box; }
         .search-box:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15); }
 
-        /* OVERLAY DO RELATÓRIO COMPLETO */
         #full-report-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; overflow-y: auto; padding: 40px 20px; }
         .report-content { max-width: 1000px; margin: 0 auto; background: white; border-radius: 8px; padding: 30px; position: relative; }
         .close-report { position: absolute; top: 20px; right: 25px; font-size: 35px; cursor: pointer; color: #64748b; font-weight: bold; }
@@ -76,10 +75,16 @@
         .badge-orange { background: #f59e0b; }
         .seq-box { background: #fff; border: 1px solid #e2e8f0; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; max-height: 150px; overflow-y: auto; border-radius: 4px; white-space: pre-wrap;}
         
-        /* BOTÃO EXPANSÍVEL PARA OS PARÂMETROS */
         .toggle-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: none !important; padding-bottom: 0 !important; margin-top: 0; transition: color 0.2s; user-select: none; }
         .toggle-header:hover { color: var(--secondary); }
         .toggle-icon { font-size: 0.85em; color: var(--text-light); font-weight: normal; background: #f1f5f9; padding: 4px 10px; border-radius: 20px;}
+
+        /* ESTILO DOS BOTÕES DE VISÃO (PILLS) */
+        .func-view-container { display: none; align-items: center; gap: 10px; margin-bottom: 15px; background: #ffffff; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .view-label { font-weight: 600; color: var(--text-light); text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; margin-right: 5px; }
+        .view-pill { background: #ffffff; border: 1px solid #cbd5e1; color: #64748b; padding: 6px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
+        .view-pill:hover { border-color: #8b5cf6; color: #8b5cf6; }
+        .view-pill.active { background: #8b5cf6; color: white; border-color: #8b5cf6; }
     </style>
 </head>
 <body>
@@ -127,18 +132,14 @@
             <h2>Navegador Taxonômico e Funcional</h2>
             
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button id="btn-taxa" class="btn-download" style="background: var(--secondary);" onclick="switchTree('taxa')">🌳 Árvore Filogenética</button>
-                <button id="btn-func" class="btn-download" style="background: #64748b;" onclick="switchTree('func')">♻️ Papel Ecológico (Atlas do Solo)</button>
+                <button id="btn-taxa" class="btn-download" style="background: var(--secondary);" onclick="switchTree('taxa')">🌳 ÁRVORE FILOGENÉTICA</button>
+                <button id="btn-func" class="btn-download" style="background: #64748b;" onclick="switchTree('func')">♻️ PAPEL ECOLÓGICO</button>
             </div>
 
-            <div id="func-view-toggles" style="display: none; margin-bottom: 15px; background: #f8fafc; padding: 12px 15px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.9em;">
-                <span style="font-weight: 600; margin-right: 15px; color: var(--primary);">Visão Ecológica:</span>
-                <label style="margin-right: 20px; cursor: pointer; color: var(--text-main);">
-                    <input type="radio" name="func-view" value="via1" checked onchange="changeFuncView(this.value)"> 1. Função (Cap.4) ➔ Grande Grupo
-                </label>
-                <label style="cursor: pointer; color: var(--text-main);">
-                    <input type="radio" name="func-view" value="via2" onchange="changeFuncView(this.value)"> 2. Grande Grupo (Cap.2) ➔ Espécies Direto
-                </label>
+            <div id="func-view-toggles" class="func-view-container">
+                <span class="view-label">VISÃO:</span>
+                <button id="btn-via1" class="view-pill active" onclick="changeFuncView('via1')">♻️ Por Função</button>
+                <button id="btn-via2" class="view-pill" onclick="changeFuncView('via2')">🌿 Por Grande Grupo</button>
             </div>
 
             <div class="silva-browser" id="silva-browser"></div>
@@ -197,7 +198,6 @@
     </div>
 
     <script>
-        // Função para mostrar/ocultar parâmetros
         function toggleParams() {
             const content = document.getElementById('params-content');
             const icon = document.getElementById('params-icon');
@@ -213,10 +213,9 @@
         let fullData = null; let leafMetadata = {}; let globalTotal = 0; let currentPath = [];
         let currentSpecies = ""; let globalPrimers = ""; let globalType = ""; let chartInstance = null;
         
-        // VARIÁVEIS PARA O MODO FUNCIONAL
         let functionalData = null;
-        let currentActiveTree = 'taxa'; // pode ser 'taxa' ou 'func'
-        let currentFuncView = 'via1'; // NOVO: controla a visualização ecológica ('via1' ou 'via2')
+        let currentActiveTree = 'taxa'; 
+        let currentFuncView = 'via1'; 
 
         function formatPercent(value) {
             let p = value * 100;
@@ -313,40 +312,43 @@
             document.body.style.overflow = 'auto';
         }
         
-        // NOVO: Função para alternar o MODO de visão ecológica (Via 1 ou Via 2)
         function changeFuncView(val) {
             currentFuncView = val;
+            
+            document.getElementById('btn-via1').classList.remove('active');
+            document.getElementById('btn-via2').classList.remove('active');
+            document.getElementById(val === 'via1' ? 'btn-via1' : 'btn-via2').classList.add('active');
+
             document.getElementById('species-card').style.display = 'none';
-            document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Distribuição de Papéis Ecológicos` : `Composição por Grandes Grupos (Cap. 2)`;
+            document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Distribuição de Papéis Ecológicos` : `Composição por Grandes Grupos`;
             renderFunctionalBrowser();
         }
 
-        // ATUALIZADO: FUNÇÃO PARA TROCAR ENTRE ÁRVORE TAXONÔMICA E FUNCIONAL
         function switchTree(type) {
             currentActiveTree = type;
             const btnTaxa = document.getElementById('btn-taxa');
             const btnFunc = document.getElementById('btn-func');
             const browserTaxa = document.getElementById('silva-browser');
             const browserFunc = document.getElementById('functional-browser');
-            const viewToggles = document.getElementById('func-view-toggles'); // Oculta/Mostra os radio buttons
+            const viewToggles = document.getElementById('func-view-toggles');
             
             document.getElementById('species-card').style.display = 'none';
             
             if(type === 'taxa') {
-                btnTaxa.style.background = 'var(--secondary)';
-                btnFunc.style.background = '#64748b';
+                btnTaxa.style.background = 'var(--secondary)'; 
+                btnFunc.style.background = '#64748b';          
                 browserTaxa.style.display = 'flex';
                 browserFunc.style.display = 'none';
                 viewToggles.style.display = 'none';
                 document.getElementById('chart-title').innerHTML = `Composição Taxonômica`;
                 updateChart(fullData); 
             } else {
-                btnFunc.style.background = 'var(--accent)';
-                btnTaxa.style.background = '#64748b';
+                btnFunc.style.background = '#8b5cf6';          
+                btnTaxa.style.background = '#64748b';          
                 browserTaxa.style.display = 'none';
                 browserFunc.style.display = 'flex';
-                viewToggles.style.display = 'block';
-                document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Distribuição de Papéis Ecológicos` : `Composição por Grandes Grupos (Cap. 2)`;
+                viewToggles.style.display = 'flex';            
+                document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Distribuição de Papéis Ecológicos` : `Composição por Grandes Grupos`;
                 renderFunctionalBrowser(); 
             }
         }
@@ -415,7 +417,6 @@
             return col;
         }
         
-        // ATUALIZADO: RENDERIZAÇÃO DA ÁRVORE ECOLÓGICA (Via 1 e Via 2)
         function renderFunctionalBrowser() {
             const browser = document.getElementById('functional-browser');
             browser.innerHTML = '';
@@ -429,8 +430,7 @@
             let dataFunc = [];
 
             if (currentFuncView === 'via1') {
-                // VIA 1: Função -> Grupo -> Espécie
-                col1.innerHTML = `<div class="silva-col-header">Papel Ecológico (Cap. 4) <span>${Object.keys(functionalData).length}</span></div>`;
+                col1.innerHTML = `<div class="silva-col-header">Papel Ecológico <span>${Object.keys(functionalData).length}</span></div>`;
 
                 Object.keys(functionalData).forEach(funcao => {
                     const gruposNessaFuncao = functionalData[funcao];
@@ -463,7 +463,6 @@
                     ul1.appendChild(li);
                 });
             } else {
-                // VIA 2: Grande Grupo direto -> Espécie
                 let gruposCompletos = {};
                 Object.keys(functionalData).forEach(funcao => {
                     Object.keys(functionalData[funcao]).forEach(grupo => {
@@ -476,7 +475,7 @@
                 });
 
                 const keys = Object.keys(gruposCompletos);
-                col1.innerHTML = `<div class="silva-col-header">Grande Grupo (Cap. 2) <span>${keys.length}</span></div>`;
+                col1.innerHTML = `<div class="silva-col-header">Grande Grupo <span>${keys.length}</span></div>`;
 
                 keys.sort((a,b) => gruposCompletos[b].matches - gruposCompletos[a].matches).forEach(grupo => {
                     const info = gruposCompletos[grupo];
@@ -510,7 +509,7 @@
             
             const col2 = document.createElement('div');
             col2.className = 'silva-col';
-            col2.innerHTML = `<div class="silva-col-header">Grande Grupo (Cap. 2) <span>${Object.keys(gruposData).length}</span></div>`;
+            col2.innerHTML = `<div class="silva-col-header">Grande Grupo <span>${Object.keys(gruposData).length}</span></div>`;
             const ul2 = document.createElement('ul');
             ul2.className = 'silva-list';
 
@@ -537,7 +536,6 @@
         }
         
         function renderFunctionalSpecies(especiesData, parentMatches, browserRef) {
-            // A MÁGICA DE LIMPEZA DA COLUNA CERTA
             const colsParaManter = currentFuncView === 'via1' ? 2 : 1;
             while (browserRef.children.length > colsParaManter) { browserRef.removeChild(browserRef.lastChild); }
             
@@ -546,7 +544,7 @@
                 if (!especiesAgrupadas[esp.especie]) {
                     especiesAgrupadas[esp.especie] = { especie: esp.especie, matches: 0 };
                 }
-                especiesAgrupadas[esp.especie].matches += esp.matches; // Soma os hits
+                especiesAgrupadas[esp.especie].matches += esp.matches;
             });
             let listaFinal = Object.values(especiesAgrupadas);
 
@@ -645,7 +643,6 @@
         fetch('result.json').then(r => r.json()).then(data => {
             fullData = data.taxonomy_tree; 
             leafMetadata = data.leaf_metadata || {}; 
-            
             functionalData = data.functional_tree; 
             
             let csvTotalMatches = data.summary.total_matches; 
