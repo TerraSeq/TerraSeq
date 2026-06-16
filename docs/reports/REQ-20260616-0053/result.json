@@ -3,17 +3,17 @@
     "metadata": {
         "submitted_by": "tiago",
         "email": "tiagomarquesgabriel2405@gmail.com",
-        "submitted_at": "16/06/2026 às 00:40",
+        "submitted_at": "16/06/2026 às 02:24",
         "target_region": "X",
         "organism": "Eukaryota",
-        "max_mismatches": 3,
+        "max_mismatches": 0,
         "amplicon_min": 600,
         "amplicon_max": 800,
         "e_value": 10.0,
         "min_coverage": 40,
-        "max_hits": 100,
+        "max_hits": 50,
         "min_tm": 0.0,
-        "database": "mistura_teste"
+        "database": "minhocas"
     },
     "primers": {
         "forward": "GGTCAACAAATCATAAAGATATTGG",
@@ -21,10 +21,10 @@
     },
     "summary": {
         "total_sequences_checked": 150000,
-        "total_matches": 20,
-        "estimated_coverage": 0.00013,
+        "total_matches": 3,
+        "estimated_coverage": 2e-05,
         "off_target_matches": 0,
-        "mean_amplicon_size": 703.5
+        "mean_amplicon_size": 706.0
     },
     "functional_tree": {
         "Decompositores da Serrapilheira": {},
@@ -33,78 +33,8 @@
                 "tamanho": "Macrofauna",
                 "especies": [
                     {
-                        "especie": "Eisenia nordenskioldi",
-                        "id": "OM687888",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Dendrobaena nassonovi nassonovi",
-                        "id": "PP873346",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Dendrodriloides grandis",
-                        "id": "PQ279313",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Imetescolex patriarchalis",
-                        "id": "PP855995",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Dendrobaena byblica",
-                        "id": "PP625722",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Pheretima iizukai",
-                        "id": "LC726532",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Eisenia nordenskioldi",
-                        "id": "OM687889",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Eisenia nordenskioldi",
-                        "id": "OM687890",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Dendrobaena sp.",
-                        "id": "PQ279309",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Eisenia nordenskioldi nordenskioldi",
-                        "id": "MK618513",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Dendrobaena schmidti",
-                        "id": "PP922154",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Eisenia andrei",
-                        "id": "PP438738",
-                        "matches": 1
-                    },
-                    {
                         "especie": "Eisenia andrei",
                         "id": "NC_065212",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Eisenia nordenskioldi",
-                        "id": "OM687887",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Dendrobaena alpina",
-                        "id": "PQ279308",
                         "matches": 1
                     },
                     {
@@ -113,8 +43,8 @@
                         "matches": 1
                     },
                     {
-                        "especie": "Eisenia nordenskioldi",
-                        "id": "OQ111865",
+                        "especie": "Eisenia andrei",
+                        "id": "PP438738",
                         "matches": 1
                     }
                 ]
@@ -122,326 +52,92 @@
         },
         "Fora do Escopo Principal": {},
         "Função Indefinida": {},
-        "Micropredadores": {
-            "Nematoides": {
-                "tamanho": "Microfauna",
-                "especies": [
-                    {
-                        "especie": "Uncinaria stenocephala",
-                        "id": "PX548150",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Uncinaria stenocephala",
-                        "id": "PX548152",
-                        "matches": 1
-                    },
-                    {
-                        "especie": "Uncinaria stenocephala",
-                        "id": "PX548153",
-                        "matches": 1
-                    }
-                ]
-            }
-        },
+        "Micropredadores": {},
         "Microrganismos": {}
     },
     "taxonomy_tree": {
         "name": "Root",
         "rank": "root",
-        "matches": 20,
+        "matches": 3,
         "coverage": 1.0,
         "children": [
             {
                 "name": "Eukaryota",
                 "rank": "domain",
-                "matches": 20,
+                "matches": 3,
                 "coverage": 1.0,
                 "children": [
                     {
                         "name": "Metazoa",
                         "rank": "kingdom",
-                        "matches": 20,
+                        "matches": 3,
                         "coverage": 1.0,
                         "children": [
                             {
                                 "name": "Spiralia",
                                 "rank": "class",
-                                "matches": 17,
-                                "coverage": 0.85,
+                                "matches": 3,
+                                "coverage": 1.0,
                                 "children": [
                                     {
                                         "name": "Lophotrochozoa",
                                         "rank": "clade",
-                                        "matches": 17,
-                                        "coverage": 0.85,
+                                        "matches": 3,
+                                        "coverage": 1.0,
                                         "children": [
                                             {
                                                 "name": "Annelida",
                                                 "rank": "clade",
-                                                "matches": 17,
-                                                "coverage": 0.85,
+                                                "matches": 3,
+                                                "coverage": 1.0,
                                                 "children": [
                                                     {
                                                         "name": "Clitellata",
                                                         "rank": "clade",
-                                                        "matches": 17,
-                                                        "coverage": 0.85,
+                                                        "matches": 3,
+                                                        "coverage": 1.0,
                                                         "children": [
                                                             {
                                                                 "name": "Oligochaeta",
                                                                 "rank": "clade",
-                                                                "matches": 17,
-                                                                "coverage": 0.85,
+                                                                "matches": 3,
+                                                                "coverage": 1.0,
                                                                 "children": [
                                                                     {
                                                                         "name": "Crassiclitellata",
                                                                         "rank": "clade",
-                                                                        "matches": 17,
-                                                                        "coverage": 0.85,
+                                                                        "matches": 3,
+                                                                        "coverage": 1.0,
                                                                         "children": [
                                                                             {
                                                                                 "name": "Lumbricina",
                                                                                 "rank": "clade",
-                                                                                "matches": 16,
-                                                                                "coverage": 0.8,
+                                                                                "matches": 3,
+                                                                                "coverage": 1.0,
                                                                                 "children": [
                                                                                     {
                                                                                         "name": "Lumbricidae",
                                                                                         "rank": "family",
-                                                                                        "matches": 16,
-                                                                                        "coverage": 0.8,
+                                                                                        "matches": 3,
+                                                                                        "coverage": 1.0,
                                                                                         "children": [
                                                                                             {
                                                                                                 "name": "Lumbricinae",
                                                                                                 "rank": "clade",
-                                                                                                "matches": 16,
-                                                                                                "coverage": 0.8,
+                                                                                                "matches": 3,
+                                                                                                "coverage": 1.0,
                                                                                                 "children": [
                                                                                                     {
                                                                                                         "name": "Eisenia",
                                                                                                         "rank": "genus",
-                                                                                                        "matches": 9,
-                                                                                                        "coverage": 0.45,
+                                                                                                        "matches": 3,
+                                                                                                        "coverage": 1.0,
                                                                                                         "children": [
-                                                                                                            {
-                                                                                                                "name": "Eisenia nordenskioldi",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 5,
-                                                                                                                "coverage": 0.25,
-                                                                                                                "children": []
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "name": "Eisenia nordenskioldi nordenskioldi",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 1,
-                                                                                                                "coverage": 0.05,
-                                                                                                                "children": []
-                                                                                                            },
                                                                                                             {
                                                                                                                 "name": "Eisenia andrei",
                                                                                                                 "rank": "species",
                                                                                                                 "matches": 3,
-                                                                                                                "coverage": 0.15,
-                                                                                                                "children": []
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "name": "Dendrobaena",
-                                                                                                        "rank": "clade",
-                                                                                                        "matches": 5,
-                                                                                                        "coverage": 0.25,
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "name": "Dendrobaena nassonovi",
-                                                                                                                "rank": "genus",
-                                                                                                                "matches": 1,
-                                                                                                                "coverage": 0.05,
-                                                                                                                "children": [
-                                                                                                                    {
-                                                                                                                        "name": "Dendrobaena nassonovi nassonovi",
-                                                                                                                        "rank": "species",
-                                                                                                                        "matches": 1,
-                                                                                                                        "coverage": 0.05,
-                                                                                                                        "children": []
-                                                                                                                    }
-                                                                                                                ]
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "name": "Dendrobaena byblica",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 1,
-                                                                                                                "coverage": 0.05,
-                                                                                                                "children": []
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "name": "Dendrobaena sp.",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 1,
-                                                                                                                "coverage": 0.05,
-                                                                                                                "children": []
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "name": "Dendrobaena schmidti",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 1,
-                                                                                                                "coverage": 0.05,
-                                                                                                                "children": []
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "name": "Dendrobaena alpina",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 1,
-                                                                                                                "coverage": 0.05,
-                                                                                                                "children": []
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "name": "Dendrodriloides",
-                                                                                                        "rank": "genus",
-                                                                                                        "matches": 1,
-                                                                                                        "coverage": 0.05,
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "name": "Dendrodriloides grandis",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 1,
-                                                                                                                "coverage": 0.05,
-                                                                                                                "children": []
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "name": "Imetescolex",
-                                                                                                        "rank": "genus",
-                                                                                                        "matches": 1,
-                                                                                                        "coverage": 0.05,
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "name": "Imetescolex patriarchalis",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 1,
-                                                                                                                "coverage": 0.05,
-                                                                                                                "children": []
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    }
-                                                                                                ]
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                ]
-                                                                            },
-                                                                            {
-                                                                                "name": "Megascolecida",
-                                                                                "rank": "clade",
-                                                                                "matches": 1,
-                                                                                "coverage": 0.05,
-                                                                                "children": [
-                                                                                    {
-                                                                                        "name": "Megascolecidae",
-                                                                                        "rank": "family",
-                                                                                        "matches": 1,
-                                                                                        "coverage": 0.05,
-                                                                                        "children": [
-                                                                                            {
-                                                                                                "name": "Pheretima",
-                                                                                                "rank": "genus",
-                                                                                                "matches": 1,
-                                                                                                "coverage": 0.05,
-                                                                                                "children": [
-                                                                                                    {
-                                                                                                        "name": "Pheretima iizukai",
-                                                                                                        "rank": "species",
-                                                                                                        "matches": 1,
-                                                                                                        "coverage": 0.05,
-                                                                                                        "children": []
-                                                                                                    }
-                                                                                                ]
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "Ecdysozoa",
-                                "rank": "clade",
-                                "matches": 3,
-                                "coverage": 0.15,
-                                "children": [
-                                    {
-                                        "name": "Nematoda",
-                                        "rank": "clade",
-                                        "matches": 3,
-                                        "coverage": 0.15,
-                                        "children": [
-                                            {
-                                                "name": "Chromadorea",
-                                                "rank": "clade",
-                                                "matches": 3,
-                                                "coverage": 0.15,
-                                                "children": [
-                                                    {
-                                                        "name": "Rhabditida",
-                                                        "rank": "clade",
-                                                        "matches": 3,
-                                                        "coverage": 0.15,
-                                                        "children": [
-                                                            {
-                                                                "name": "Rhabditina",
-                                                                "rank": "clade",
-                                                                "matches": 3,
-                                                                "coverage": 0.15,
-                                                                "children": [
-                                                                    {
-                                                                        "name": "Rhabditomorpha",
-                                                                        "rank": "clade",
-                                                                        "matches": 3,
-                                                                        "coverage": 0.15,
-                                                                        "children": [
-                                                                            {
-                                                                                "name": "Strongyloidea",
-                                                                                "rank": "clade",
-                                                                                "matches": 3,
-                                                                                "coverage": 0.15,
-                                                                                "children": [
-                                                                                    {
-                                                                                        "name": "Ancylostomatidae",
-                                                                                        "rank": "family",
-                                                                                        "matches": 3,
-                                                                                        "coverage": 0.15,
-                                                                                        "children": [
-                                                                                            {
-                                                                                                "name": "Ancylostomatinae",
-                                                                                                "rank": "clade",
-                                                                                                "matches": 3,
-                                                                                                "coverage": 0.15,
-                                                                                                "children": [
-                                                                                                    {
-                                                                                                        "name": "Uncinaria",
-                                                                                                        "rank": "genus",
-                                                                                                        "matches": 3,
-                                                                                                        "coverage": 0.15,
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "name": "Uncinaria stenocephala",
-                                                                                                                "rank": "species",
-                                                                                                                "matches": 3,
-                                                                                                                "coverage": 0.15,
+                                                                                                                "coverage": 1.0,
                                                                                                                 "children": []
                                                                                                             }
                                                                                                         ]
@@ -471,239 +167,13 @@
         ]
     },
     "leaf_metadata": {
-        "Eisenia nordenskioldi": {
-            "info": {
-                "acc": "OM687888",
-                "desc": "Eisenia nordenskioldi mitochondrion, complete genome",
-                "length": "16123"
-            },
-            "amplicons": [
-                {
-                    "acc": "OM687888",
-                    "size": "706",
-                    "tm": "78.7254664440382",
-                    "start": "16",
-                    "end": "722",
-                    "seq": "TCAACCAATCACAAAGATATTGGCACTCTCTATTTTATTCTTGGTGTCTGAGCCGGCATAGTTGGTGCCGGAATAAGACTCTTAATTCGAATCGAATTAAGTCAACCCGGGGCCTTCTTAGGGAGGGACCAACTATATAATACTATTGTTACAGCCCATGCATTTGTAATAATTTTCTTCCTAGTCATACCTGTATTCATTGGTGGATTTGGAAACTGACTTCTACCTCTAATATTAGGTGCCCCAGATATAGCCTTTCCACGACTAAACAACATAAGGTTCTGACTACTCCCCCCTTCACTCATCCTTCTAGTATCTTCCGCAGCAGTAGAAAAGGGGGCTGGAACAGGATGAACTGTATATCCTCCTCTATCTAGAAATTTAGCCCATGCAGGGCCCTCAGTTGATCTTGCAATCTTCTCCCTTCATTTGGCTGGGGCCTCATCAATTCTAGGGGCCATCAACTTCATTACCACCGTCATTAATATACGTTGAACAGGAATGCGTCTTGAACGAATTCCACTATTTGTTTGAGCTGTAATTATTACAGTGGTTCTACTTCTGCTATCTCTTCCAGTCTTAGCCGGAGCAATCACCATACTATTAACAGATCGAAACCTCAACACCTCTTTTTTCGATCCGGCTGGAGGGGGGGACCCTATTCTTTATCAACACCTATTCTGATTTTTTGGTCATCCCGAAGTTTA"
-                },
-                {
-                    "acc": "OM687889",
-                    "size": "706",
-                    "tm": "78.78099811047053",
-                    "start": "16",
-                    "end": "722",
-                    "seq": "TCAACCAATCACAAAGATATTGGCACTCTCTATTTTATTCTTGGTGTCTGAGCCGGCATAGTTGGTGCCGGAATAAGACTCTTAATTCGAATCGAATTAAGTCAACCCGGGGCCTTCTTAGGGAGGGACCAACTATATAATACTATTGTTACAGCCCATGCATTTGTAATAATTTTCTTCCTAGTCATACCTGTATTCATTGGTGGATTTGGAAACTGACTTCTACCTCTAATATTAGGTGCCCCAGATATAGCCTTTCCACGACTAAACAACATAAGGTTCTGACTACTCCCCCCTTCACTCATCCTTCTAGTATCTTCCGCAGCAGTAGAAAAGGGGGCTGGAACAGGATGAACTGTATATCCTCCTCTATCTAGGAATTTAGCCCATGCAGGGCCCTCAGTTGATCTTGCAATCTTCTCCCTTCATTTGGCTGGGGCCTCATCAATTCTAGGGGCCATCAACTTCATTACCACCGTCATTAATATACGTTGAACAGGAATGCGTCTTGAACGAATTCCACTATTTGTTTGAGCTGTAATTATTACAGTGGTTCTACTTCTGCTATCTCTTCCAGTCTTAGCCGGAGCAATCACCATACTATTAACAGATCGAAACCTCAACACCTCTTTTTTCGATCCGGCTGGAGGGGGGGACCCTATTCTTTATCAACACCTATTCTGATTTTTTGGTCATCCCGAAGTTTA"
-                },
-                {
-                    "acc": "OM687890",
-                    "size": "706",
-                    "tm": "78.7254664440382",
-                    "start": "16",
-                    "end": "722",
-                    "seq": "TCAACCAATCACAAAGATATTGGCACTCTCTATTTTATTCTTGGTGTCTGAGCCGGCATAGTTGGTGCCGGAATAAGACTCTTAATTCGAATCGAATTAAGTCAACCCGGGGCCTTCTTAGGGAGGGACCAACTATATAATACTATTGTTACAGCCCATGCATTTGTAATAATTTTCTTCCTAGTCATACCTGTATTCATTGGTGGATTTGGAAACTGACTTCTACCTCTAATATTAGGTGCCCCAGATATAGCCTTTCCACGACTAAACAACATAAGGTTCTGACTACTCCCCCCTTCACTCATCCTTCTAGTATCTTCCGCAGCAGTAGAAAAGGGGGCTGGAACAGGATGAACTGTATATCCTCCTCTATCTAGAAATTTAGCCCATGCAGGGCCCTCAGTTGATCTTGCAATCTTCTCCCTTCATTTGGCTGGGGCCTCATCAATTCTAGGGGCCATCAACTTCATTACCACCGTCATTAATATACGTTGAACAGGAATGCGTCTTGAACGAATTCCACTATTTGTTTGAGCTGTAATTATTACAGTGGTTCTACTTCTGCTATCTCTTCCAGTCTTAGCCGGAGCAATCACCATACTATTAACAGATCGAAACCTCAACACCTCTTTTTTCGATCCGGCTGGAGGGGGGGACCCTATTCTTTATCAACACCTATTCTGATTTTTTGGTCATCCCGAAGTTTA"
-                },
-                {
-                    "acc": "OM687887",
-                    "size": "706",
-                    "tm": "78.7254664440382",
-                    "start": "16",
-                    "end": "722",
-                    "seq": "TCAACCAATCACAAAGATATTGGCACTCTCTATTTTATTCTTGGTGTCTGAGCCGGCATAGTTGGTGCCGGAATAAGACTCTTAATTCGAATCGAATTAAGTCAACCCGGGGCCTTCTTAGGGAGGGACCAACTATATAATACTATTGTTACAGCCCATGCATTTGTAATAATTTTCTTCCTAGTCATACCTGTATTCATTGGTGGATTTGGAAACTGACTTCTACCTCTAATATTAGGTGCCCCAGATATAGCCTTTCCACGACTAAACAACATAAGGTTCTGACTACTCCCCCCTTCACTCATCCTTCTAGTATCTTCCGCAGCAGTAGAAAAGGGGGCTGGAACAGGATGAACTGTATATCCTCCTCTATCTAGAAATTTAGCCCATGCAGGGCCCTCAGTTGATCTTGCAATCTTCTCCCTTCATTTGGCTGGGGCCTCATCAATTCTAGGGGCCATCAACTTCATTACCACCGTCATTAATATACGTTGAACAGGAATGCGTCTTGAACGAATTCCACTATTTGTTTGAGCTGTAATTATTACAGTGGTTCTACTTCTGCTATCTCTTCCAGTCTTAGCCGGAGCAATCACCATACTATTAACAGATCGAAACCTCAACACCTCTTTTTTCGATCCGGCTGGAGGGGGGGACCCTATTCTTTATCAACACCTATTCTGATTTTTTGGTCATCCCGAAGTTTA"
-                },
-                {
-                    "acc": "OQ111865",
-                    "size": "703",
-                    "tm": "78.97750737576996",
-                    "start": "16",
-                    "end": "719",
-                    "seq": "TCAACTAATCACAAAGATATTGGCACCCTTTATTTTATCCTGGGAGTTTGGGCCGGCATAGTAGGAGCCGGAATAAGTCTTCTTATTCGAATCGAGCTAAGACAGCCGGGGGCATTCTTAGGTAGGGATCAACTTTACAATACTATTGTTACAGCCCATGCATTTGTAATAATTTTCTTCCTAGTGATACCTGTATTTATTGGGGGGTTTGGAAACTGACTTTTACCCCTTATACTTGGTGCCCCAGACATAGCCTTTCCACGACTCAATAATATGAGATTCTGGCTGCTGCCCCCATCCCTCATTCTCCTTGTTTCCTCTGCTGCTGTAGAAAAGGGGGCCGGAACAGGATGAACTGTTTATCCCCCCCTGTCTAGAAATATTGCCCACGCAGGTCCCTCTGTAGACCTAGCTATTTTCTCCCTTCACCTAGCCGGGGCTTCCTCCATTCTTGGGGCTATTAATTTTATTACCACAGTTATTAATATACGCTGAACAGGTATACGCCTCGAACGAATTCCTCTATTCGTATGAGCTGTTATTATCACAGTAGTTCTTCTTCTTCTATCTCTTCCAGTGCTAGCTGGTGCTATTACCATATTACTAACAGATCGAAATCTAAACACTTCTTTTTTTGATCCTGCGGGTGGGGGAGATCCTATTCTATACCAGCATCTATTTTGATTTTTTGGTCACCCTGAAGT"
-                }
-            ]
-        },
-        "Dendrobaena nassonovi nassonovi": {
-            "info": {
-                "acc": "PP873346",
-                "desc": "Dendrobaena nassonovi nassonovi mitochondrion, partial genome",
-                "length": "15312"
-            },
-            "amplicons": [
-                {
-                    "acc": "PP873346",
-                    "size": "706",
-                    "tm": "76.91688631034299",
-                    "start": "16",
-                    "end": "722",
-                    "seq": "TCTACAAATCATAAAGATATTGGAACCTTATACTTTATTTTAGGGATTTGGGCCGGAATAGTGGGTGCAGGCATAAGCCTTCTTATTCGAATTGAACTAAGCCAACCAGGCGCCTTCCTTGGAAGGGATCAATTATATAATACTATTGTTACAGCTCATGCTTTTGTAATAATCTTCTTTCTAGTGATACCAGTATTTATTGGAGGATTTGGAAACTGACTTCTACCATTAATATTAGGTGCTCCTGATATAGCCTTTCCTCGATTAAATAATATAAGATTTTGACTTCTCCCTCCTTCTCTTATTCTCTTAGTTTCTTCTGCAGCCGTTGAAAAGGGGGCGGGAACTGGATGAACAGTATACCCCCCTCTAGCTAGAAATTTAGCTCATGCTGGACCCTCAGTAGACTTAGCTATTTTTTCACTTCATTTAGCAGGTGCCTCATCAATCCTCGGTGCAATTAATTTTATCACAACAGTAATCAATATACGTTGATCAGGACTACGCCTAGAGCGAATTCCCTTATTTGTTTGAGCAGTAGTAATTACAGTAGTTCTACTTCTTCTATCATTACCAGTACTTGCCGGGGCAATCACCATACTTCTCACTGATCGAAATTTAAACACCTCATTTTTTGATCCCGCGGGAGGGGGTGATCCTATTCTATATCAACATCTATTTTGATTCTTTGGTCATCCTGAAGTTTA"
-                }
-            ]
-        },
-        "Uncinaria stenocephala": {
-            "info": {
-                "acc": "PX548150",
-                "desc": "Uncinaria stenocephala isolate TSF_1.2 mitochondrion, complete genome",
-                "length": "13725"
-            },
-            "amplicons": [
-                {
-                    "acc": "PX548150",
-                    "size": "697",
-                    "tm": "73.74633444792192",
-                    "start": "55",
-                    "end": "752",
-                    "seq": "AATCATAAAGATATTGGTACATTATATTTTTTGTTTGGTTTGTGGTCAGGTATGGTTGGTACTAGTTTGTCTTTAATTATTCGTTTGGAGTTGGCAAAACCTGGTTTATTATTGGGTAATGGACAGTTATATAATTCTATTATTACTGCTCATGCAATTTTAATAATTTTTTTTATGGTTATACCTACAATGATTGGGGGTTTTGGAAATTGAATGGTTCCTTTGATGTTAGGTGCTCCTGATATAAGTTTTCCTCGTTTAAATAATTTGAGTTTTTGATTATTACCTACTGCTATGTTTTTAATTCTTGATTCTTGTTTTGTTGATATGGGTAGGGGGACTAGTTGAACTATTTATCCTCCTTTGAGGACTTTAGGACATCCTGGGAGAAGTGTTGATTTAGCTATTTTTAGTTTACATTGTGCTGGTTTAAGATCTATTTTAGGTGGTATTAATTTTATGTGTACTACTAAAAATTTGCGTAGAAGTTCTATTTCGTTAGAACATATAAGTTTATTTGTGTGAACAGTTTTTGTTACGGTTTTTTTGTTGGTTTTATCATTGCCTGTTTTAGCAGGTGCTATTACAATGCTTTTAACTGATCGTAATTTGAATACTTCTTTTTTTGATCCAAGAACAGGTGGTAATCCTTTAATTTATCAACATTTATTTTGATTTTTTGGTCATCCTGAGGTTTA"
-                },
-                {
-                    "acc": "PX548152",
-                    "size": "697",
-                    "tm": "73.86145180669916",
-                    "start": "55",
-                    "end": "752",
-                    "seq": "AATCATAAAGATATTGGTACATTATATTTTTTGTTTGGTTTGTGGTCAGGTATGGTTGGTACTAGTTTGTCTTTAATTATTCGTTTGGAGTTGGCAAAACCTGGTTTATTATTAGGTAATGGACAGTTATATAATTCTATTATCACTGCTCATGCAATTTTAATAATTTTTTTTATGGTTATACCTACAATGATTGGGGGTTTTGGAAATTGAATGGTTCCTTTGATGCTAGGTGCTCCTGATATAAGTTTTCCTCGTTTAAATAATTTGAGTTTTTGATTATTACCTACTGCTATGTTTTTAATTCTTGATTCTTGTTTTGTTGATATGGGTAGGGGGACTAGTTGAACTATTTATCCTCCTTTGAGGACTTTAGGACATCCTGGGAGAAGTGTTGATTTAGCTATTTTTAGTTTACATTGTGCTGGTTTAAGATCTATTTTAGGTGGTATTAATTTTATGTGTACTACTAAAAATTTGCGTAGAAGTTCTATTTCGTTAGAACATATAAGTTTATTTGTGTGAACAGTTTTTGTTACGGTTTTTTTGTTGGTTTTATCATTGCCTGTTTTAGCAGGTGCTATTACAATGCTTTTAACTGATCGTAATTTGAATACTTCTTTTTTTGATCCAAGAACAGGTGGTAATCCTTTAATTTACCAACATTTATTTTGATTTTTTGGTCATCCTGAGGTTTA"
-                },
-                {
-                    "acc": "PX548153",
-                    "size": "697",
-                    "tm": "74.01177140217135",
-                    "start": "55",
-                    "end": "752",
-                    "seq": "AATCATAAAGATATTGGTACATTATATTTTTTGTTTGGTTTGTGGTCAGGTATGGTTGGTACTAGTTTGTCTTTAATTATTCGTTTGGAGTTGGCAAAACCTGGTTTATTATTGGGTAATGGACAGTTATATAATTCTATTATTACTGCTCATGCAATTTTAATAATTTTTTTTATGGTTATACCTACAATGATTGGGGGTTTTGGAAATTGAATGGTTCCTTTGATGTTAGGTGCTCCTGATATAAGTTTTCCTCGTTTAAATAATTTGAGTTTTTGATTATTACCTACTGCTATGTTTTTAATTCTTGATTCTTGTTTTGTTGATATGGGTAGGGGGACTAGTTGAACTATTTATCCTCCTTTGAGGACTTTAGGACATCCTGGGAGAAGTGTTGATTTAGCTATTTTTAGTTTGCATTGTGCTGGTTTAAGATCTATTTTAGGTGGTATTAATTTTATGTGTACTACTAAAAATTTGCGTAGAAGTTCTATTTCGTTAGARCATATAAGTTTATTTGTGTGAACAGTTTTTGTTACGGTTTTTTTGTTGGTTTTATCATTGCCTGTTTTGGCAGGTGCTATTACAATGCTTTTAACTGATCGTAATTTGAATACTTCTTTTTTTGATCCAAGAACAGGTGGTAATCCTTTAATTTACCAACATTTATTTTGATTTTTTGGTCATCCTGAGGTTTA"
-                }
-            ]
-        },
-        "Dendrodriloides grandis": {
-            "info": {
-                "acc": "PQ279313",
-                "desc": "Dendrodriloides grandis mitochondrion, partial genome",
-                "length": "15471"
-            },
-            "amplicons": [
-                {
-                    "acc": "PQ279313",
-                    "size": "703",
-                    "tm": "78.06327684107737",
-                    "start": "16",
-                    "end": "719",
-                    "seq": "TCAACAAATCACAAAGACATTGGGACCCTTTACTTCATTTTAGGTATTTGAGCGGGAATGGTGGGAGCTGGAATAAGTCTTCTTATCCGAATTGAACTAAGACAGCCTGGGACATTCCTGGGAAGAGATCAATTATATAATACTATTGTTACAGCACATGCATTTGTAATAATCTTTTTCCTTGTAATACCTGTATTCATTGGGGGGTTTGGAAACTGGCTTCTCCCTCTTATACTGGGAGCCCCAGATATAGCCTTCCCGCGACTAAACAACATAAGTTTCTGATTGCTGCCACCCTCTCTAATTCTTTTAGTCTCTTCAGCTGCCGTTGAAAAGGGGGCAGGAACAGGTTGAACCGTATACCCCCCTCTAGCTAGAAATTTAGCTCATGCTGGTCCTTCAGTTGATCTTGCAATCTTCTCTCTTCACCTAGCTGGAGCCTCATCAATTCTCGGTGCTATTAACTTTATTACAACCGTTATTAATATACGTTGATCAGGTTTACGCCTAGAACGAATTCCATTATTTGTGTGAGCAGTAGTGATCACAGTCGTTCTACTTCTTCTATCACTTCCTGTTTTAGCAGGAGCAATTACTATGCTACTAACAGATCGAAATTTAAATACATCCTTCTTTGATCCTGCAGGAGGTGGAGACCCCATTCTTTATCAGCATTTATTTTGATTTTTTGGTCACCCTGAAGT"
-                }
-            ]
-        },
-        "Imetescolex patriarchalis": {
-            "info": {
-                "acc": "PP855995",
-                "desc": "Imetescolex patriarchalis mitochondrion, partial genome",
-                "length": "15028"
-            },
-            "amplicons": [
-                {
-                    "acc": "PP855995",
-                    "size": "703",
-                    "tm": "78.9750604068762",
-                    "start": "16",
-                    "end": "719",
-                    "seq": "TCAACCAATCACAAAGATATTGGAACTTTATACTTTATTCTTGGCGTTTGAGCCGGCATAGTAGGAGCCGGAATAAGCCTTCTTATTCGAATTGAGTTAAGACAGCCGGGAGCATTCTTAGGGAGAGACCAGCTATATAATACAATTGTTACAGCCCATGCGTTTGTAATAATCTTCTTCTTAGTAATGCCCGTATTTATCGGGGGATTTGGAAACTGACTTCTACCCCTAATGCTAGGTGCCCCAGATATAGCATTTCCTCGACTTAATAACTTAAGATTCTGACTTCTACCCCCCTCACTAATCCTACTGGTCTCCTCGGCCGCGGTAGAAAAAGGAGCTGGAACAGGATGAACTGTATATCCGCCTCTTGCAAGAAATCTAGCTCACGCTGGACCATCAGTAGACCTAGCTATTTTCTCTCTTCACTTAGCGGGGGCGTCTTCAATCCTCGGTGCAATTAATTTTATTACCACTGTTATTAATATACGATGAAGAGGCCTGCGATTAGAACGAATTCCCTTATTTGTATGGGCCGTAGTAATTACAGTAGTTCTTCTGCTTCTATCCCTACCAGTGCTTGCAGGTGCAATCACCATGCTCCTCACAGATCGAAATCTAAACACTTCGTTCTTTGATCCTGCCGGAGGAGGAGATCCAATTCTATATCAGCACTTATTCTGATTTTTTGGGCACCCTGAAGT"
-                }
-            ]
-        },
-        "Dendrobaena byblica": {
-            "info": {
-                "acc": "PP625722",
-                "desc": "Dendrobaena byblica mitochondrion, partial genome",
-                "length": "15080"
-            },
-            "amplicons": [
-                {
-                    "acc": "PP625722",
-                    "size": "703",
-                    "tm": "78.38848271002507",
-                    "start": "16",
-                    "end": "719",
-                    "seq": "TCAACAAACCATAAAGATATTGGAACTCTATACTTCATTCTCGGCATCTGAGCTGGCATGGTCGGCGCTGGCATAAGTCTTCTTATTCGAATCGAGTTAAGACAGCCGGGGGCCTTCCTAGGAAGAGACCAGTTATATAACACCATTGTAACTGCACATGCATTTGTTATAATTTTTTTCTTAGTTATACCCGTATTTATTGGAGGATTTGGTAATTGACTCCTACCTTTAATACTAGGTGCGCCAGATATGGCATTTCCACGTCTTAATAACATAAGATTTTGACTTCTCCCGCCCTCTCTAATCTTGCTAGTCTCCTCGGCTGCTGTAGAAAAGGGGGCGGGAACAGGTTGAACTGTATACCCCCCCTTAGCAAGAAACCTAGCCCATGCTGGACCTTCAGTAGACTTAGCTATTTTCTCCCTTCATTTAGCGGGCGCCTCATCAATTTTAGGAGCTATTAACTTTATTACAACAGTTATTAACATACGGTGAAGTGGTCTACGCCTAGAACGAATTCCATTATTTGTATGAGCGGTCCTAATTACTGTTGTACTTCTTCTTTTATCTCTCCCTGTTTTAGCCGGTGCCATTACCATATTACTAACAGACCGAAACTTAAATACTTCATTTTTCGACCCGGCAGGTGGAGGAGATCCAATTCTTTATCAACACTTATTCTGATTTTTCGGTCACCCTGAAGT"
-                }
-            ]
-        },
-        "Pheretima iizukai": {
-            "info": {
-                "acc": "LC726532",
-                "desc": "Pheretima iizukai CS141 mitochondrial DNA, nearly complete genome",
-                "length": "14588"
-            },
-            "amplicons": [
-                {
-                    "acc": "LC726532",
-                    "size": "703",
-                    "tm": "76.32532470425485",
-                    "start": "8681",
-                    "end": "9384",
-                    "seq": "TCTACAAACCATAAAGATATTGGAACTTTATATTTCATTCTAGGTATTTGAGCCGGAATAATCGGAGCAGGGATAAGACTCCTTATTCGAATTGAACTAAGACAACCTGGCTCATTTCTAGGCAGAGACCAGCTATATAATACTATTGTAACAGCCCACGCATTCTTAATAATTTTCTTTCTAGTAATACCAGTATTTATTGGAGGATTTGGAAACTGACTATTACCCCTAATACTTGGAACTCCAGATATAGCATTTCCACGACTAAATAATATAAGATTTTGATTATTACCACCTTCACTTATTCTATTGGTATCTTCAGCCGCAGTAGAAAAGGGTGCAGGAACGGGATGGACAGTATATCCACCTCTAGCAAGAAATATTGCACACTCTGGGCCTTCAGTAGATCTTGCAATTTTTTCATTACATCTTGCAGGTGCATCTTCAATTTTAGGAGCTATTAATTTCATTACCACAGTAATTAATATACGATGATCAGGACTTCGATTAGAACGAATTCCACTATTCGTTTGAGCAGTGGTAATTACCGTAGTACTTTTATTGCTTTCACTTCCAGTCCTTGCTGGGGCCATTACAATACTATTAACAGATCGAAACCTTAACACATCATTTTTTGATCCTGCGGGAGGAGGAGACCCAATTCTCTACCAACACCTATTTTGATTTTTTGGTCACCCAGAAGT"
-                }
-            ]
-        },
-        "Dendrobaena sp.": {
-            "info": {
-                "acc": "PQ279309",
-                "desc": "Dendrobaena sp. mitochondrion, complete genome",
-                "length": "15407"
-            },
-            "amplicons": [
-                {
-                    "acc": "PQ279309",
-                    "size": "703",
-                    "tm": "76.95323717412288",
-                    "start": "16",
-                    "end": "719",
-                    "seq": "TCAACCAATCATAAAGATATTGGAACCCTTTACTTCATTCTAGGAATTTGAGCCGGAATAGTAGGAGCTGGAATAAGCCTACTAATTCGTATTGAACTAAGACAGCCGGGAGCCTTCCTAGGCAGTGATCAACTATATAATACTATTGTTACAGCACATGCTTTTGTTATAATCTTCTTCTTAGTTATACCTGTATTCATCGGGGGATTTGGAAATTGACTCCTCCCGCTTATATTAGGAGCTCCTGATATAGCATTCCCTCGATTAAATAACATAAGATTTTGACTACTTCCCCCCTCATTAATTCTATTAGTATCTTCCGCAGCGGTAGAAAAAGGTGCAGGTACAGGATGAACAGTATATCCTCCTCTAGCAAGAAACCTAGCACATGCAGGACCTTCAGTAGACTTGGCTATTTTCTCCCTTCATTTAGCAGGAGCCTCATCAATCTTAGGGGCTATCAACTTTATTACTACTGTAGTAAATATACGTTGAGCCGGAATACGTTTAGAGCGAATTCCCTTATTTGTATGAGCTGTAATTATTACAGTAGTATTACTTCTTCTTTCACTTCCGGTTCTTGCAGGAGCAATTACAATACTTTTAACAGACCGAAACTTAAATACCTCATTCTTCGATCCTGCTGGTGGGGGAGATCCTATCCTTTATCAACATCTTTTCTGATTCTTTGGTCACCCTGAAGT"
-                }
-            ]
-        },
-        "Eisenia nordenskioldi nordenskioldi": {
-            "info": {
-                "acc": "MK618513",
-                "desc": "Eisenia nordenskioldi nordenskioldi from Russia mitochondrion, partial genome",
-                "length": "14567"
-            },
-            "amplicons": [
-                {
-                    "acc": "MK618513",
-                    "size": "706",
-                    "tm": "78.75022258546386",
-                    "start": "16",
-                    "end": "722",
-                    "seq": "TCAACCAATCACAAAGATATTGGCACTCTCTATTTTATTCTTGGTGTCTGAGCCGGCATAGTTGGTGCCGGAATAAGACTCTTAATTCGAATCGAATTAAGTCAACCCGGGGCCTTCTTAGGGAGAGACCAACTATATAATACCATTGTTACAGCCCATGCATTTGTAATAATTTTCTTCCTAGTCATACCTGTATTCATTGGTGGATTTGGAAACTGACTTCTACCTCTAATATTAGGTGCCCCAGATATAGCCTTTCCACGACTAAACAACATAAGATTCTGGCTACTCCCCCCTTCACTCATCCTTCTAGTATCTTCCGCAGCAGTAGAAAAGGGGGCTGGAACAGGATGAACTGTATATCCTCCTCTATCTAGAAATTTAGCCCATGCAGGGCCCTCAGTTGATCTTGCAATCTTCTCCCTTCATTTGGCTGGGGCCTCATCAATTCTAGGGGCCATCAACTTCATTACCACCGTCATTAATATACGTTGAACAGGAATGCGTCTTGAACGAATTCCACTATTTGTTTGAGCTGTAATTATTACAGTGGTTCTACTTCTGCTATCTCTTCCAGTCTTAGCCGGAGCAATCACCATACTATTAACAGATCGAAACCTCAACACCTCTTTTTTCGATCCGGCTGGAGGGGGGGACCCTATTCTTTATCAACACCTATTCTGATTTTTTGGTCATCCCGAAGTTTA"
-                }
-            ]
-        },
-        "Dendrobaena schmidti": {
-            "info": {
-                "acc": "PP922154",
-                "desc": "Dendrobaena schmidti mitochondrion, complete genome",
-                "length": "15539"
-            },
-            "amplicons": [
-                {
-                    "acc": "PP922154",
-                    "size": "703",
-                    "tm": "78.02167751329313",
-                    "start": "16",
-                    "end": "719",
-                    "seq": "TCAACTAATCATAAAGATATTGGAACTCTATACTTCATCTTAGGGGTCTGAGCCGGAATAGTGGGGGCTGGTATAAGTCTACTCATTCGAATTGAGCTCAGTCAACCAGGTGCCTTTCTAGGCAGTGATCAACTCTATAACACAATTGTTACAGCTCACGCATTTGTTATAATTTTCTTTTTAGTAATACCTGTATTTATTGGAGGATTTGGAAACTGACTTCTTCCTCTAATACTAGGAGCTCCCGATATAGCATTTCCCCGCCTAAATAATATAAGATTTTGACTTCTGCCTCCATCTCTAATCCTTTTAGTATCCTCTGCCGCAGTAGAGAAAGGTGCAGGTACAGGCTGAACAGTATACCCACCCTTAGCAAGAAATCTAGCCCATGCTGGTCCATCTGTAGATCTAGCAATTTTTTCTCTTCATTTAGCAGGTGCATCATCTATCCTAGGGGCTATTAATTTTATTACTACGGTAGTAAACATGCGCTGATCTGGCTTACGACTAGAACGAATCCCGTTATTTGTTTGAGCAGTAGTGATCACAGTCGTCCTTCTTCTTCTCTCCCTTCCAGTACTCGCAGGAGCAATCACAATACTTCTAACTGATCGAAATCTAAACACCTCTTTCTTCGACCCAGCAGGCGGAGGCGATCCTATCCTATATCAACACTTATTCTGATTTTTTGGTCACCCGGAAGT"
-                }
-            ]
-        },
         "Eisenia andrei": {
             "info": {
-                "acc": "PP438738",
+                "acc": "NC_065212",
                 "desc": "Eisenia andrei mitochondrion, complete genome",
-                "length": "15715"
+                "length": "15714"
             },
             "amplicons": [
-                {
-                    "acc": "PP438738",
-                    "size": "706",
-                    "tm": "78.97104520864923",
-                    "start": "16",
-                    "end": "722",
-                    "seq": "TCAACAAATCACAAAGATATTGGAACTCTCTATTTCATTCTCGGGGTCTGAGCAGGTATGGTTGGTGCTGGTATAAGCCTTCTCATTCGAATCGAGCTAAGGCAACCAGGTGCCTTCCTAGGAAGGGACCAACTATATAATACAATTGTTACAGCCCATGCATTTGTAATAATTTTCTTTCTGGTAATACCTGTATTTATTGGTGGATTTGGAAACTGACTTCTACCTCTTATACTAGGAGCTCCAGACATAGCCTTTCCACGTCTCAACAACATAAGATTTTGACTTCTGCCCCCTTCCCTAATTCTCCTAGTATCCTCTGCTGCAGTGGAAAAGGGTGCTGGAACAGGGTGGACAGTTTACCCACCCCTATCCAGTAACTTAGCGCACGCGGGGCCCTCAGTGGACCTGGCTATTTTTTCCCTCCATTTAGCAGGTGCCTCCTCAATTTTAGGGGCAATTAACTTCATTACTACAGTTATTAACATACGATGAAGTGGGCTTCGACTAGAACGAATCCCCCTATTTGTATGAGCTGTAGTTATTACCGTGGTGTTACTACTTTTATCTCTTCCAGTACTTGCGGGAGCTATCACTATACTATTGACAGATCGAAACCTAAATACCTCATTCTTTGACCCTGCTGGAGGTGGCGACCCTATTCTCTACCAACATTTATTCTGATTTTTTGGACACCCTGAAGTTTA"
-                },
                 {
                     "acc": "NC_065212",
                     "size": "706",
@@ -719,29 +189,19 @@
                     "start": "16",
                     "end": "722",
                     "seq": "TCAACAAATCACAAAGATATTGGAACTCTCTATTTCATTCTCGGGGTCTGAGCAGGTATGGTTGGTGCTGGTATAAGCCTTCTCATTCGAATCGAGCTAAGGCAACCAGGTGCCTTCCTAGGAAGGGACCAACTATACAATACAATTGTTACAGCCCATGCATTTGTAATAATTTTCTTTCTGGTTATGCCTGTATTTATTGGTGGATTTGGAAACTGACTTCTACCTCTTATACTGGGAGCTCCAGACATAGCCTTTCCACGTCTCAACAACATAAGATTTTGACTTCTGCCCCCTTCCCTAATTCTCCTAGTATCCTCTGCTGCAGTGGAGAAGGGTGCTGGAACAGGGTGGACAGTTTACCCACCCCTATCCAGTAACTTAGCGCACGCGGGGCCCTCAGTGGACCTGGCTATTTTTTCCCTCCATTTAGCAGGTGCCTCCTCAATTTTAGGGGCAATTAACTTCATTACTACAGTTATTAACATACGGTGAAGTGGGCTTCGACTAGAACGAATCCCCCTATTTGTATGAGCTGTAGTTATTACCGTGGTGTTACTACTTTTATCTCTTCCAGTACTTGCGGGAGCTATCACTATACTATTGACAGATCGAAACCTGAATACCTCATTCTTTGACCCTGCTGGAGGTGGCGATCCTATTCTCTACCAACATTTATTCTGATTTTTTGGACACCCTGAAGTTTA"
-                }
-            ]
-        },
-        "Dendrobaena alpina": {
-            "info": {
-                "acc": "PQ279308",
-                "desc": "Dendrobaena alpina mitochondrion, complete genome",
-                "length": "15199"
-            },
-            "amplicons": [
+                },
                 {
-                    "acc": "PQ279308",
-                    "size": "703",
-                    "tm": "77.94300093170074",
+                    "acc": "PP438738",
+                    "size": "706",
+                    "tm": "78.97104520864923",
                     "start": "16",
-                    "end": "719",
-                    "seq": "TCTACCAATCATAAAGATATTGGAACTCTTTACTTTATTCTTGGAATCTGAGCCGGTATGGTGGGTGCCGGAATAAGACTTCTAATTCGAATTGAATTAAGCCAGCCCGGGGCCTTTCTAGGAAGAGATCAGTTATATAATACCATTGTTACTGCTCATGCTTTTGTTATAATCTTTTTCTTAGTTATACCCGTATTTATTGGCGGATTTGGAAACTGACTTCTCCCCCTTATACTTGGTGCACCCGATATAGCCTTTCCACGATTAAATAATATAAGTTTCTGACTTCTCCCTCCCTCTTTAATCCTACTAGTTTCCTCTGCAGCTGTAGAAAAGGGGGCAGGCACCGGATGAACTGTATACCCTCCTCTAGCCAGAAATCTTGCTCATGCGGGCCCATCAGTAGATCTGGCAATTTTCTCCTTACACTTGGCAGGAGCCTCATCTATTCTAGGAGCAATTAACTTCATTACAACAGTTATTAATATACGCTGAACAGGCTTGCGACTGGAACGAATCCCACTATTTGTATGAGCTGTTATTATTACAGTTGTTCTCCTTCTTCTATCTCTTCCCGTACTAGCTGGAGCTATTACGATACTTTTAACCGACCGAAATCTAAATACCTCATTTTTTGATCCTGCTGGGGGAGGAGACCCAATTTTATATCAACACTTATTCTGATTTTTTGGTCACCCCGAAGT"
+                    "end": "722",
+                    "seq": "TCAACAAATCACAAAGATATTGGAACTCTCTATTTCATTCTCGGGGTCTGAGCAGGTATGGTTGGTGCTGGTATAAGCCTTCTCATTCGAATCGAGCTAAGGCAACCAGGTGCCTTCCTAGGAAGGGACCAACTATATAATACAATTGTTACAGCCCATGCATTTGTAATAATTTTCTTTCTGGTAATACCTGTATTTATTGGTGGATTTGGAAACTGACTTCTACCTCTTATACTAGGAGCTCCAGACATAGCCTTTCCACGTCTCAACAACATAAGATTTTGACTTCTGCCCCCTTCCCTAATTCTCCTAGTATCCTCTGCTGCAGTGGAAAAGGGTGCTGGAACAGGGTGGACAGTTTACCCACCCCTATCCAGTAACTTAGCGCACGCGGGGCCCTCAGTGGACCTGGCTATTTTTTCCCTCCATTTAGCAGGTGCCTCCTCAATTTTAGGGGCAATTAACTTCATTACTACAGTTATTAACATACGATGAAGTGGGCTTCGACTAGAACGAATCCCCCTATTTGTATGAGCTGTAGTTATTACCGTGGTGTTACTACTTTTATCTCTTCCAGTACTTGCGGGAGCTATCACTATACTATTGACAGATCGAAACCTAAATACCTCATTCTTTGACCCTGCTGGAGGTGGCGACCCTATTCTCTACCAACATTTATTCTGATTTTTTGGACACCCTGAAGTTTA"
                 }
             ]
         }
     },
     "warnings": [
-        "Cobertura geral baixa. Verifique os filos relevantes.",
-        "Potenciais off-targets (Tolerância a mismatch alta)."
+        "Cobertura geral baixa. Verifique os filos relevantes."
     ]
 }
