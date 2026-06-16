@@ -119,7 +119,7 @@ def enviar_email_notificacao(email_destino, req_id):
     msg['From'] = EMAIL_REMETENTE
     msg['To'] = email_destino
     msg['Subject'] = f"🧬 Análise in silico Concluída ({req_id})"
-    corpo = f"Olá,\n\nSua simulação de PCR foi concluída com sucesso!\nID: {req_id}\n\nAcesse o relatório: {link_pages}\n\n⚠️ Aviso Importante: O servidor web leva de 1 a 2 minutos para realizar a publicação dos arquivos. Se você acessar o link e esbarrar em um 'Erro 404' (Página não encontrada), não se preocupe! Aguarde alguns instantes e atualize a página (Ctrl + F5).\n\nAtt,\Equipe de Bioinformática"
+    corpo = f"Olá,\n\nSua simulação de PCR foi concluída com sucesso!\nID: {req_id}\n\nAcesse o relatório: {link_pages}\n\n⚠️ Aviso Importante: O servidor web leva de 1 a 2 minutos para realizar a publicação dos arquivos. Se você acessar o link e esbarrar em um 'Erro 404' (Página não encontrada), não se preocupe! Aguarde alguns instantes e atualize a página (Ctrl + F5).\n\nAtt,\\Equipe de Bioinformática"
     msg.attach(MIMEText(corpo, 'plain', 'utf-8'))
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
