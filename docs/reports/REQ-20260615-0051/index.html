@@ -133,13 +133,13 @@
             
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <button id="btn-taxa" class="btn-download" style="background: var(--secondary);" onclick="switchTree('taxa')">🌳 ÁRVORE FILOGENÉTICA</button>
-                <button id="btn-func" class="btn-download" style="background: #64748b;" onclick="switchTree('func')">♻️ PAPEL ECOLÓGICO</button>
+                <button id="btn-func" class="btn-download" style="background: #64748b;" onclick="switchTree('func')">♻️ CLASSIFICAÇÃO FUNCIONAL</button>
             </div>
 
             <div id="func-view-toggles" class="func-view-container">
                 <span class="view-label">VISÃO:</span>
                 <button id="btn-via1" class="view-pill active" onclick="changeFuncView('via1')">♻️ Por Função</button>
-                <button id="btn-via2" class="view-pill" onclick="changeFuncView('via2')">🌿 Por Grande Grupo</button>
+                <button id="btn-via2" class="view-pill" onclick="changeFuncView('via2')">🌿 Por Grupo</button>
             </div>
 
             <div class="silva-browser" id="silva-browser"></div>
@@ -430,14 +430,15 @@
             let dataFunc = [];
 
             if (currentFuncView === 'via1') {
+                // VIA 1: Função Ecológica -> Grupo -> Espécie
                 col1.innerHTML = `<div class="silva-col-header">Papel Ecológico <span>${Object.keys(functionalData).length}</span></div>`;
 
                 Object.keys(functionalData).forEach(funcao => {
                     const gruposNessaFuncao = functionalData[funcao];
                     let totalMatchesFuncao = 0;
                     
-                    Object.values(gruposNessaFuncao).forEach(listaEspecies => {
-                        listaEspecies.forEach(esp => { totalMatchesFuncao += esp.matches; });
+                    Object.values(gruposNessaFuncao).forEach(dadosGrupo => {
+                        dadosGrupo.especies.forEach(esp => { totalMatchesFuncao += esp.matches; });
                     });
 
                     if(totalMatchesFuncao > 0) {
@@ -463,33 +464,46 @@
                     ul1.appendChild(li);
                 });
             } else {
-                let gruposCompletos = {};
+                // VIA 2: Tamanho Biológico -> Grupo -> Espécie
+                let gruposPorTamanho = {};
+                
                 Object.keys(functionalData).forEach(funcao => {
                     Object.keys(functionalData[funcao]).forEach(grupo => {
+                        let tamanho = functionalData[funcao][grupo].tamanho;
+                        let especies = functionalData[funcao][grupo].especies;
                         let totalMatchesGrupo = 0;
-                        functionalData[funcao][grupo].forEach(esp => { totalMatchesGrupo += esp.matches; });
+                        especies.forEach(esp => { totalMatchesGrupo += esp.matches; });
+
                         if(totalMatchesGrupo > 0) {
-                            gruposCompletos[grupo] = { data: functionalData[funcao][grupo], matches: totalMatchesGrupo, funcao: funcao };
+                            if(!gruposPorTamanho[tamanho]) gruposPorTamanho[tamanho] = [];
+                            gruposPorTamanho[tamanho].push({
+                                grupo: grupo,
+                                funcao: funcao,
+                                matches: totalMatchesGrupo,
+                                especies: especies
+                            });
                         }
                     });
                 });
 
-                const keys = Object.keys(gruposCompletos);
-                col1.innerHTML = `<div class="silva-col-header">Grande Grupo <span>${keys.length}</span></div>`;
+                const keys = Object.keys(gruposPorTamanho);
+                col1.innerHTML = `<div class="silva-col-header">Tamanho Biológico <span>${keys.length}</span></div>`;
 
-                keys.sort((a,b) => gruposCompletos[b].matches - gruposCompletos[a].matches).forEach(grupo => {
-                    const info = gruposCompletos[grupo];
-                    labelsFunc.push(grupo);
-                    dataFunc.push(info.matches);
+                keys.sort((a,b) => b.localeCompare(a)).forEach(tamanho => {
+                    let totalMatchesTamanho = 0;
+                    gruposPorTamanho[tamanho].forEach(g => { totalMatchesTamanho += g.matches; });
+                    
+                    labelsFunc.push(tamanho);
+                    dataFunc.push(totalMatchesTamanho);
 
                     const li = document.createElement('li');
                     li.className = 'silva-item';
-                    let globPerc = globalTotal > 0 ? formatPercent(info.matches / globalTotal) : "0.0%";
+                    let globPerc = globalTotal > 0 ? formatPercent(totalMatchesTamanho / globalTotal) : "0.0%";
                     
-                    li.innerHTML = `<div class="taxon-name" style="line-height:1.2;">📂 ${grupo}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal;">♻️ ${info.funcao}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    li.innerHTML = `<div class="taxon-name">📏 ${tamanho}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     li.onclick = () => {
-                        renderFunctionalSpecies(info.data, info.matches, browser);
+                        renderTamanhoGroups(gruposPorTamanho[tamanho], totalMatchesTamanho, browser);
                         Array.from(ul1.children).forEach(c => c.classList.remove('active'));
                         li.classList.add('active');
                         document.getElementById('species-card').style.display = 'none';
@@ -504,6 +518,7 @@
             renderPieChart(labelsFunc, dataFunc);
         }
 
+        // Renderiza a 2ª Coluna para a Via 1 (Grupos)
         function renderFunctionalGroups(gruposData, parentMatches, browserRef) {
             while (browserRef.children.length > 1) { browserRef.removeChild(browserRef.lastChild); }
             
@@ -514,7 +529,7 @@
             ul2.className = 'silva-list';
 
             Object.keys(gruposData).forEach(grupo => {
-                const especiesData = gruposData[grupo];
+                const especiesData = gruposData[grupo].especies;
                 let totalMatchesGrupo = 0;
                 especiesData.forEach(esp => { totalMatchesGrupo += esp.matches; });
 
@@ -534,10 +549,39 @@
             col2.appendChild(ul2);
             browserRef.appendChild(col2);
         }
+
+        // NOVO: Renderiza a 2ª Coluna para a Via 2 (Grupos dentro de um Tamanho)
+        function renderTamanhoGroups(listaGrupos, parentMatches, browserRef) {
+            while (browserRef.children.length > 1) { browserRef.removeChild(browserRef.lastChild); }
+            
+            const col2 = document.createElement('div');
+            col2.className = 'silva-col';
+            col2.innerHTML = `<div class="silva-col-header">Grupos Identificados <span>${listaGrupos.length}</span></div>`;
+            const ul2 = document.createElement('ul');
+            ul2.className = 'silva-list';
+
+            listaGrupos.sort((a,b) => b.matches - a.matches).forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'silva-item';
+                let globPerc = parentMatches > 0 ? formatPercent(item.matches / parentMatches) : "0.0%";
+                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;">📂 ${item.grupo}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal;">♻️ ${item.funcao}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+
+                li.onclick = () => {
+                     renderFunctionalSpecies(item.especies, item.matches, browserRef);
+                     Array.from(ul2.children).forEach(c => c.classList.remove('active'));
+                     li.classList.add('active');
+                     document.getElementById('species-card').style.display = 'none';
+                };
+                ul2.appendChild(li);
+            });
+            col2.appendChild(ul2);
+            browserRef.appendChild(col2);
+        }
         
+        // Renderiza a 3ª Coluna (Espécies finais)
         function renderFunctionalSpecies(especiesData, parentMatches, browserRef) {
-            const colsParaManter = currentFuncView === 'via1' ? 2 : 1;
-            while (browserRef.children.length > colsParaManter) { browserRef.removeChild(browserRef.lastChild); }
+            // A Via 1 e a Via 2 agora ambas têm 2 colunas pai, então sempre limpamos a partir da 3ª
+            while (browserRef.children.length > 2) { browserRef.removeChild(browserRef.lastChild); }
             
             let especiesAgrupadas = {};
             especiesData.forEach(esp => {
