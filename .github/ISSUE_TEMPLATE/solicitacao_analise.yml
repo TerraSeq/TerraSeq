@@ -59,6 +59,25 @@ body:
       options:
         - "Protozoa"
         - "Fungi"
+        - "Bacteria"
+        - "Archaea"
+        - "Nematoda"
+        - "Tardigrada"
+        - "Rotifera"
+        - "Acari"
+        - "Collembola"
+        - "Minhocas"
+        - "Formigas"
+        - "Cupins"
+        - "Isopodes"
+        - "Miriapodes"
+        - "Platelmintos"
+        - "Aracnideos"
+        - "Insetos"
+        - "Moluscos"
+        - "Plantas"
+        - "Virus"
+        - "Megafauna"
     validations:
       required: true
 

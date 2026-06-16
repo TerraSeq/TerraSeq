@@ -25,8 +25,6 @@ EMAIL_REMETENTE = "tiagogabriel3542@gmail.com"
 EMAIL_SENHA = "huyapitnfjegbsuz"
 
 # --- CONFIGURAÇÕES DA API DO GITHUB ---
-import os
-
 caminho_token = os.path.join(os.path.dirname(__file__), 'tokenGitHubIssues.txt')
 with open(caminho_token, "r") as f:
     GITHUB_TOKEN = f.read().strip()
@@ -37,6 +35,52 @@ HEADERS = {
     "Authorization": f"token {GITHUB_TOKEN}",
     "Accept": "application/vnd.github.v3+json"
 }
+
+# ==========================================
+# MOTOR DE CLASSIFICAÇÃO ECOLÓGICA (Atlas)
+# ==========================================
+REGRAS_CLASSIFICACAO_ECOLOGICA = [
+    # --- Engenheiros do Ecossistema ---
+    ("Enquitreídeos", "Mesofauna / Macrofauna", "Engenheiros do Ecossistema", ["enchytraeidae"]),
+    ("Formigas", "Macrofauna", "Engenheiros do Ecossistema", ["formicidae"]),
+    ("Cupins", "Macrofauna", "Engenheiros do Ecossistema", ["isoptera", "termitoidae", "termitidae", "rhinotermitidae", "termopsidae", "kalotermitidae"]),
+    ("Minhocas", "Macrofauna", "Engenheiros do Ecossistema", ["lumbricina", "lumbricidae", "megascolecidae", "glossoscolecidae", "moniligastridae", "ocnerodrilidae", "acanthodrilidae", "criodrilidae", "oligochaeta"]),
+
+    # --- Decompositores da Serrapilheira ---
+    ("Ácaros", "Mesofauna", "Decompositores da Serrapilheira", ["acari", "acariformes", "parasitiformes", "oribatida", "mesostigmata", "trombidiformes", "sarcoptiformes", "ixodida"]),
+    ("Colêmbolos, Proturos e Dipluros", "Mesofauna", "Decompositores da Serrapilheira", ["collembola", "protura", "diplura"]),
+    ("Isópodes", "Macrofauna", "Decompositores da Serrapilheira", ["isopoda", "oniscidea"]),
+    ("Miriápodes", "Macrofauna", "Decompositores da Serrapilheira", ["myriapoda", "diplopoda", "chilopoda", "symphyla", "pauropoda"]),
+    ("Insetos (Adultos e Larvas)", "Macrofauna", "Decompositores da Serrapilheira", ["coleoptera", "diptera", "lepidoptera", "hexapoda", "insecta"]),
+
+    # --- Micropredadores ---
+    ("Aracnídeos (Aranhas e Escorpiões)", "Macrofauna", "Micropredadores", ["araneae", "pseudoscorpiones", "scorpiones", "opiliones"]),
+    ("Platelmintos", "Macrofauna", "Micropredadores", ["platyhelminthes", "turbellaria", "geoplanidae"]),
+    ("Protistas", "Microfauna", "Micropredadores", ["amoebozoa", "alveolata", "ciliophora", "euglenozoa", "cercozoa", "apicomplexa", "heterolobosea", "foraminifera", "rhizaria", "stramenopiles", "protista"]),
+    ("Nematoides", "Microfauna", "Micropredadores", ["nematoda"]),
+    ("Tardígrados", "Microfauna", "Micropredadores", ["tardigrada"]),
+    ("Rotíferos", "Microfauna", "Micropredadores", ["rotifera"]),
+
+    # --- Microrganismos ---
+    ("Fungos", "Microrganismos", "Microrganismos", ["fungi", "ascomycota", "basidiomycota", "mucoromycota", "chytridiomycota", "zoopagomycota", "glomeromycota"]),
+    ("Archaea", "Microrganismos", "Microrganismos", ["archaea"]),
+    ("Bactérias", "Microrganismos", "Microrganismos", ["bacteria", "cyanobacteria", "proteobacteria", "firmicutes", "actinobacteria"]),
+
+    # --- Fora do Escopo Principal ---
+    ("Moluscos", "Macrofauna / Megafauna", "Fora do Escopo Principal", ["mollusca", "gastropoda"]),
+    ("Plantas (Raízes)", "Flora", "Fora do Escopo Principal", ["viridiplantae", "embryophyta"]),
+    ("Vírus", "Vírus", "Fora do Escopo Principal", ["viruses", "viricota", "riboviria"]),
+    ("Megafauna (Vertebrados)", "Megafauna", "Fora do Escopo Principal", ["mammalia", "reptilia", "amphibia", "vertebrata"]),
+]
+
+FUNCOES_ECOLOGICAS = sorted({f for _, _, f, _ in REGRAS_CLASSIFICACAO_ECOLOGICA} | {"Função Indefinida"})
+
+def classificar_ecologia(linhagem):
+    tax_str = " ".join(linhagem).lower()
+    for grande_grupo, tamanho, funcao_ecologica, termos in REGRAS_CLASSIFICACAO_ECOLOGICA:
+        if any(termo in tax_str for termo in termos):
+            return grande_grupo, tamanho, funcao_ecologica
+    return "Não Classificado", "Indefinido", "Função Indefinida"
 
 # ==========================================
 # FUNÇÕES DE APOIO E E-MAIL
@@ -95,6 +139,8 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
     print(f"🌳 Consultando NCBI para {total_organismos} organismos únicos...")
     paths = []
     meta_dict = {} 
+    
+    functional_roles = {funcao: {} for funcao in FUNCOES_ECOLOGICAS}
 
     for index, subject_id in enumerate(lista_ids, 1):
         print(f"   ⏳ Baixando dados [{index}/{total_organismos}]: {subject_id}...", end="\r")
@@ -121,6 +167,17 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
                         },
                         "amplicons": []
                     }
+                
+                grupo, tamanho, funcao = classificar_ecologia(linhagem)
+                
+                if grupo not in functional_roles[funcao]:
+                    functional_roles[funcao][grupo] = {"tamanho": tamanho, "especies": []}
+                    
+                functional_roles[funcao][grupo]["especies"].append({
+                    "especie": especie,
+                    "id": acc,
+                    "matches": len(hits_data_map.get(subject_id, []))
+                })
                 
                 if subject_id in hits_data_map:
                     meta_dict[especie]["amplicons"].extend(hits_data_map[subject_id])
@@ -154,7 +211,7 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
         for child in node["children"]: calc_coverage(child)
     calc_coverage(root)
 
-    return root, meta_dict
+    return root, meta_dict, functional_roles
 
 def publicar_no_github(req_id):
     print("🚀 Iniciando publicação no GitHub Pages...")
@@ -188,7 +245,7 @@ def atualizar_vitrine_html(req, req_id):
     data_hoje = datetime.now().strftime("%d/%m/%Y")
 
     # MARCADOR
-    marcador_alvo = "<!-- NOVAS_LINHAS -->"
+    marcador_alvo = ""
 
     # Nova linha da tabela
     nova_linha = f"""
@@ -266,19 +323,49 @@ def run_pipeline(req, req_id):
     max_hits = str(req.get('Limite de hits', 500) or 500)
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
-    # Seleção dinâmica do Banco de Dados!
-    banco_selecionado = str(req.get('Banco de Dados', 'Protozoa')).strip()
-    if banco_selecionado.lower() == 'fungi':
-        caminho_genomas = os.path.join(raiz_projeto, "data/refseq/fungi_all.fasta")
-        total_sequencias_banco = 500000 # Estimativa para Fungi
-    else:
-        caminho_genomas = os.path.join(raiz_projeto, "data/refseq/protozoa_all.fasta")
-        total_sequencias_banco = 150000 # Estimativa para Protozoa
+    # ==========================================
+    # SELEÇÃO DINÂMICA DO BANCO DE DADOS
+    # ==========================================
+    banco_selecionado = str(req.get('Banco de Dados', 'Protozoa')).strip().lower()
+    
+    BANCOS_DISPONIVEIS = {
+        "fungi": ("fungi_all.fasta", 500000),
+        "protozoa": ("protozoa_all.fasta", 150000),
+        "bacteria": ("bacteria_all.fasta", 2000000),
+        "archaea": ("archaea_all.fasta", 50000),
+        "nematoda": ("nematoda_all.fasta", 30000),
+        "tardigrada": ("tardigrada_all.fasta", 500),
+        "rotifera": ("rotifera_all.fasta", 1000),
+        "acari": ("acari_all.fasta", 10000),
+        "collembola": ("collembola_all.fasta", 5000),
+        "minhocas": ("minhocas_all.fasta", 2000),
+        "formigas": ("formicidae_all.fasta", 15000),
+        "cupins": ("termitoidae_all.fasta", 8000),
+        "isopodes": ("isopoda_all.fasta", 2000),
+        "miriapodes": ("myriapoda_all.fasta", 1500),
+        "mistura_teste": ("mistura_solo.fasta", 42000),
+        "platelmintos": ("platelmintos_all.fasta", 5000),
+        "aracnideos": ("aracnideos_all.fasta", 12000),
+        "insetos": ("insetos_all.fasta", 50000),
+        "moluscos": ("moluscos_all.fasta", 15000),
+        "plantas": ("plantas_all.fasta", 100000),
+        "virus": ("virus_all.fasta", 1000000),
+        "megafauna": ("megafauna_all.fasta", 50000)
+    }
 
+    if banco_selecionado in BANCOS_DISPONIVEIS:
+        arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS[banco_selecionado]
+    else:
+        arquivo_alvo, total_sequencias_banco = ("protozoa_all.fasta", 150000)
+
+    caminho_genomas = os.path.join(raiz_projeto, "data/refseq", arquivo_alvo)
     prefixo_saida = os.path.join(pasta_resultado, "saida")
     
+    # Caminho absoluto para o motor do BLAST (Correção do Servidor)
+    caminho_script_blast = os.path.join(raiz_projeto, "primer_blast_local.py")
+    
     cmd_blast = [
-        sys.executable, "primer_blast_local.py",
+        sys.executable, caminho_script_blast,
         "-g", caminho_genomas, "-p", caminho_primer, "-o", prefixo_saida,
         "-e", e_value, "--min_size", min_size, "--max_size", max_size,
         "-m", tm_min, "--max_3prime_mismatches", str(mismatches),
@@ -340,7 +427,7 @@ def run_pipeline(req, req_id):
     lista_bacterias = list(bacterias_encontradas)
     
     print("⚙️ Preparando montagem taxonômica...")
-    arvore_real, meta_dict = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
+    arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
 
     avisos = []
     cobertura_global = (len(lista_bacterias) / total_sequencias_banco) 
@@ -377,6 +464,7 @@ def run_pipeline(req, req_id):
             "off_target_matches": 0,
             "mean_amplicon_size": round(media_amplicon, 1)
         },
+        "functional_tree": papeis_funcionais,
         "taxonomy_tree": arvore_real,
         "leaf_metadata": meta_dict,
         "warnings": avisos
@@ -399,7 +487,6 @@ def buscar_requisicoes_github():
         if response.status_code == 200:
             return response.json()
         else:
-            # ESSA É A LINHA QUE VAI DEDURAR O ERRO!
             print(f"⚠️ O GitHub recusou a conexão. Código: {response.status_code} | Motivo: {response.text}")
     except Exception as e:
         print(f"⚠️ Erro de conexão com GitHub: {e}")
@@ -438,8 +525,8 @@ def parse_issue_body(body):
         'Primer forward': data.get("Primer Forward (5' -> 3')", ''),
         'Primer reverse': data.get("Primer Reverse (5' -> 3')", ''),
         'Região alvo': data.get('Região Alvo', '18S'),
-        'Banco de Dados': data.get('Banco de Dados', 'Protozoa'), # <- O arquivo físico
-        'Tipo de organismo': data.get('Tipo de organismo', 'Eukaryota'), # <- O metadado
+        'Banco de Dados': data.get('Banco de Dados', 'Protozoa'),
+        'Tipo de organismo': data.get('Tipo de organismo', 'Eukaryota'),
         'Máximo de Mismatches na extremidade 3': data.get("Máximo de Mismatches (Extremidade 3')", '3'),
         'Tamanho do amplicon: MIN': data.get('Tamanho Mínimo do Amplicon (bp)', '3000'),
         'Tamanho do amplicon: MAX': data.get('Tamanho Máximo do Amplicon (bp)', '8000'),
