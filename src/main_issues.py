@@ -17,7 +17,7 @@ import traceback
 # ==========================================
 # CONFIGURAÇÕES INICIAIS E API
 # ==========================================
-Entrez.email = "tiagogabriel3542@gmail.com" # Seu e-mail do NCBI
+Entrez.email = "tiagogabriel3542@gmail.com" 
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -26,7 +26,7 @@ EMAIL_SENHA = "huyapitnfjegbsuz"
 
 # --- CONFIGURAÇÕES DA API DO GITHUB ---
 import os
-# Agora ele lê o token direto da pasta src/ onde o arquivo realmente está!
+
 caminho_token = os.path.join(os.path.dirname(__file__), 'tokenGitHubIssues.txt')
 with open(caminho_token, "r") as f:
     GITHUB_TOKEN = f.read().strip()
@@ -360,7 +360,6 @@ def run_pipeline(req, req_id):
             "max_mismatches": mismatches,
             "amplicon_min": int(min_size),
             "amplicon_max": int(max_size),
-            # --- PARÂMETROS ADICIONADOS AQUI TAMBÉM ---
             "e_value": float(e_value),
             "min_coverage": int(cobertura),
             "max_hits": int(max_hits),

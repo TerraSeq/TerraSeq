@@ -16,11 +16,11 @@ from email.mime.multipart import MIMEMultipart
 import traceback
 
 # --- CONFIGURAÇÕES INICIAIS ---
-Entrez.email = "tiagogabriel3542@gmial.com" # Coloque seu e-mail do NCBI aqui
+Entrez.email = "tiagogabriel3542@gmial.com"
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-EMAIL_REMETENTE = "tiagogabriel3542@gmail.com" # Coloque seu e-mail de envio aqui
+EMAIL_REMETENTE = "tiagogabriel3542@gmail.com" 
 EMAIL_SENHA = "huyapitnfjegbsuz"
 
 caminho_credenciais = os.path.join(os.path.dirname(__file__), 'credentials.json')
@@ -30,6 +30,78 @@ client = gspread.authorize(credentials)
 
 NOME_DA_PLANILHA = "Submissoes_Primers_Pipeline"
 planilha = client.open(NOME_DA_PLANILHA).sheet1
+
+# ==========================================
+# MOTOR DE CLASSIFICAÇÃO ECOLÓGICA (Global Soil Biodiversity Atlas)
+#
+# "Grande Grupo"     -> Capítulo II (Diversidade dos Organismos do Solo)
+# "Função Ecológica" -> Capítulo IV, p.112 (Ecosystem Functions and Services)
+#
+# O Cap. IV (p.112) define 4 grupos funcionais para a biota do solo:
+#   1) Microrganismos                  -> Bactérias, Archaea, Fungos
+#   2) Micropredadores                 -> Protistas, Nematoides, Tardígrados, Rotíferos
+#   3) Decompositores da Serrapilheira -> meso/macrofauna que fragmenta a
+#      serrapilheira: Ácaros, Colêmbolos, Isópodes, Miriápodes, larvas de insetos
+#   4) Engenheiros do Ecossistema       -> Minhocas, Enquitreídeos, Formigas, Cupins
+#
+# Grupos que existem no Cap. II mas NÃO se encaixam nos 4 grupos funcionais do
+# Cap. IV (Moluscos, Plantas/raízes, Vírus, Megafauna/Vertebrados) recebem a
+# função "Fora do Escopo do Atlas (Cap.4)". Eles continuam aparecendo
+# normalmente na árvore taxonômica, mas ficam isolados na árvore funcional.
+# ==========================================
+
+# Cada item: (Grande Grupo, Função Ecológica, [termos de busca na linhagem do NCBI])
+# A lista é avaliada NA ORDEM: o primeiro grupo cujo termo aparecer na linhagem
+# "vence". Por isso grupos mais ESPECÍFICOS (ex: Enchytraeidae) vêm ANTES de
+# grupos mais GENÉRICOS que os englobam (ex: Oligochaeta -> Minhocas).
+# ==========================================
+# MOTOR DE CLASSIFICAÇÃO ECOLÓGICA (Atlas)
+# Formato: (Grupo, Tamanho Biológico, Função Ecológica, [termos])
+# ==========================================
+
+REGRAS_CLASSIFICACAO_ECOLOGICA = [
+    # --- Engenheiros do Ecossistema ---
+    ("Enquitreídeos", "Mesofauna / Macrofauna", "Engenheiros do Ecossistema", ["enchytraeidae"]),
+    ("Formigas", "Macrofauna", "Engenheiros do Ecossistema", ["formicidae"]),
+    ("Cupins", "Macrofauna", "Engenheiros do Ecossistema", ["isoptera", "termitoidae", "termitidae", "rhinotermitidae", "termopsidae", "kalotermitidae"]),
+    ("Minhocas", "Macrofauna", "Engenheiros do Ecossistema", ["lumbricina", "lumbricidae", "megascolecidae", "glossoscolecidae", "moniligastridae", "ocnerodrilidae", "acanthodrilidae", "criodrilidae", "oligochaeta"]),
+
+    # --- Decompositores da Serrapilheira ---
+    ("Ácaros", "Mesofauna", "Decompositores da Serrapilheira", ["acari", "acariformes", "parasitiformes", "oribatida", "mesostigmata", "trombidiformes", "sarcoptiformes", "ixodida"]),
+    ("Colêmbolos, Proturos e Dipluros", "Mesofauna", "Decompositores da Serrapilheira", ["collembola", "protura", "diplura"]),
+    ("Isópodes", "Macrofauna", "Decompositores da Serrapilheira", ["isopoda", "oniscidea"]),
+    ("Miriápodes", "Macrofauna", "Decompositores da Serrapilheira", ["myriapoda", "diplopoda", "chilopoda", "symphyla", "pauropoda"]),
+    ("Insetos (Adultos e Larvas)", "Macrofauna", "Decompositores da Serrapilheira", ["coleoptera", "diptera", "lepidoptera", "hexapoda", "insecta"]),
+
+    # --- Micropredadores ---
+    ("Aracnídeos (Aranhas e Escorpiões)", "Macrofauna", "Micropredadores", ["araneae", "pseudoscorpiones", "scorpiones", "opiliones"]),
+    ("Platelmintos", "Macrofauna", "Micropredadores", ["platyhelminthes", "turbellaria", "geoplanidae"]),
+    ("Protistas", "Microfauna", "Micropredadores", ["amoebozoa", "alveolata", "ciliophora", "euglenozoa", "cercozoa", "apicomplexa", "heterolobosea", "foraminifera", "rhizaria", "stramenopiles", "protista"]),
+    ("Nematoides", "Microfauna", "Micropredadores", ["nematoda"]),
+    ("Tardígrados", "Microfauna", "Micropredadores", ["tardigrada"]),
+    ("Rotíferos", "Microfauna", "Micropredadores", ["rotifera"]),
+
+    # --- Microrganismos ---
+    ("Fungos", "Microrganismos", "Microrganismos", ["fungi", "ascomycota", "basidiomycota", "mucoromycota", "chytridiomycota", "zoopagomycota", "glomeromycota"]),
+    ("Archaea", "Microrganismos", "Microrganismos", ["archaea"]),
+    ("Bactérias", "Microrganismos", "Microrganismos", ["bacteria", "cyanobacteria", "proteobacteria", "firmicutes", "actinobacteria"]),
+
+    # --- Fora do Escopo Principal ---
+    ("Moluscos", "Macrofauna / Megafauna", "Fora do Escopo Principal", ["mollusca", "gastropoda"]),
+    ("Plantas (Raízes)", "Flora", "Fora do Escopo Principal", ["viridiplantae", "embryophyta"]),
+    ("Vírus", "Vírus", "Fora do Escopo Principal", ["viruses", "viricota", "riboviria"]),
+    ("Megafauna (Vertebrados)", "Megafauna", "Fora do Escopo Principal", ["mammalia", "reptilia", "amphibia", "vertebrata"]),
+]
+
+FUNCOES_ECOLOGICAS = sorted({f for _, _, f, _ in REGRAS_CLASSIFICACAO_ECOLOGICA} | {"Função Indefinida"})
+
+def classificar_ecologia(linhagem):
+    tax_str = " ".join(linhagem).lower()
+    for grande_grupo, tamanho, funcao_ecologica, termos in REGRAS_CLASSIFICACAO_ECOLOGICA:
+        if any(termo in tax_str for termo in termos):
+            return grande_grupo, tamanho, funcao_ecologica
+    return "Não Classificado", "Indefinido", "Função Indefinida"
+
 
 def validate_primer(seq):
     seq = str(seq).strip()
@@ -83,7 +155,12 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
     print(f"🌳 Consultando NCBI para {total_organismos} organismos únicos...")
     paths = []
     meta_dict = {} 
-
+    
+    # DICIONÁRIO PARA A CLASSIFICAÇÃO FUNCIONAL (Cap. 4, p.112)
+    # Gerado a partir de FUNCOES_ECOLOGICAS, então cobre automaticamente os
+    # 4 grupos do Atlas + "Fora do Escopo do Atlas (Cap.4)" + "Função Indefinida".
+    functional_roles = {funcao: {} for funcao in FUNCOES_ECOLOGICAS}
+    
     for index, subject_id in enumerate(lista_ids, 1):
         print(f"   ⏳ Baixando dados [{index}/{total_organismos}]: {subject_id}...", end="\r")
         try:
@@ -110,13 +187,26 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
                         "amplicons": []
                     }
                 
+                # ---> INJETAR ESTA PARTE NOVA LOGO ABAIXO DO paths.append <---
+                grupo, tamanho, funcao = classificar_ecologia(linhagem)
+                
+                if grupo not in functional_roles[funcao]:
+                    # Agora criamos um dicionário que guarda o tamanho e a lista de espécies
+                    functional_roles[funcao][grupo] = {"tamanho": tamanho, "especies": []}
+                    
+                functional_roles[funcao][grupo]["especies"].append({
+                    "especie": especie,
+                    "id": acc,
+                    "matches": len(hits_data_map.get(subject_id, []))
+                })
+                
                 if subject_id in hits_data_map:
                     meta_dict[especie]["amplicons"].extend(hits_data_map[subject_id])
                     
         except Exception:
             paths.append(["Unclassified"])
         
-        time.sleep(0.4) # Timeout educado pro NCBI não bloquear seu IP
+        time.sleep(0.4) 
 
     print(f"\n   ✅ Árvore construída com sucesso para {total_organismos} organismos!")
 
@@ -142,7 +232,7 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
         for child in node["children"]: calc_coverage(child)
     calc_coverage(root)
 
-    return root, meta_dict
+    return root, meta_dict, functional_roles
 
 def publicar_no_github(req_id):
     print("🚀 Iniciando publicação no GitHub Pages...")
@@ -247,21 +337,40 @@ def run_pipeline(req, req_id):
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
     # ==========================================
-    # NOVO: SELEÇÃO DINÂMICA DO BANCO DE DADOS
+    # NOVO: SELEÇÃO DINÂMICA DO BANCO DE DADOS (ATLAS)
     # ==========================================
-    # Puxa o valor da nova pergunta do Forms (se o usuário não preencher, assume Protozoa)
-    banco_selecionado = str(req.get('Banco de Dados', 'Protozoa')).strip()
+    banco_selecionado = str(req.get('Banco de Dados', 'Protozoa')).strip().lower()
     
-    if banco_selecionado.lower() == 'fungi':
-        caminho_genomas = os.path.join(raiz_projeto, "data/refseq/fungi_all.fasta")
-        total_sequencias_banco = 500000 # Usado lá embaixo para a % de cobertura
+    # Dicionário: "nome_no_forms": ("arquivo_fasta", "total_estimado_para_cobertura")
+    BANCOS_DISPONIVEIS = {
+        "fungi": ("fungi_all.fasta", 500000),
+        "protozoa": ("protozoa_all.fasta", 150000),
+        "bacteria": ("bacteria_all.fasta", 2000000),
+        "archaea": ("archaea_all.fasta", 50000),
+        "nematoda": ("nematoda_all.fasta", 30000),
+        "tardigrada": ("tardigrada_all.fasta", 500),
+        "rotifera": ("rotifera_all.fasta", 1000),
+        "acari": ("acari_all.fasta", 10000),
+        "collembola": ("collembola_all.fasta", 5000),
+        "minhocas": ("minhocas_all.fasta", 2000),
+        "formigas": ("formicidae_all.fasta", 15000),
+        "cupins": ("termitoidae_all.fasta", 8000),
+        "isopodes": ("isopoda_all.fasta", 2000),
+        "mistura_teste": ("mistura_solo.fasta", 42000),
+        "miriapodes": ("myriapoda_all.fasta", 1500)
+    }
+
+    if banco_selecionado in BANCOS_DISPONIVEIS:
+        arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS[banco_selecionado]
     else:
-        caminho_genomas = os.path.join(raiz_projeto, "data/refseq/protozoa_all.fasta")
-        total_sequencias_banco = 150000 # Usado lá embaixo para a % de cobertura
+        # Fallback de segurança se o usuário digitar algo errado
+        arquivo_alvo, total_sequencias_banco = ("protozoa_all.fasta", 150000)
+
+    caminho_genomas = os.path.join(raiz_projeto, "data/refseq", arquivo_alvo)
 
     prefixo_saida = os.path.join(pasta_resultado, "saida")
     
-    # Repare que mantive suas configurações de processamento intactas (-t 8, etc)
+    
     cmd_blast = [
         sys.executable, "primer_blast_local.py",
         "-g", caminho_genomas, "-p", caminho_primer, "-o", prefixo_saida,
@@ -306,14 +415,12 @@ def run_pipeline(req, req_id):
                 
                 acc_limpo = sid.split('|')[0].split('.')[0]
 
-                # --- CAÇADOR DE TM BLINDADO ---
                 tm_real = "N/A"
                 for chave, valor in linha.items():
                     if chave and "amplicon_tm" in chave.lower().strip():
                         tm_real = valor
                         break
-                # ------------------------------
-
+        
                 hits_data_map[sid].append({
                     "acc": acc_limpo,
                     "size": extrair_campo_flexivel(linha, "size", "N/A"),
@@ -328,7 +435,7 @@ def run_pipeline(req, req_id):
     lista_bacterias = list(bacterias_encontradas)
     
     print("⚙️ Preparando montagem taxonômica...")
-    arvore_real, meta_dict = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
+    arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
 
     avisos = []
     cobertura_global = (len(lista_bacterias) / 150000) 
@@ -348,7 +455,6 @@ def run_pipeline(req, req_id):
             "max_mismatches": mismatches,
             "amplicon_min": int(min_size),
             "amplicon_max": int(max_size),
-            # --- NOVOS CAMPOS ADICIONADOS PARA A REUNIÃO ---
             "e_value": float(e_value),
             "min_coverage": int(cobertura),
             "max_hits": int(max_hits),
@@ -366,6 +472,8 @@ def run_pipeline(req, req_id):
             "off_target_matches": 0,
             "mean_amplicon_size": round(media_amplicon, 1)
         },
+        # ---> 2. INJETAR O NOVO NÓ AQUI ANTES DO WARNINGS:
+        "functional_tree": papeis_funcionais,
         "taxonomy_tree": arvore_real,
         "leaf_metadata": meta_dict,
         "warnings": avisos
