@@ -356,8 +356,17 @@ def run_pipeline(req, req_id):
         "formigas": ("formicidae_all.fasta", 15000),
         "cupins": ("termitoidae_all.fasta", 8000),
         "isopodes": ("isopoda_all.fasta", 2000),
+        "miriapodes": ("myriapoda_all.fasta", 1500),
         "mistura_teste": ("mistura_solo.fasta", 42000),
-        "miriapodes": ("myriapoda_all.fasta", 1500)
+        
+        # --- NOVOS BANCOS ADICIONADOS ---
+        "platelmintos": ("platelmintos_all.fasta", 5000),
+        "aracnideos": ("aracnideos_all.fasta", 12000),
+        "insetos": ("insetos_all.fasta", 50000),
+        "moluscos": ("moluscos_all.fasta", 15000),
+        "plantas": ("plantas_all.fasta", 100000),
+        "virus": ("virus_all.fasta", 1000000),
+        "megafauna": ("megafauna_all.fasta", 50000)
     }
 
     if banco_selecionado in BANCOS_DISPONIVEIS:
