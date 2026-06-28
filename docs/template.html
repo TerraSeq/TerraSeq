@@ -70,8 +70,9 @@
         .param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
         /* ÁREA PRINCIPAL (Resultados) */
-        .main-content { display: flex; flex-direction: column; gap: 30px; }
-        .panel { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.04); padding: 25px; }
+        /* ÁREA PRINCIPAL (Resultados) */
+        .main-content { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+        .panel { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.04); padding: 25px; min-width: 0; }
         .panel-title { font-size: 1.25rem; color: var(--primary); font-weight: 600; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
 
         /* Botões e Filtros da Árvore */
