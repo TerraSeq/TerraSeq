@@ -3,7 +3,7 @@
     "metadata": {
         "submitted_by": "tiago forms",
         "email": "tiagomarquesgabriel2405@gmail.com",
-        "submitted_at": "27/06/2026 às 21:18",
+        "submitted_at": "27/06/2026 às 21:20",
         "target_region": "X",
         "organism": "Eukaryota",
         "max_mismatches": 2,
@@ -11,7 +11,7 @@
         "amplicon_max": 8000,
         "e_value": 10.0,
         "min_coverage": 40,
-        "max_hits": 10,
+        "max_hits": 30,
         "min_tm": 0.0,
         "database": "refseq"
     },
