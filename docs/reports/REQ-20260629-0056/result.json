@@ -3,21 +3,21 @@
     "metadata": {
         "submitted_by": "Tiago M G",
         "email": "tiagogabriel3542@gmail.com",
-        "submitted_at": "29/06/2026 às 04:43",
-        "target_region": "COI",
+        "submitted_at": "29/06/2026 às 18:04",
+        "target_region": "16S rRNA V4",
         "organism": "Eukaryota",
-        "max_mismatches": 3,
+        "max_mismatches": 2,
         "amplicon_min": 200,
-        "amplicon_max": 6000,
+        "amplicon_max": 450,
         "e_value": 10.0,
-        "min_coverage": 95,
-        "max_hits": 100,
+        "min_coverage": 80,
+        "max_hits": 1000,
         "min_tm": 0.0,
         "database": "refseqsoil"
     },
     "primers": {
-        "forward": "GGTCAACAAATCATAAAGATATTGG",
-        "reverse": "TAAACTTCAGGGTGACCAAAAAATCA"
+        "forward": "GTGCCAGCMGCCGCGGTAA",
+        "reverse": "GGACTACHVGGGTWTCTAAT"
     },
     "summary": {
         "total_sequences_checked": 150000,
@@ -43,7 +43,6 @@
     },
     "leaf_metadata": {},
     "warnings": [
-        "Cobertura geral baixa. Verifique os filos relevantes.",
-        "Potenciais off-targets (Tolerância a mismatch alta)."
+        "Cobertura geral baixa. Verifique os filos relevantes."
     ]
 }
