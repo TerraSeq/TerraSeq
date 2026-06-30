@@ -3,7 +3,7 @@
     "metadata": {
         "submitted_by": "Tiago G",
         "email": "tiagogabriel3542@gmail.com",
-        "submitted_at": "30/06/2026 às 00:52",
+        "submitted_at": "30/06/2026 às 01:08",
         "target_region": "16S rRNA V4",
         "organism": "Eukaryota",
         "max_mismatches": 4,
@@ -11,7 +11,7 @@
         "amplicon_max": 800,
         "e_value": 10.0,
         "min_coverage": 80,
-        "max_hits": 5000,
+        "max_hits": 1000,
         "min_tm": 0.0,
         "database": "refseqsoil"
     },
@@ -21,10 +21,10 @@
     },
     "summary": {
         "total_sequences_checked": 150000,
-        "total_matches": 200,
-        "estimated_coverage": 0.00133,
+        "total_matches": 118,
+        "estimated_coverage": 0.00079,
         "off_target_matches": 0,
-        "mean_amplicon_size": 705.5
+        "mean_amplicon_size": 705.8
     },
     "functional_tree": {
         "Decompositores da Serrapilheira": {},
@@ -37,7 +37,7 @@
     "taxonomy_tree": {
         "name": "Root",
         "rank": "root",
-        "matches": 231,
+        "matches": 137,
         "coverage": 1.0,
         "children": []
     },
