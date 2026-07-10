@@ -3,7 +3,7 @@
     "metadata": {
         "submitted_by": "Teste 1",
         "email": "tiagomarquesgabriel2405@gmail.com",
-        "submitted_at": "10/07/2026 às 15:57",
+        "submitted_at": "10/07/2026 às 16:06",
         "target_region": "18S",
         "organism": "Eukaryota",
         "max_mismatches": 2,
@@ -17,7 +17,7 @@
     },
     "primers": {
         "forward": "CCAGCASCYGCGGTAATTCC",
-        "reverse": "GACGAGGCATTTGGCTACCTT"
+        "reverse": "AGCTYAAHAGGGTCTTCT"
     },
     "summary": {
         "total_sequences_checked": 46190,
