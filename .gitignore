@@ -1,6 +1,11 @@
 *.csv
 *.out
-data/
+data/refseq/*
+!data/refseq/.gitkeep
+
+data/blast_dbs/*
+!data/blast_dbs/.gitkeep
+
 __pycache__/
 src/credentials.json
 src/tokenGitHubIssues.txt

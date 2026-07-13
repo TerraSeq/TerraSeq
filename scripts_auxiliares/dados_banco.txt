@@ -1,0 +1,68 @@
+TAXON              | TOTAL  | REFSEQ | GENBANK | PESO (GB)
+------------------------------------------------------------
+enchytraeidae      | 8      | 0      | 8       | 8.36 GB
+formicidae         | 213    | 31     | 182     | 60.53 GB
+isoptera           | 50     | 2      | 48      | 50.43 GB
+oligochaeta        | 25     | 0      | 25      | 22.27 GB
+acari              | 145    | 20     | 125     | 91.82 GB
+collembola         | 139    | 1      | 138     | 28.52 GB
+protura            | 0      | 0      | 0       | 0.00 GB
+diplura            | 0      | 0      | 0       | 0.00 GB
+isopoda            | 14     | 0      | 14      | 31.36 GB
+myriapoda          | 68     | 0      | 68      | 45.04 GB
+hexapoda           | 5284   | 330    | 4954    | 2795.69 GB
+arachnida          | 267    | 26     | 241     | 355.91 GB
+platyhelminthes    | 103    | 4      | 99      | 54.00 GB
+protista           | 0      | 0      | 0       | 0.00 GB
+nematoda           | 248    | 8      | 240     | 39.58 GB
+tardigrada         | 6      | 1      | 5       | 0.94 GB
+rotifera           | 20     | 0      | 20      | 3.09 GB
+fungi              | 5444   | 668    | 4776    | 194.21 GB
+archaea            | 822    | 822    | 0       | 2.40 GB
+bacteria           | 22549  | 22549  | 0       | 94.62 GB
+mollusca           | 545    | 36     | 509     | 735.05 GB
+viridiplantae      | 3479   | 201    | 3278    | 3782.82 GB
+viruses            | 0      | 0      | 0       | 0.00 GB
+vertebrata         | 5977   | 872    | 5105    | 8150.91 GB
+------------------------------------------------------------
+🏆 RESUMO FINAL DO BANCO DE REFERÊNCIA:
+   -> Genomas Totais : 45406
+   -> Apenas RefSeq  : 25571
+   -> Apenas GenBank : 19835
+   -> Peso Estimado  : 16547.56 GB
+------------------------------------------------------------
+
+TAXON            | TOTAL  | REFSEQ | GB (REF) | GENBANK | GB (GEN)
+---------------------------------------------------------------------------
+enchytraeidae    | 8      | 0      | 0.00     | 8       | 8.36
+formicidae       | 213    | 31     | 8.43     | 182     | 52.10
+isoptera         | 50     | 2      | 1.40     | 48      | 49.03
+oligochaeta      | 25     | 0      | 0.00     | 25      | 22.27
+acari            | 145    | 20     | 26.03    | 125     | 65.79
+collembola       | 139    | 1      | 0.21     | 138     | 28.31
+protura          | 0      | 0      | 0.00     | 0       | 0.00
+diplura          | 0      | 0      | 0.00     | 0       | 0.00
+isopoda          | 14     | 0      | 0.00     | 14      | 31.36
+myriapoda        | 68     | 0      | 0.00     | 68      | 45.04
+hexapoda         | 5284   | 330    | 194.55   | 4954    | 2601.14
+arachnida        | 267    | 26     | 34.68    | 241     | 321.23
+platyhelminthes  | 103    | 4      | 1.39     | 99      | 52.61
+protista         | 0      | 0      | 0.00     | 0       | 0.00
+nematoda         | 248    | 8      | 0.80     | 240     | 38.78
+tardigrada       | 6      | 1      | 0.16     | 5       | 0.78
+rotifera         | 20     | 0      | 0.00     | 20      | 3.09
+fungi            | 5444   | 668    | 20.24    | 4776    | 173.96
+archaea          | 822    | 822    | 2.40     | 0       | 0.00
+bacteria         | 22549  | 22549  | 94.62    | 0       | 0.00
+mollusca         | 545    | 36     | 42.70    | 509     | 692.34
+viridiplantae    | 3479   | 201    | 208.04   | 3278    | 3574.78
+viruses          | 0      | 0      | 0.00     | 0       | 0.00
+vertebrata       | 5977   | 872    | 1587.17  | 5105    | 6563.74
+---------------------------------------------------------------------------
+🏆 PESO DETALHADO DO BANCO DE REFERÊNCIA:
+   -> Genomas Totais : 45406
+   -> Peso RefSeq    : 2222.83 GB (25571 genomas)
+   -> Peso GenBank   : 14324.72 GB (19835 genomas)
+   -> Peso Somado    : 16547.56 GB
+---------------------------------------------------------------------------
+

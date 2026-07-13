@@ -74,9 +74,9 @@ REGRAS_CLASSIFICACAO_ECOLOGICA = [
     ("Insetos (Adultos e Larvas)", "Macrofauna", "Decompositores da Serrapilheira", ["coleoptera", "diptera", "lepidoptera", "hexapoda", "insecta"]),
 
     # --- Micropredadores ---
-    ("Aracnídeos (Aranhas e Escorpiões)", "Macrofauna", "Micropredadores", ["araneae", "pseudoscorpiones", "scorpiones", "opiliones"]),
+    ("Aracnídeos (Aranhas e Escorpiões)", "Macrofauna", "Micropredadores", ["arachnida", "araneae", "pseudoscorpiones", "scorpiones", "opiliones"]),
     ("Platelmintos", "Macrofauna", "Micropredadores", ["platyhelminthes", "turbellaria", "geoplanidae"]),
-    ("Protistas", "Microfauna", "Micropredadores", ["amoebozoa", "alveolata", "ciliophora", "euglenozoa", "cercozoa", "apicomplexa", "heterolobosea", "foraminifera", "rhizaria", "stramenopiles", "protista"]),
+    ("Protistas", "Microfauna", "Micropredadores", ["excavata", "nuclearia", "ancyromonas", "fonticula", "rozella", "breviata", "apusomonadida", "amoebozoa", "alveolata", "ciliophora", "euglenozoa", "cercozoa", "apicomplexa", "heterolobosea", "foraminifera", "rhizaria", "stramenopiles", "protista"]),
     ("Nematoides", "Microfauna", "Micropredadores", ["nematoda"]),
     ("Tardígrados", "Microfauna", "Micropredadores", ["tardigrada"]),
     ("Rotíferos", "Microfauna", "Micropredadores", ["rotifera"]),
@@ -150,7 +150,7 @@ def extrair_campo_flexivel(dicionario_linha, palavra_chave, padrao="N/A"):
             return valor
     return padrao
 
-def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
+def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map, total_sequences_banco):
     total_organismos = len(lista_ids)
     print(f"🌳 Consultando NCBI para {total_organismos} organismos únicos...")
     paths = []
@@ -164,7 +164,11 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
     for index, subject_id in enumerate(lista_ids, 1):
         print(f"   ⏳ Baixando dados [{index}/{total_organismos}]: {subject_id}...", end="\r")
         try:
-            acc = subject_id.split('|')[0].split('.')[0] 
+            # CORREÇÃO: Pega o ID após o último | ou antes do primeiro | se não tiver prefixo.
+            # Se for gb|JBAMJC...| ele pega o item do meio.
+            partes = subject_id.split('|')
+            acc = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
+            acc = acc.split('.')[0]  # Remove a versão do Accession (.1)
             handle = Entrez.efetch(db="nucleotide", id=acc, retmode="xml")
             records = Entrez.read(handle)
             handle.close()
@@ -339,43 +343,73 @@ def run_pipeline(req, req_id):
     # ==========================================
     # NOVO: SELEÇÃO DINÂMICA DO BANCO DE DADOS (ATLAS)
     # ==========================================
-    banco_selecionado = str(req.get('Banco de Dados', 'Protozoa')).strip().lower()
+    banco_selecionado = str(req.get('Banco de Dados', 'refseqsoil')).strip().lower()
+    
+    # --- NOVO: Mapeamento Dinâmico do Banco Completo Local ---
+    DIRETORIO_BLAST = "/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs"
+    try:
+        indices = [f.split('.')[0] for f in os.listdir(DIRETORIO_BLAST) if f.endswith('.nsq') or f.endswith('.00.nsq')]
+        bancos_locais_unicos = set([os.path.join(DIRETORIO_BLAST, b) for b in indices])
+        string_banco_completo = " ".join(bancos_locais_unicos)
+    except FileNotFoundError:
+        string_banco_completo = ""
+        
+    # 2. NOVO: Mapeamento dinâmico EXCLUSIVO para agrupar os Protozoários
+    # Definimos os nomes exatos das bases que compõem os protistas
+    tags_protozoarios = ["amoebozoa", "sar", "discoba", "metamonada"]
+    bancos_protozoa = [os.path.join(DIRETORIO_BLAST, b) for b in tags_protozoarios]
+    string_protozoa_completo = " ".join(bancos_protozoa)
     
     # Dicionário: "nome_no_forms": ("arquivo_fasta", "total_estimado_para_cobertura")
     BANCOS_DISPONIVEIS = {
         "fungi": ("fungi_all.fasta", 500000),
-        "protozoa": ("protozoa_all.fasta", 150000),
-        "bacteria": ("bacteria_all.fasta", 2000000),
-        "archaea": ("archaea_all.fasta", 50000),
-        "nematoda": ("nematoda_all.fasta", 30000),
-        "tardigrada": ("tardigrada_all.fasta", 500),
-        "rotifera": ("rotifera_all.fasta", 1000),
-        "acari": ("acari_all.fasta", 10000),
-        "collembola": ("collembola_all.fasta", 5000),
-        "minhocas": ("minhocas_all.fasta", 2000),
-        "formigas": ("formicidae_all.fasta", 15000),
-        "cupins": ("termitoidae_all.fasta", 8000),
-        "isopodes": ("isopoda_all.fasta", 2000),
-        "miriapodes": ("myriapoda_all.fasta", 1500),
-        "mistura_teste": ("mistura_solo.fasta", 42000),
+        "protozoa": (string_protozoa_completo, 784),
+        "bacteria": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/bacteria", 22550),
+        "archaea": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/archaea", 822),
+        "nematoda": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/nematoda", 248),
+        "tardigrada": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/tardigrada", 6),
+        "rotifera": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/rotifera", 20),
+        "acari": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/acari", 145),
+        "collembola": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/collembola", 139),
+        "minhocas": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/oligochaeta", 25),
+        "formigas": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/formicidae", 213),
+        "isopodes": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/isopoda", 14),
+        "miriapodes": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/myriapoda", 68),
+        "enchytraeidae": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/enchytraeidae", 8),
+        "isoptera": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/isoptera", 50),
+        "platelmintos": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/platyhelminthes", 103),
         
         # --- NOVOS BANCOS ADICIONADOS ---
-        "platelmintos": ("platelmintos_all.fasta", 5000),
-        "aracnideos": ("aracnideos_all.fasta", 12000),
-        "insetos": ("insetos_all.fasta", 50000),
-        "moluscos": ("moluscos_all.fasta", 15000),
-        "plantas": ("plantas_all.fasta", 100000),
-        "virus": ("virus_all.fasta", 1000000),
-        "megafauna": ("megafauna_all.fasta", 50000)
+        #"platelmintos": ("platelmintos_all.fasta", 5000),
+        #"aracnideos": ("aracnideos_all.fasta", 12000),
+        #"insetos": ("insetos_all.fasta", 50000),
+        #"moluscos": ("moluscos_all.fasta", 15000),
+        #"plantas": ("plantas_all.fasta", 100000),
+        #"virus": ("virus_all.fasta", 1000000),
+        #"megafauna": ("megafauna_all.fasta", 50000),
+        "amoebozoa": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/amoebozoa", 51),
+        "sar": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/sar", 599),
+        "discoba": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/discoba", 111),
+        "metamonada": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/metamonada", 23),
+        "refseqsoil": (string_banco_completo, 46190)
     }
 
+    # 1. Busca no dicionário
     if banco_selecionado in BANCOS_DISPONIVEIS:
         arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS[banco_selecionado]
     else:
-        # Fallback de segurança se o usuário digitar algo errado
-        arquivo_alvo, total_sequencias_banco = ("protozoa_all.fasta", 150000)
+        # NOVO Fallback de segurança: Se digitar errado, roda contra o Atlas completo
+        print(f"⚠️ Banco '{banco_selecionado}' não mapeado. Usando o banco completo 'refseqsoil' por segurança.")
+        arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS["refseqsoil"]
+        banco_selecionado = "refseqsoil" # Atualiza o nome para o log do HTML ficar correto
 
-    caminho_genomas = os.path.join(raiz_projeto, "data/refseq", arquivo_alvo)
+    # 2. Resolução do caminho (Nova Lógica Híbrida)
+    # Se a string contiver espaços (ex: refseqsoil ou protozoa) ou for um caminho absoluto (/home/...)
+    if " " in arquivo_alvo or arquivo_alvo.startswith("/home/"):
+        caminho_genomas = arquivo_alvo  
+    else:
+        # Lógica legada para arquivos .fasta soltos (ex: seu "fungi_all.fasta")
+        caminho_genomas = os.path.join(raiz_projeto, "data/refseq", arquivo_alvo)
 
     prefixo_saida = os.path.join(pasta_resultado, "saida")
     
@@ -399,7 +433,22 @@ def run_pipeline(req, req_id):
     for chave, valor in req.items():
         print(f"Coluna: '{chave}' | Valor recebido: '{valor}'")
     print("⚙️ Rodando programa...")
+    
+    # 1. Inicia o cronômetro
+    inicio_blast = time.time() 
+    
     subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
+    
+    # 2. Para o cronômetro e calcula a diferença
+    fim_blast = time.time() 
+    tempo_total_segundos = fim_blast - inicio_blast
+    
+    # 3. Formata o tempo para ficar bonito no log (ex: 1m 45s)
+    minutos = int(tempo_total_segundos // 60)
+    segundos = int(tempo_total_segundos % 60)
+    tempo_formatado = f"{minutos}m {segundos}s"
+    
+    print(f"⏱️ Tempo de execução do banco '{banco_selecionado}': {tempo_formatado}")
 
     hits_data_map = {}
     arquivo_pass = f"{prefixo_saida}__results.pass.csv"
@@ -422,7 +471,9 @@ def run_pipeline(req, req_id):
                 if sid not in hits_data_map:
                     hits_data_map[sid] = []
                 
-                acc_limpo = sid.split('|')[0].split('.')[0]
+                partes_sid = sid.split('|')
+                acc_limpo = partes_sid[1] if len(partes_sid) > 1 and partes_sid[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes_sid[0]
+                acc_limpo = acc_limpo.split('.')[0]
 
                 tm_real = "N/A"
                 for chave, valor in linha.items():
@@ -444,10 +495,10 @@ def run_pipeline(req, req_id):
     lista_bacterias = list(bacterias_encontradas)
     
     print("⚙️ Preparando montagem taxonômica...")
-    arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
+    arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map, total_sequencias_banco)
 
     avisos = []
-    cobertura_global = (len(lista_bacterias) / 150000) 
+    cobertura_global = (len(lista_bacterias) / total_sequencias_banco) if total_sequencias_banco > 0 else 0
     if cobertura_global < 0.60: avisos.append("Cobertura geral baixa. Verifique os filos relevantes.")
     if mismatches > 2: avisos.append("Potenciais off-targets (Tolerância a mismatch alta).")
 
@@ -475,7 +526,7 @@ def run_pipeline(req, req_id):
             "reverse": rev
         },
         "summary": {
-            "total_sequences_checked": 150000,
+            "total_sequences_checked": total_sequencias_banco,
             "total_matches": len(lista_bacterias),
             "estimated_coverage": round(cobertura_global, 5),
             "off_target_matches": 0,
@@ -509,10 +560,18 @@ while True:
         registros = planilha.get_all_records()
         for index, req in enumerate(registros):
             linha_planilha = index + 2 
+            
+            # ---> ADICIONE ESTA CHECAGEM AQUI <---
+            # Se não tiver nenhum primer preenchido, é uma linha fantasma. Pule para a próxima!
+            if str(req.get('Primer forward', '')).strip() == '':
+                continue
+            # --------------------------------------
+            
             status_atual = str(req.get('Status', '')).strip().lower()
             
             if status_atual == '' or status_atual == 'pending':
                 print(f"\n🔔 Nova requisição encontrada na linha {linha_planilha}!")
+                # ... resto do código continua igualzinho
                 planilha.update_cell(linha_planilha, COL_STATUS, 'running') 
                 
                 hoje_str = datetime.now().strftime('%Y%m%d')
@@ -538,3 +597,4 @@ while True:
         traceback.print_exc()
         print("Reiniciando a varredura em 10 segundos...")
         time.sleep(10)
+

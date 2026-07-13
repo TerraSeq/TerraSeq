@@ -227,11 +227,11 @@ def publicar_no_github(req_id):
 
 def atualizar_vitrine_html(req, req_id):
     print("🖥️ Atualizando painel de resultados na página inicial...")
-    
+
     raiz_projeto = os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')
     )
-    
+
     caminho_index = os.path.join(
         raiz_projeto,
         "docs/index.html"
@@ -244,10 +244,8 @@ def atualizar_vitrine_html(req, req_id):
     banco = str(req.get('Banco de Dados', 'Protozoa')).strip()
     data_hoje = datetime.now().strftime("%d/%m/%Y")
 
-    # MARCADOR
-    marcador_alvo = ""
+    marcador_alvo = "<!-- NOVAS_LINHAS -->"
 
-    # Nova linha da tabela
     nova_linha = f"""
                     <tr>
                         <td><strong>{req_id}</strong></td>
@@ -274,20 +272,16 @@ def atualizar_vitrine_html(req, req_id):
                     """
 
     try:
-        # Ler HTML atual
         with open(caminho_index, 'r', encoding='utf-8') as f:
             conteudo = f.read()
 
-        # Verifica se marcador existe
         if marcador_alvo in conteudo:
 
-            # Insere nova linha ANTES do marcador
             novo_conteudo = conteudo.replace(
                 marcador_alvo,
                 nova_linha + "\n" + marcador_alvo
             )
 
-            # Salva arquivo atualizado
             with open(caminho_index, 'w', encoding='utf-8') as f:
                 f.write(novo_conteudo)
 

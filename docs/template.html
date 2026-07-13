@@ -138,6 +138,8 @@
         
         /* Rodapé Institucional */
         .footer-logo-banner { background-color: #e5e5e5; padding: 30px 20px; display: flex; justify-content: center; align-items: center; gap: 50px; flex-wrap: wrap; border-top: 1px solid #d1d5db; margin-top: 50px;}
+        .brand-logo { display: flex; align-items: center; height: 48px; overflow: hidden; }
+        .brand-logo img { height: 48px; width: auto; max-width: 220px; object-fit: contain; display: block; filter: brightness(1.05); }
         .footer-logo-item { max-width: 120px; max-height: 55px; object-fit: contain; filter: grayscale(100%) opacity(0.7); transition: all 0.3s ease; cursor: pointer;}
         .footer-logo-item:hover { filter: grayscale(0%) opacity(1); transform: scale(1.05);}
         footer { background: #1e293b; color: #94a3b8; text-align: center; padding: 20px; font-size: 0.85em; margin-top: 0;}
@@ -145,7 +147,9 @@
 </head>
 <body>
     <nav class="navbar">
-        <h2>🌿 eDNA SoilCheck</h2>
+        <a href="../../index.html" style="display:flex; align-items:center; text-decoration:none;">
+            <img src="imagens/Logo2.png" alt="TerraSeq" style="height:80px; width:auto; display:block; filter: brightness(1.05);">
+        </a>
         <a href="../../index.html" class="btn-voltar">⬅ Voltar ao Sistema</a>
     </nav>
 
@@ -317,11 +321,16 @@
         <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Universidade de Coimbra" class="footer-logo-item" title="Faculty of Sciences and Technology of the University of Coimbra">
         <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="CNPq" class="footer-logo-item" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="FAPES" class="footer-logo-item" title="Fundação de Amparo à Pesquisa e Inovação do Espírito Santo">
+        <img src="imagens/footer.png" alt="Logo 2" class="footer-logo-item" title="Logo 2">
     </div>
 
     <footer>
-        <p>🧬 <strong>eDNA SoilCheck - Plataforma de Bioinformática para Análise do Solo</strong></p>
-        <small>&copy; 2026 Desenvolvido no Laboratório de Bioinformática.</small>
+        <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
+            <img src="imagens/Logo3.png" alt="TerraSeq" style="height:22px; width:auto; display:block; opacity:0.95;">
+            <span><strong>TerraSeq</strong></span>
+            <span style="margin-left:2px;">- In silico primer optimization for Earth biodiversity assessment</span>
+        </div>
+        <small>© 2026 Developed by the TerraSeq Team</small>
     </footer>
 
     <script>
