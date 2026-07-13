@@ -9,3 +9,8 @@ data/blast_dbs/*
 __pycache__/
 src/credentials.json
 src/tokenGitHubIssues.txt
+
+.env
+
+src/gitTerraSeq.txt
+src/credentialsTiago.json

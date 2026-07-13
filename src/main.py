@@ -14,21 +14,41 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import traceback
+from dotenv import load_dotenv
 
 # --- CONFIGURAÇÕES INICIAIS ---
-Entrez.email = "tiagogabriel3542@gmial.com"
+# Carrega variáveis do arquivo .env (que NÃO é versionado no Git).
+# Veja .env.example para o modelo com as chaves esperadas.
+load_dotenv()
 
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
-EMAIL_REMETENTE = "tiagogabriel3542@gmail.com" 
-EMAIL_SENHA = "huyapitnfjegbsuz"
+def _obter_env_obrigatoria(nome):
+    valor = os.environ.get(nome)
+    if not valor:
+        print(f"❌ Erro fatal: variável de ambiente '{nome}' não encontrada.")
+        print("   Verifique se o arquivo .env existe na raiz do projeto e está preenchido.")
+        print("   Use .env.example como modelo.")
+        sys.exit(1)
+    return valor
 
-caminho_credenciais = os.path.join(os.path.dirname(__file__), 'credentials.json')
+Entrez.email = _obter_env_obrigatoria("ENTREZ_EMAIL")
+
+SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+EMAIL_REMETENTE = _obter_env_obrigatoria("EMAIL_REMETENTE")
+EMAIL_SENHA = _obter_env_obrigatoria("EMAIL_SENHA")
+
+GITHUB_REPO_OWNER = os.environ.get("GITHUB_REPO_OWNER", "TerraSeq")
+GITHUB_REPO_NAME = os.environ.get("GITHUB_REPO_NAME", "pipeline_genoma")
+
+caminho_credenciais = os.path.join(
+    os.path.dirname(__file__),
+    os.environ.get("GOOGLE_CREDENTIALS_PATH", "credentials.json")
+)
 scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 credentials = Credentials.from_service_account_file(caminho_credenciais, scopes=scopes)
 client = gspread.authorize(credentials)
 
-NOME_DA_PLANILHA = "Submissoes_Primers_Pipeline"
+NOME_DA_PLANILHA = os.environ.get("NOME_DA_PLANILHA", "Submissoes_Primers_Pipeline")
 planilha = client.open(NOME_DA_PLANILHA).sheet1
 
 # ==========================================
@@ -114,7 +134,7 @@ def enviar_email_notificacao(email_destino, req_id):
     if not email_destino or "@" not in email_destino: 
         print(f"   ⏩ E-mail ignorado: Destinatário ausente ou inválido ({email_destino}).")
         return
-    link_pages = f"https://tiagogabrielsi.github.io/pipeline_genoma/reports/{req_id}/"
+    link_pages = f"https://{GITHUB_REPO_OWNER}.github.io/{GITHUB_REPO_NAME}/reports/{req_id}/"
     msg = MIMEMultipart()
     msg['From'] = EMAIL_REMETENTE
     msg['To'] = email_destino
@@ -341,12 +361,15 @@ def run_pipeline(req, req_id):
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
     # ==========================================
-    # NOVO: SELEÇÃO DINÂMICA DO BANCO DE DADOS (ATLAS)
+    # SELEÇÃO DINÂMICA DO BANCO DE DADOS (ATLAS)
     # ==========================================
     banco_selecionado = str(req.get('Banco de Dados', 'refseqsoil')).strip().lower()
     
-    # --- NOVO: Mapeamento Dinâmico do Banco Completo Local ---
-    DIRETORIO_BLAST = "/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs"
+    # --- Mapeamento Dinâmico do Banco Completo Local ---
+    DIRETORIO_BLAST = os.environ.get(
+        "DIRETORIO_BLAST",
+        "/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs"
+    )
     try:
         indices = [f.split('.')[0] for f in os.listdir(DIRETORIO_BLAST) if f.endswith('.nsq') or f.endswith('.00.nsq')]
         bancos_locais_unicos = set([os.path.join(DIRETORIO_BLAST, b) for b in indices])
@@ -354,8 +377,7 @@ def run_pipeline(req, req_id):
     except FileNotFoundError:
         string_banco_completo = ""
         
-    # 2. NOVO: Mapeamento dinâmico EXCLUSIVO para agrupar os Protozoários
-    # Definimos os nomes exatos das bases que compõem os protistas
+    # Mapeamento dinâmico EXCLUSIVO para agrupar os Protozoários
     tags_protozoarios = ["amoebozoa", "sar", "discoba", "metamonada"]
     bancos_protozoa = [os.path.join(DIRETORIO_BLAST, b) for b in tags_protozoarios]
     string_protozoa_completo = " ".join(bancos_protozoa)
@@ -364,33 +386,24 @@ def run_pipeline(req, req_id):
     BANCOS_DISPONIVEIS = {
         "fungi": ("fungi_all.fasta", 500000),
         "protozoa": (string_protozoa_completo, 784),
-        "bacteria": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/bacteria", 22550),
-        "archaea": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/archaea", 822),
-        "nematoda": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/nematoda", 248),
-        "tardigrada": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/tardigrada", 6),
-        "rotifera": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/rotifera", 20),
-        "acari": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/acari", 145),
-        "collembola": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/collembola", 139),
-        "minhocas": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/oligochaeta", 25),
-        "formigas": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/formicidae", 213),
-        "isopodes": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/isopoda", 14),
-        "miriapodes": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/myriapoda", 68),
-        "enchytraeidae": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/enchytraeidae", 8),
-        "isoptera": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/isoptera", 50),
-        "platelmintos": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/platyhelminthes", 103),
-        
-        # --- NOVOS BANCOS ADICIONADOS ---
-        #"platelmintos": ("platelmintos_all.fasta", 5000),
-        #"aracnideos": ("aracnideos_all.fasta", 12000),
-        #"insetos": ("insetos_all.fasta", 50000),
-        #"moluscos": ("moluscos_all.fasta", 15000),
-        #"plantas": ("plantas_all.fasta", 100000),
-        #"virus": ("virus_all.fasta", 1000000),
-        #"megafauna": ("megafauna_all.fasta", 50000),
-        "amoebozoa": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/amoebozoa", 51),
-        "sar": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/sar", 599),
-        "discoba": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/discoba", 111),
-        "metamonada": ("/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs/metamonada", 23),
+        "bacteria": (os.path.join(DIRETORIO_BLAST, "bacteria"), 22550),
+        "archaea": (os.path.join(DIRETORIO_BLAST, "archaea"), 822),
+        "nematoda": (os.path.join(DIRETORIO_BLAST, "nematoda"), 248),
+        "tardigrada": (os.path.join(DIRETORIO_BLAST, "tardigrada"), 6),
+        "rotifera": (os.path.join(DIRETORIO_BLAST, "rotifera"), 20),
+        "acari": (os.path.join(DIRETORIO_BLAST, "acari"), 145),
+        "collembola": (os.path.join(DIRETORIO_BLAST, "collembola"), 139),
+        "minhocas": (os.path.join(DIRETORIO_BLAST, "oligochaeta"), 25),
+        "formigas": (os.path.join(DIRETORIO_BLAST, "formicidae"), 213),
+        "isopodes": (os.path.join(DIRETORIO_BLAST, "isopoda"), 14),
+        "miriapodes": (os.path.join(DIRETORIO_BLAST, "myriapoda"), 68),
+        "enchytraeidae": (os.path.join(DIRETORIO_BLAST, "enchytraeidae"), 8),
+        "isoptera": (os.path.join(DIRETORIO_BLAST, "isoptera"), 50),
+        "platelmintos": (os.path.join(DIRETORIO_BLAST, "platyhelminthes"), 103),
+        "amoebozoa": (os.path.join(DIRETORIO_BLAST, "amoebozoa"), 51),
+        "sar": (os.path.join(DIRETORIO_BLAST, "sar"), 599),
+        "discoba": (os.path.join(DIRETORIO_BLAST, "discoba"), 111),
+        "metamonada": (os.path.join(DIRETORIO_BLAST, "metamonada"), 23),
         "refseqsoil": (string_banco_completo, 46190)
     }
 
@@ -398,17 +411,16 @@ def run_pipeline(req, req_id):
     if banco_selecionado in BANCOS_DISPONIVEIS:
         arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS[banco_selecionado]
     else:
-        # NOVO Fallback de segurança: Se digitar errado, roda contra o Atlas completo
+        # Fallback de segurança: Se digitar errado, roda contra o Atlas completo
         print(f"⚠️ Banco '{banco_selecionado}' não mapeado. Usando o banco completo 'refseqsoil' por segurança.")
         arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS["refseqsoil"]
         banco_selecionado = "refseqsoil" # Atualiza o nome para o log do HTML ficar correto
 
-    # 2. Resolução do caminho (Nova Lógica Híbrida)
-    # Se a string contiver espaços (ex: refseqsoil ou protozoa) ou for um caminho absoluto (/home/...)
-    if " " in arquivo_alvo or arquivo_alvo.startswith("/home/"):
+    # 2. Resolução do caminho (Lógica Híbrida)
+    if " " in arquivo_alvo or arquivo_alvo.startswith("/"):
         caminho_genomas = arquivo_alvo  
     else:
-        # Lógica legada para arquivos .fasta soltos (ex: seu "fungi_all.fasta")
+        # Lógica legada para arquivos .fasta soltos (ex: "fungi_all.fasta")
         caminho_genomas = os.path.join(raiz_projeto, "data/refseq", arquivo_alvo)
 
     prefixo_saida = os.path.join(pasta_resultado, "saida")
@@ -561,7 +573,6 @@ while True:
         for index, req in enumerate(registros):
             linha_planilha = index + 2 
             
-            # ---> ADICIONE ESTA CHECAGEM AQUI <---
             # Se não tiver nenhum primer preenchido, é uma linha fantasma. Pule para a próxima!
             if str(req.get('Primer forward', '')).strip() == '':
                 continue
@@ -597,4 +608,3 @@ while True:
         traceback.print_exc()
         print("Reiniciando a varredura em 10 segundos...")
         time.sleep(10)
-
