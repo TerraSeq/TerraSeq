@@ -13,23 +13,35 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import traceback
+from dotenv import load_dotenv
 
 # ==========================================
 # CONFIGURAÇÕES INICIAIS E API
 # ==========================================
-Entrez.email = "tiagogabriel3542@gmail.com" 
+# Carrega variáveis do arquivo .env (que NÃO é versionado no Git).
+# Veja .env.example para o modelo com as chaves esperadas.
+load_dotenv()
 
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
-EMAIL_REMETENTE = "tiagogabriel3542@gmail.com" 
-EMAIL_SENHA = "huyapitnfjegbsuz"
+def _obter_env_obrigatoria(nome):
+    valor = os.environ.get(nome)
+    if not valor:
+        print(f"❌ Erro fatal: variável de ambiente '{nome}' não encontrada.")
+        print("   Verifique se o arquivo .env existe na raiz do projeto e está preenchido.")
+        print("   Use .env.example como modelo.")
+        sys.exit(1)
+    return valor
+
+Entrez.email = _obter_env_obrigatoria("ENTREZ_EMAIL")
+
+SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+EMAIL_REMETENTE = _obter_env_obrigatoria("EMAIL_REMETENTE")
+EMAIL_SENHA = _obter_env_obrigatoria("EMAIL_SENHA")
 
 # --- CONFIGURAÇÕES DA API DO GITHUB ---
-caminho_token = os.path.join(os.path.dirname(__file__), 'tokenGitHubIssues.txt')
-with open(caminho_token, "r") as f:
-    GITHUB_TOKEN = f.read().strip()
-REPO_OWNER = "tiagogabrielsi"
-REPO_NAME = "pipeline_genoma"
+GITHUB_TOKEN = _obter_env_obrigatoria("GITHUB_TOKEN")
+REPO_OWNER = os.environ.get("GITHUB_REPO_OWNER", "TerraSeq")
+REPO_NAME = os.environ.get("GITHUB_REPO_NAME", "TerraSeq")
 
 HEADERS = {
     "Authorization": f"token {GITHUB_TOKEN}",
@@ -145,7 +157,11 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
     for index, subject_id in enumerate(lista_ids, 1):
         print(f"   ⏳ Baixando dados [{index}/{total_organismos}]: {subject_id}...", end="\r")
         try:
-            acc = subject_id.split('|')[0].split('.')[0] 
+            # Mesmo tratamento do main.py: pega o campo certo em formatos
+            # tipo "gb|JBAMJC...|" (senão pegaria "gb" como se fosse o ID).
+            partes = subject_id.split('|')
+            acc = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
+            acc = acc.split('.')[0]  # Remove a versão do Accession (.1)
             handle = Entrez.efetch(db="nucleotide", id=acc, retmode="xml")
             records = Entrez.read(handle)
             handle.close()
@@ -314,57 +330,83 @@ def run_pipeline(req, req_id):
     mismatches = int(req.get('Máximo de Mismatches na extremidade 3', 0) or 0)
     e_value = str(req.get('E-value máximo', 10.0) or 10.0)
     cobertura = str(req.get('Cobertura mínima', 0) or 0)
-    max_hits = str(req.get('Limite de hits', 500) or 500)
+    max_hits = str(req.get('Limite de hits', 30000) or 30000)
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
     # ==========================================
-    # SELEÇÃO DINÂMICA DO BANCO DE DADOS
+    # SELEÇÃO DINÂMICA DO BANCO DE DADOS (ATLAS)
+    # Mesmo motor usado no main.py (Google Sheets) — aqui a única
+    # diferença é a origem da requisição (GitHub Issues em vez de Sheets).
     # ==========================================
-    banco_selecionado = str(req.get('Banco de Dados', 'Protozoa')).strip().lower()
-    
+    banco_selecionado = str(req.get('Banco de Dados', 'refseqsoil')).strip().lower()
+
+    # --- Mapeamento Dinâmico do Banco Completo Local ---
+    DIRETORIO_BLAST = os.environ.get(
+        "DIRETORIO_BLAST",
+        "/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/blast_dbs"
+    )
+    try:
+        indices = [f.split('.')[0] for f in os.listdir(DIRETORIO_BLAST) if f.endswith('.nsq') or f.endswith('.00.nsq')]
+        bancos_locais_unicos = set([os.path.join(DIRETORIO_BLAST, b) for b in indices])
+        string_banco_completo = " ".join(bancos_locais_unicos)
+    except FileNotFoundError:
+        string_banco_completo = ""
+
+    # Mapeamento dinâmico EXCLUSIVO para agrupar os Protozoários
+    tags_protozoarios = ["amoebozoa", "sar", "discoba", "metamonada"]
+    bancos_protozoa = [os.path.join(DIRETORIO_BLAST, b) for b in tags_protozoarios]
+    string_protozoa_completo = " ".join(bancos_protozoa)
+
+    # Dicionário: "nome_no_forms/issue": ("arquivo_fasta", "total_estimado_para_cobertura")
     BANCOS_DISPONIVEIS = {
         "fungi": ("fungi_all.fasta", 500000),
-        "protozoa": ("protozoa_all.fasta", 150000),
-        "bacteria": ("bacteria_all.fasta", 2000000),
-        "archaea": ("archaea_all.fasta", 50000),
-        "nematoda": ("nematoda_all.fasta", 30000),
-        "tardigrada": ("tardigrada_all.fasta", 500),
-        "rotifera": ("rotifera_all.fasta", 1000),
-        "acari": ("acari_all.fasta", 10000),
-        "collembola": ("collembola_all.fasta", 5000),
-        "minhocas": ("minhocas_all.fasta", 2000),
-        "formigas": ("formicidae_all.fasta", 15000),
-        "cupins": ("termitoidae_all.fasta", 8000),
-        "isopodes": ("isopoda_all.fasta", 2000),
-        "miriapodes": ("myriapoda_all.fasta", 1500),
-        "mistura_teste": ("mistura_solo.fasta", 42000),
-        "platelmintos": ("platelmintos_all.fasta", 5000),
-        "aracnideos": ("aracnideos_all.fasta", 12000),
-        "insetos": ("insetos_all.fasta", 50000),
-        "moluscos": ("moluscos_all.fasta", 15000),
-        "plantas": ("plantas_all.fasta", 100000),
-        "virus": ("virus_all.fasta", 1000000),
-        "megafauna": ("megafauna_all.fasta", 50000)
+        "protozoa": (string_protozoa_completo, 784),
+        "bacteria": (os.path.join(DIRETORIO_BLAST, "bacteria"), 22550),
+        "archaea": (os.path.join(DIRETORIO_BLAST, "archaea"), 822),
+        "nematoda": (os.path.join(DIRETORIO_BLAST, "nematoda"), 248),
+        "tardigrada": (os.path.join(DIRETORIO_BLAST, "tardigrada"), 6),
+        "rotifera": (os.path.join(DIRETORIO_BLAST, "rotifera"), 20),
+        "acari": (os.path.join(DIRETORIO_BLAST, "acari"), 145),
+        "collembola": (os.path.join(DIRETORIO_BLAST, "collembola"), 139),
+        "minhocas": (os.path.join(DIRETORIO_BLAST, "oligochaeta"), 25),
+        "formigas": (os.path.join(DIRETORIO_BLAST, "formicidae"), 213),
+        "isopodes": (os.path.join(DIRETORIO_BLAST, "isopoda"), 14),
+        "miriapodes": (os.path.join(DIRETORIO_BLAST, "myriapoda"), 68),
+        "enchytraeidae": (os.path.join(DIRETORIO_BLAST, "enchytraeidae"), 8),
+        "isoptera": (os.path.join(DIRETORIO_BLAST, "isoptera"), 50),
+        "platelmintos": (os.path.join(DIRETORIO_BLAST, "platyhelminthes"), 103),
+        "amoebozoa": (os.path.join(DIRETORIO_BLAST, "amoebozoa"), 51),
+        "sar": (os.path.join(DIRETORIO_BLAST, "sar"), 599),
+        "discoba": (os.path.join(DIRETORIO_BLAST, "discoba"), 111),
+        "metamonada": (os.path.join(DIRETORIO_BLAST, "metamonada"), 23),
+        "refseqsoil": (string_banco_completo, 46190)
     }
 
+    # 1. Busca no dicionário
     if banco_selecionado in BANCOS_DISPONIVEIS:
         arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS[banco_selecionado]
     else:
-        arquivo_alvo, total_sequencias_banco = ("protozoa_all.fasta", 150000)
+        # Fallback de segurança: Se digitar errado, roda contra o Atlas completo
+        print(f"⚠️ Banco '{banco_selecionado}' não mapeado. Usando o banco completo 'refseqsoil' por segurança.")
+        arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS["refseqsoil"]
+        banco_selecionado = "refseqsoil"  # Atualiza o nome para o log/JSON ficar correto
 
-    caminho_genomas = os.path.join(raiz_projeto, "data/refseq", arquivo_alvo)
+    # 2. Resolução do caminho (Lógica Híbrida)
+    if " " in arquivo_alvo or arquivo_alvo.startswith("/"):
+        caminho_genomas = arquivo_alvo
+    else:
+        # Lógica legada para arquivos .fasta soltos (ex: "fungi_all.fasta")
+        caminho_genomas = os.path.join(raiz_projeto, "data/refseq", arquivo_alvo)
+
     prefixo_saida = os.path.join(pasta_resultado, "saida")
-    
-    # Caminho absoluto para o motor do BLAST (Correção do Servidor)
-    caminho_script_blast = os.path.join(raiz_projeto, "primer_blast_local.py")
-    
+
     cmd_blast = [
-        sys.executable, caminho_script_blast,
+        sys.executable, "primer_blast_local.py",
         "-g", caminho_genomas, "-p", caminho_primer, "-o", prefixo_saida,
         "-e", e_value, "--min_size", min_size, "--max_size", max_size,
         "-m", tm_min, "--max_3prime_mismatches", str(mismatches),
         "--qcov_hsp_perc", cobertura, "--max_target_seqs", max_hits,
-        "-t", "2",
+        "-t", "8",
         "--amp_seq"
     ]
     
@@ -377,7 +419,15 @@ def run_pipeline(req, req_id):
     for chave, valor in req.items():
         print(f"Coluna: '{chave}' | Valor recebido: '{valor}'")
     print("⚙️ Rodando programa...")
+
+    inicio_blast = time.time()
     subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
+    fim_blast = time.time()
+
+    tempo_total_segundos = fim_blast - inicio_blast
+    minutos = int(tempo_total_segundos // 60)
+    segundos = int(tempo_total_segundos % 60)
+    print(f"⏱️ Tempo de execução do banco '{banco_selecionado}': {minutos}m {segundos}s")
 
     hits_data_map = {}
     arquivo_pass = f"{prefixo_saida}__results.pass.csv"
@@ -400,7 +450,9 @@ def run_pipeline(req, req_id):
                 if sid not in hits_data_map:
                     hits_data_map[sid] = []
                 
-                acc_limpo = sid.split('|')[0].split('.')[0]
+                partes_sid = sid.split('|')
+                acc_limpo = partes_sid[1] if len(partes_sid) > 1 and partes_sid[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes_sid[0]
+                acc_limpo = acc_limpo.split('.')[0]
 
                 tm_real = "N/A"
                 for chave, valor in linha.items():
@@ -424,7 +476,7 @@ def run_pipeline(req, req_id):
     arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
 
     avisos = []
-    cobertura_global = (len(lista_bacterias) / total_sequencias_banco) 
+    cobertura_global = (len(lista_bacterias) / total_sequencias_banco) if total_sequencias_banco > 0 else 0
     if cobertura_global < 0.60: avisos.append("Cobertura geral baixa. Verifique os filos relevantes.")
     if mismatches > 2: avisos.append("Potenciais off-targets (Tolerância a mismatch alta).")
 

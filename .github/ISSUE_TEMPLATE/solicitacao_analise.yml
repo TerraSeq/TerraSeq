@@ -6,13 +6,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### Bem-vindo ao Pipeline de Validação de Primers!
-        Preencha os campos abaixo com os parâmetros para a sua simulação de PCR.
+        ## 🧬 Pipeline de Validação de Primers
+        Preencha os campos abaixo com os parâmetros da sua simulação de PCR.
+        O relatório será gerado automaticamente e um link será enviado por e-mail.
+
+        ---
+        ### 👤 Identificação
 
   - type: input
     id: nome
     attributes:
       label: Nome do Pesquisador
+      placeholder: "Ex: Maria Silva"
     validations:
       required: true
 
@@ -24,10 +29,16 @@ body:
     validations:
       required: true
 
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 🧪 Sequências dos Primers
+
   - type: input
     id: primer_fwd
     attributes:
-      label: "Primer Forward (5' -> 3')"
+      label: "Primer Forward (5' → 3')"
       placeholder: "Ex: CCAGCASCYGCGGTAATTCC"
     validations:
       required: true
@@ -35,10 +46,16 @@ body:
   - type: input
     id: primer_rev
     attributes:
-      label: "Primer Reverse (5' -> 3')"
+      label: "Primer Reverse (5' → 3')"
       placeholder: "Ex: RCCACAAGCYARTTATCC"
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 🎯 Alvo da Análise
 
   - type: dropdown
     id: regiao_alvo
@@ -56,7 +73,13 @@ body:
     id: banco_dados
     attributes:
       label: Banco de Dados
+      description: "Selecione contra qual banco genômico o BLAST será rodado (Sar = Stramenopila/Alveolata/Rhizaria)"
       options:
+        - "Amoebozoa"
+        - "Sar"
+        - "Discoba"
+        - "Metamonada"
+        - "Refseqsoil"
         - "Protozoa"
         - "Fungi"
         - "Bacteria"
@@ -71,13 +94,6 @@ body:
         - "Cupins"
         - "Isopodes"
         - "Miriapodes"
-        - "Platelmintos"
-        - "Aracnideos"
-        - "Insetos"
-        - "Moluscos"
-        - "Plantas"
-        - "Virus"
-        - "Megafauna"
     validations:
       required: true
 
@@ -91,6 +107,12 @@ body:
         - "Arqueias"
     validations:
       required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### ⚙️ Parâmetros do BLAST
 
   - type: input
     id: max_mismatches
