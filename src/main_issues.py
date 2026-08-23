@@ -241,7 +241,7 @@ def publicar_no_github(req_id):
         print(f"   ⚠️ Erro ao empurrar pro Git: {e}")
         
 
-def atualizar_vitrine_html(req, req_id):
+def atualizar_vitrine_html(req, req_id, resultado_json=None):
     print("🖥️ Atualizando painel de resultados na página inicial...")
 
     raiz_projeto = os.path.abspath(
@@ -258,20 +258,33 @@ def atualizar_vitrine_html(req, req_id):
     rev = str(req.get('Primer reverse', '')).strip().upper()
     alvo = str(req.get('Região alvo', 'Não informada')).strip()
     banco = str(req.get('Banco de Dados', 'Protozoa')).strip()
-    data_hoje = datetime.now().strftime("%d/%m/%Y")
+    data_hoje = datetime.now()
+    data_hoje_br = data_hoje.strftime("%d/%m/%Y")
+    data_hoje_iso = data_hoje.strftime("%Y-%m-%d")
+
+    resultado_json = resultado_json or {}
+    nome_par = str(resultado_json.get('primers', {}).get('pair_name', '')).strip() or f"Par {alvo}"
+    mean_amp = resultado_json.get('summary', {}).get('mean_amplicon_size')
+    try:
+        amplicon_int = int(round(float(mean_amp)))
+    except (TypeError, ValueError):
+        amplicon_int = 0
+    amplicon_display = f"{amplicon_int} bp" if amplicon_int > 0 else "N/D"
 
     marcador_alvo = "<!-- NOVAS_LINHAS -->"
 
     nova_linha = f"""
-                    <tr>
+                    <tr data-amplicon="{amplicon_int}" data-date="{data_hoje_iso}">
                         <td><strong>{req_id}</strong></td>
+                        <td>{nome_par}</td>
                         <td>{alvo}</td>
                         <td>{banco}</td>
                         <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
                             <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> {fwd}<br>
                             <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> {rev}
                         </td>
-                        <td>{data_hoje}</td>
+                        <td>{amplicon_display}</td>
+                        <td>{data_hoje_br}</td>
                         <td>
                             <span class="status-badge">
                                 Concluído
@@ -319,7 +332,11 @@ def run_pipeline(req, req_id):
     
     fwd = str(req.get('Primer forward', '')).strip().upper()
     rev = str(req.get('Primer reverse', '')).strip().upper()
-    
+    alvo_para_nome = str(req.get('Região alvo', '')).strip()
+    nome_par = str(req.get('Nome do Par de Primers', '')).strip()
+    if not nome_par:
+        nome_par = f"Par {alvo_para_nome}" if alvo_para_nome else f"Par {req_id}"
+
     caminho_primer = os.path.join(pasta_resultado, "primer.fasta")
     with open(caminho_primer, "w") as f:
         f.write(f">Ensaio_{req_id}|Target|fwd\n{fwd}\n")
@@ -501,7 +518,8 @@ def run_pipeline(req, req_id):
         },
         "primers": {
             "forward": fwd,
-            "reverse": rev
+            "reverse": rev,
+            "pair_name": nome_par
         },
         "summary": {
             "total_sequences_checked": total_sequencias_banco,
@@ -515,13 +533,13 @@ def run_pipeline(req, req_id):
         "leaf_metadata": meta_dict,
         "warnings": avisos
     }
-    
+
     print("📝 Salvando arquivos de saída (JSON/HTML)...")
     with open(os.path.join(pasta_resultado, "result.json"), 'w', encoding='utf-8') as f:
         json.dump(resultado_json, f, indent=4, ensure_ascii=False)
-        
+
     shutil.copy(os.path.join(raiz_projeto, "docs/template.html"), os.path.join(pasta_resultado, "index.html"))
-    return f"docs/reports/{req_id}"
+    return f"docs/reports/{req_id}", resultado_json
 
 # ==========================================
 # GITHUB API CONTROLLERS
@@ -568,6 +586,7 @@ def parse_issue_body(body):
     req = {
         'Nome completo': data.get('Nome do Pesquisador', 'Pesquisador'),
         'Email': data.get('E-mail para Notificação', ''),
+        'Nome do Par de Primers': data.get('Nome do Par de Primers', ''),
         'Primer forward': data.get("Primer Forward (5' -> 3')", ''),
         'Primer reverse': data.get("Primer Reverse (5' -> 3')", ''),
         'Região alvo': data.get('Região Alvo', '18S'),
@@ -605,8 +624,8 @@ while True:
             hoje_str = datetime.now().strftime('%Y%m%d')
             req_id = f"REQ-{hoje_str}-ISSUE{numero_issue:04d}"
             
-            caminho_relatorio = run_pipeline(req_mapeado, req_id)
-            atualizar_vitrine_html(req_mapeado, req_id)
+            caminho_relatorio, resultado_json = run_pipeline(req_mapeado, req_id)
+            atualizar_vitrine_html(req_mapeado, req_id, resultado_json)
             publicar_no_github(req_id)
             
             email_usuario = req_mapeado.get('Email', '')

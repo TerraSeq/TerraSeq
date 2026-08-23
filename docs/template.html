@@ -43,6 +43,11 @@
         .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--secondary); }
         .kpi-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; }
         .kpi-value { font-size: 2.2rem; font-weight: 700; color: var(--primary); line-height: 1; }
+        .kpi-sub { font-size: 0.78rem; color: var(--text-light); margin-top: 6px; line-height: 1.3; }
+
+        /* Ícones ilustrativos dos grupos/funções ecológicas */
+        .icon-badge { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; min-width: 26px; border-radius: 50%; background: var(--accent); margin-right: 8px; font-size: 14px; vertical-align: middle; }
+        .silva-item.active .icon-badge { background: rgba(255,255,255,0.25); }
         
         /* NOVO LAYOUT: GRID PRINCIPAL (Sidebar + Conteúdo) */
         .layout-grid { display: grid; grid-template-columns: 320px 1fr; gap: 30px; align-items: start; }
@@ -175,8 +180,14 @@
                 <div class="kpi-value" id="tot-match">0</div>
             </div>
             <div class="kpi-card">
+                <div class="kpi-title">Genomas no Banco (Grupo)</div>
+                <div class="kpi-value" id="total-genomes">0</div>
+                <div class="kpi-sub" id="total-genomes-sub"></div>
+            </div>
+            <div class="kpi-card">
                 <div class="kpi-title">Cobertura Estimada</div>
                 <div class="kpi-value" id="est-cov" style="color: var(--success);">0%</div>
+                <div class="kpi-sub" id="est-cov-sub"></div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-title">Média do Amplicon</div>
@@ -340,6 +351,56 @@
         let functionalData = null;
         let currentActiveTree = 'taxa'; 
         let currentFuncView = 'via1'; 
+
+        // Ícones ilustrativos para os grupos funcionais (Cap. II/IV do Atlas)
+        const FUNCTION_ICONS = {
+            "Engenheiros do Ecossistema": "🏗️",
+            "Decompositores da Serrapilheira": "🍂",
+            "Micropredadores": "🕵️",
+            "Microrganismos": "🦠",
+            "Fora do Escopo Principal": "📦",
+            "Função Indefinida": "❓"
+        };
+        const GROUP_ICONS = {
+            "Enquitreídeos": "🪱",
+            "Formigas": "🐜",
+            "Cupins": "🐛",
+            "Minhocas": "🪱",
+            "Ácaros": "🕷️",
+            "Colêmbolos, Proturos e Dipluros": "🦟",
+            "Isópodes": "🪲",
+            "Miriápodes": "🐍",
+            "Insetos (Adultos e Larvas)": "🐞",
+            "Aracnídeos (Aranhas e Escorpiões)": "🕷️",
+            "Platelmintos": "🪱",
+            "Protistas": "🔬",
+            "Nematoides": "🪱",
+            "Tardígrados": "🐻",
+            "Rotíferos": "🔬",
+            "Fungos": "🍄",
+            "Archaea": "🧫",
+            "Bactérias": "🦠",
+            "Moluscos": "🐌",
+            "Plantas (Raízes)": "🌱",
+            "Vírus": "☣️",
+            "Megafauna (Vertebrados)": "🦌",
+            "Não Classificado": "❓"
+        };
+        const SIZE_ICONS = {
+            "Microrganismos": "🦠",
+            "Microfauna": "🔬",
+            "Mesofauna": "🐛",
+            "Mesofauna / Macrofauna": "🐛",
+            "Macrofauna": "🐜",
+            "Macrofauna / Megafauna": "🐌",
+            "Megafauna": "🦌",
+            "Flora": "🌱",
+            "Vírus": "☣️",
+            "Indefinido": "❓"
+        };
+        function functionIcon(nome) { return FUNCTION_ICONS[nome] || "♻️"; }
+        function groupIcon(nome) { return GROUP_ICONS[nome] || "📂"; }
+        function sizeIcon(nome) { return SIZE_ICONS[nome] || "📏"; }
 
         function formatPercent(value) {
             let p = value * 100;
@@ -574,7 +635,7 @@
                     if (totalMatchesFuncao === 0) li.classList.add('empty');
                     
                     let globPerc = globalTotal > 0 ? formatPercent(totalMatchesFuncao / globalTotal) : "0.0%";
-                    li.innerHTML = `<div class="taxon-name">♻️ ${funcao}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${functionIcon(funcao)}</span>${funcao}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     if (totalMatchesFuncao > 0) {
                         li.onclick = () => {
@@ -622,7 +683,7 @@
                     li.className = 'silva-item';
                     let globPerc = globalTotal > 0 ? formatPercent(totalMatchesTamanho / globalTotal) : "0.0%";
                     
-                    li.innerHTML = `<div class="taxon-name">📏 ${tamanho}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${sizeIcon(tamanho)}</span>${tamanho}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     li.onclick = () => {
                         renderTamanhoGroups(gruposPorTamanho[tamanho], totalMatchesTamanho, browser);
@@ -657,7 +718,7 @@
                 const li = document.createElement('li');
                 li.className = 'silva-item';
                 let globPerc = parentMatches > 0 ? formatPercent(totalMatchesGrupo / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name">📂 ${grupo}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${groupIcon(grupo)}</span>${grupo}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                 
                 li.onclick = () => {
                      renderFunctionalSpecies(especiesData, totalMatchesGrupo, browserRef);
@@ -684,7 +745,7 @@
                 const li = document.createElement('li');
                 li.className = 'silva-item';
                 let globPerc = parentMatches > 0 ? formatPercent(item.matches / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;">📂 ${item.grupo}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal;">♻️ ${item.funcao}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;"><span class="icon-badge">${groupIcon(item.grupo)}</span>${item.grupo}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal; margin-left:34px;">${functionIcon(item.funcao)} ${item.funcao}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
 
                 li.onclick = () => {
                      renderFunctionalSpecies(item.especies, item.matches, browserRef);
@@ -822,6 +883,17 @@
             document.getElementById('rev').textContent = data.primers.reverse;
             document.getElementById('est-cov').textContent = formatPercent(data.summary.estimated_coverage);
             document.getElementById('mean-amp').textContent = data.summary.mean_amplicon_size + ' bp';
+
+            // Total de genomas disponíveis no banco de dados para o grupo pesquisado,
+            // e quanto desse total foi "captado" pelos resultados do PCR in silico.
+            const totalGenomasBanco = data.summary.total_sequences_checked || 0;
+            const nomeGrupoBanco = data.metadata.database
+                ? data.metadata.database.charAt(0).toUpperCase() + data.metadata.database.slice(1)
+                : "Banco";
+            document.getElementById('total-genomes').textContent = totalGenomasBanco.toLocaleString('pt-BR');
+            document.getElementById('total-genomes-sub').textContent = `Total catalogado para "${nomeGrupoBanco}"`;
+            document.getElementById('est-cov-sub').textContent =
+                `${csvTotalMatches.toLocaleString('pt-BR')} de ${totalGenomasBanco.toLocaleString('pt-BR')} genomas de "${nomeGrupoBanco}" captados`;
 
             if(data.metadata) {
                 document.getElementById('param-banco').textContent = data.metadata.database || "Protozoa";

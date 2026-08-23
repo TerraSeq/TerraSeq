@@ -36,6 +36,15 @@ body:
         ### 🧪 Sequências dos Primers
 
   - type: input
+    id: primer_pair_name
+    attributes:
+      label: Nome do Par de Primers
+      description: "Um nome/apelido para identificar este par de primers nos resultados (Ex: 18S_Euk_1391F-1510R)"
+      placeholder: "Ex: 18S_Euk_1391F-1510R"
+    validations:
+      required: false
+
+  - type: input
     id: primer_fwd
     attributes:
       label: "Primer Forward (5' → 3')"

@@ -289,6 +289,49 @@
             font-size: 0.95rem;
             font-weight: 500;
         }
+
+        /* Barra de ferramentas da tabela (Resultados por página) */
+        .table-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .page-size-label {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 600;
+        }
+        .page-size-select {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: white;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Cabeçalhos ordenáveis da tabela de resultados */
+        .results-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .results-table th.sortable:hover {
+            background-color: var(--secondary-color);
+        }
+        .sort-arrow {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 0.75em;
+            opacity: 0.5;
+        }
+        .results-table th.sortable.sort-asc .sort-arrow::after { content: "▲"; opacity: 1; }
+        .results-table th.sortable.sort-desc .sort-arrow::after { content: "▼"; opacity: 1; }
+        .results-table th.sortable:not(.sort-asc):not(.sort-desc) .sort-arrow::after { content: "⇅"; }
     </style>
 </head>
 <body>
@@ -337,1329 +380,929 @@
             <p>Histórico de análises já processadas e validadas pelo pipeline contra nossos bancos de genomas de referência.</p>
         </div>
 
+        <div class="table-toolbar">
+            <label for="page-size-select" class="page-size-label">Resultados por página:</label>
+            <select id="page-size-select" class="page-size-select">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="all">Todos</option>
+            </select>
+        </div>
+
         <div style="overflow-x: auto;">
             <table class="results-table">
                 <thead>
                     <tr>
-                        <th>ID da Requisição</th>
-                        <th>Alvo</th>
-                        <th>Banco</th>
+                        <th class="sortable" data-sort-key="id" data-sort-type="text">ID da Requisição<span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="primername" data-sort-type="text">Nome do Par de Primers<span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="alvo" data-sort-type="text">Alvo<span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="banco" data-sort-type="text">Banco<span class="sort-arrow"></span></th>
                         <th>Primers (5'→3')</th>
-                        <th>Data</th>
+                        <th class="sortable" data-sort-key="amplicon" data-sort-type="number">Tamanho do Amplicon<span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="date" data-sort-type="text">Data<span class="sort-arrow"></span></th>
                         <th>Status</th>
                         <th>Ação</th>
                     </tr>
                 </thead>
                 <tbody id="results-body">
-
-                    <tr>
-                        <td><strong>REQ-20260518-ISSUE0002</strong></td>
-                        <td>18S</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>18/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260518-ISSUE0002/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                                Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260518-ISSUE0010</strong></td>
-                        <td>18S</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>18/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260518-ISSUE0010/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260518-0040</strong></td>
-                        <td>18</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>18/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260518-0040/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260518-ISSUE0011</strong></td>
-                        <td>ITS</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>18/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260518-ISSUE0011/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260518-ISSUE0012</strong></td>
-                        <td>Outra</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>18/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260518-ISSUE0012/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260518-0041</strong></td>
-                        <td>18S</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>18/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260518-0041/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260518-0042</strong></td>
-                        <td>Outra</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>19/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260518-0042/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260519-ISSUE0013</strong></td>
-                        <td>16S</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>19/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260519-ISSUE0013/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260519-ISSUE0014</strong></td>
-                        <td>ITS</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>19/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260519-ISSUE0014/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260519-0043</strong></td>
-                        <td>ITS</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>19/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260519-0043/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260519-0044</strong></td>
-                        <td>18S</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>19/05/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260519-0044/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260610-0046</strong></td>
-                        <td>18S</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>10/06/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260610-0046/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>REQ-20260610-ISSUE0015</strong></td>
-                        <td>16S</td>
-                        <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
-                        <td>10/06/2026</td>
-                        <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260610-ISSUE0015/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
+                    <tr data-amplicon="5989" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0046</strong></td>
+                        <td>Par 18S</td>
                         <td>18S</td>
                         <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC</td>
+                        <td>5989 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0046/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0046/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="5989" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0047</strong></td>
+                        <td>Par 18s</td>
                         <td>18s</td>
                         <td>Protozoa</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC</td>
+                        <td>5989 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0047/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0047/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="704" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0048</strong></td>
+                        <td>Par Gene COI (DNA Barcoding)</td>
                         <td>Gene COI (DNA Barcoding)</td>
                         <td>Acari</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="704" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0048</strong></td>
+                        <td>Par Gene COI (DNA Barcoding)</td>
                         <td>Gene COI (DNA Barcoding)</td>
                         <td>Formigas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="704" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0048</strong></td>
+                        <td>Par Gene COI (DNA Barcoding)</td>
                         <td>Gene COI (DNA Barcoding)</td>
                         <td>Minhocas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="704" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0049</strong></td>
+                        <td>Par Gene COI (DNA Barcoding)</td>
                         <td>Gene COI (DNA Barcoding)</td>
                         <td>Minhocas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0049/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0049/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="703" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0050</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>703 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0050/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0050/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="703" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0050</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>703 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0050/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0050/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="702" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="702" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="702" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="702" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="702" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="702" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="702" data-date="2026-06-15">
                         <td><strong>REQ-20260615-0052</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
                         <td>15/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260615-0052/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260615-0052/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-16">
                         <td><strong>REQ-20260616-0053</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>16/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-16">
                         <td><strong>REQ-20260616-0053</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>Minhocas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>16/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-16">
                         <td><strong>REQ-20260616-0053</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>Minhocas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>16/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-16">
                         <td><strong>REQ-20260616-0053</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>Minhocas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>16/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="704" data-date="2026-06-16">
                         <td><strong>REQ-20260616-ISSUE0017</strong></td>
+                        <td>Par Outra</td>
                         <td>Outra</td>
                         <td>Minhocas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
                         <td>16/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260616-ISSUE0017/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260616-ISSUE0017/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="701" data-date="2026-06-16">
                         <td><strong>REQ-20260616-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>Mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>701 bp</td>
                         <td>16/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260616-0055/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260616-0055/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="4512" data-date="2026-06-16">
                         <td><strong>REQ-20260616-0045</strong></td>
+                        <td>Par 18s</td>
                         <td>18s</td>
                         <td>Fungi</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC</td>
+                        <td>4512 bp</td>
                         <td>16/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260616-0045/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260616-0045/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-                    <tr>
+                    <tr data-amplicon="701" data-date="2026-06-25">
                         <td><strong>REQ-20260625-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>Mistura_teste</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>701 bp</td>
                         <td>25/06/2026</td>
                         <td><span class="status-badge">Concluído</span></td>
-                        <td>
-                            <a href="reports/REQ-20260625-0055/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                        <td><a href="reports/REQ-20260625-0055/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
 
-
-                    <tr>
+                    <tr data-amplicon="648" data-date="2026-06-26">
                         <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>RefSeq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
                         <td>26/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260626-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="648" data-date="2026-06-26">
                         <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>Banco_Solo_Unificado</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
                         <td>26/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260626-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="648" data-date="2026-06-26">
                         <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>Banco_Solo_Unificado</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
                         <td>26/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260626-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="648" data-date="2026-06-26">
                         <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>RefSeq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
                         <td>26/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260626-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="648" data-date="2026-06-26">
                         <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>refseq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
                         <td>26/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260626-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="648" data-date="2026-06-26">
                         <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>refseq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>648 bp</td>
                         <td>26/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260626-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="416" data-date="2026-06-27">
                         <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>refseq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
                         <td>27/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260627-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="416" data-date="2026-06-27">
                         <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>refseq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
                         <td>27/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260627-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="416" data-date="2026-06-27">
                         <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>refseq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
                         <td>27/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260627-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="416" data-date="2026-06-27">
                         <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>refseq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
                         <td>27/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260627-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="416" data-date="2026-06-27">
                         <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
                         <td>X</td>
                         <td>refseq</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
                         <td>27/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260627-0055/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0056</strong></td>
+                        <td>Par COI</td>
                         <td>COI</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0056/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0056/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0056</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCMGCCGCGGTAA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GGACTACHVGGGTWTCTAAT
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GGACTACHVGGGTWTCTAAT</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0056/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0056/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0056</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0056/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0056/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0056</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0056/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0056/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0057</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0057/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0057/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0057</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0057/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0057/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0058/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0058/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0058/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0058/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-29">
                         <td><strong>REQ-20260629-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>29/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260629-0058/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0058/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-30">
                         <td><strong>REQ-20260630-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>30/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260630-0058/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0058/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="706" data-date="2026-06-30">
                         <td><strong>REQ-20260630-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
                         <td>30/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260630-0058/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0058/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="705" data-date="2026-06-30">
                         <td><strong>REQ-20260630-0059</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
                         <td>30/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260630-0059/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0059/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="705" data-date="2026-06-30">
                         <td><strong>REQ-20260630-0059</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
                         <td>30/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260630-0059/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0059/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="705" data-date="2026-06-30">
                         <td><strong>REQ-20260630-0059</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
                         <td>30/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260630-0059/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0059/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="705" data-date="2026-06-30">
                         <td><strong>REQ-20260630-0059</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>Formigas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
                         <td>30/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260630-0059/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0059/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="705" data-date="2026-06-30">
                         <td><strong>REQ-20260630-0060</strong></td>
+                        <td>Par 16S rRNA V4</td>
                         <td>16S rRNA V4</td>
                         <td>Formigas</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
                         <td>30/06/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260630-0060/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0060/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="0" data-date="2026-07-13">
                         <td><strong>REQ-20260713-0061</strong></td>
+                        <td>Par 18S</td>
                         <td>18S</td>
                         <td>RefSeqSoil</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC</td>
+                        <td>N/D</td>
                         <td>13/07/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260713-0061/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260713-0061/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
 
-                    <tr>
+                    <tr data-amplicon="703" data-date="2026-07-14">
                         <td><strong>REQ-20260714-0062</strong></td>
+                        <td>Par COI</td>
                         <td>COI</td>
                         <td>Isoptera</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAAACTTCAGGGTGACCAAAAAATCA
-                        </td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>703 bp</td>
                         <td>14/07/2026</td>
-                        <td>
-                            <span class="status-badge">
+                        <td><span class="status-badge">
                                 Concluído
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/REQ-20260714-0062/"
+                            </span></td>
+                        <td><a href="reports/REQ-20260714-0062/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
                                Ver Relatório
-                            </a>
-                        </td>
+                            </a></td>
                     </tr>
-                    
+
 <!-- NOVAS_LINHAS -->
 
                 </tbody>
@@ -1812,20 +1455,55 @@
             const tableBody = document.getElementById("results-body");
             if (!tableBody) return;
 
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            let rows = Array.from(tableBody.querySelectorAll("tr"));
 
-            // --- NOVIDADE: Inverte a ordem para exibir os mais recentes primeiro ---
-            rows.reverse();
-            rows.forEach(row => tableBody.appendChild(row));
-            // -----------------------------------------------------------------------
-
-            const rowsPerPage = 10;
+            const pageSizeSelect = document.getElementById("page-size-select");
+            let rowsPerPage = 10;
             let currentPage = 1;
-            const totalPages = Math.ceil(rows.length / rowsPerPage);
+            let sortKey = "amplicon";
+            let sortDir = "desc";
+
+            // Índice da coluna (0-based) correspondente a cada chave ordenável
+            const COLUMN_INDEX = { id: 0, primername: 1, alvo: 2, banco: 3, date: 6 };
+
+            function getSortValue(row, key, type) {
+                if (key === "amplicon") {
+                    return parseFloat(row.dataset.amplicon) || 0;
+                }
+                if (key === "date") {
+                    return row.dataset.date || "";
+                }
+                const cell = row.children[COLUMN_INDEX[key]];
+                const text = cell ? cell.textContent.trim().toLowerCase() : "";
+                return type === "number" ? (parseFloat(text) || 0) : text;
+            }
+
+            function sortRows(key, type) {
+                const dir = sortDir === "asc" ? 1 : -1;
+                rows.sort((a, b) => {
+                    const va = getSortValue(a, key, type);
+                    const vb = getSortValue(b, key, type);
+                    if (va < vb) return -1 * dir;
+                    if (va > vb) return 1 * dir;
+                    return 0;
+                });
+                rows.forEach(row => tableBody.appendChild(row));
+            }
+
+            function updateSortHeadersUI() {
+                document.querySelectorAll(".results-table th.sortable").forEach(th => {
+                    th.classList.remove("sort-asc", "sort-desc");
+                    if (th.dataset.sortKey === sortKey) {
+                        th.classList.add(sortDir === "asc" ? "sort-asc" : "sort-desc");
+                    }
+                });
+            }
 
             function displayRows(page) {
-                const start = (page - 1) * rowsPerPage;
-                const end = start + rowsPerPage;
+                const total = rows.length;
+                const perPage = rowsPerPage === "all" ? total : rowsPerPage;
+                const start = (page - 1) * perPage;
+                const end = start + perPage;
 
                 rows.forEach((row, index) => {
                     row.style.display = index >= start && index < end ? "" : "none";
@@ -1836,9 +1514,11 @@
                 const infoText = document.getElementById("page-info-text");
                 if (!infoText) return;
 
-                const start = (currentPage - 1) * rowsPerPage + 1;
-                const end = Math.min(currentPage * rowsPerPage, rows.length);
-                infoText.innerText = `${start} - ${end} de ${rows.length}`;
+                const total = rows.length;
+                const perPage = rowsPerPage === "all" ? total : rowsPerPage;
+                const start = total === 0 ? 0 : (currentPage - 1) * perPage + 1;
+                const end = Math.min(currentPage * perPage, total);
+                infoText.innerText = `${start} - ${end} de ${total}`;
             }
 
             function updatePaginationUI() {
@@ -1849,11 +1529,17 @@
                 updatePaginationInfo();
             }
 
+            function getTotalPages() {
+                const perPage = rowsPerPage === "all" ? rows.length : rowsPerPage;
+                return Math.max(1, Math.ceil(rows.length / perPage));
+            }
+
             function setupPagination() {
                 const paginationContainer = document.getElementById("pagination-container");
                 if (!paginationContainer) return;
 
                 paginationContainer.innerHTML = "";
+                const totalPages = getTotalPages();
 
                 for (let i = 1; i <= totalPages; i++) {
                     const btn = document.createElement("button");
@@ -1890,7 +1576,41 @@
                 updatePaginationInfo();
             }
 
+            function refreshTable() {
+                currentPage = 1;
+                displayRows(currentPage);
+                setupPagination();
+            }
+
+            // --- Ordenação por clique no cabeçalho ---
+            document.querySelectorAll(".results-table th.sortable").forEach(th => {
+                th.addEventListener("click", function() {
+                    const key = th.dataset.sortKey;
+                    const type = th.dataset.sortType;
+                    if (sortKey === key) {
+                        sortDir = sortDir === "asc" ? "desc" : "asc";
+                    } else {
+                        sortKey = key;
+                        sortDir = type === "number" ? "desc" : "asc";
+                    }
+                    sortRows(sortKey, type);
+                    updateSortHeadersUI();
+                    refreshTable();
+                });
+            });
+
+            // --- Controle de "Resultados por página" ---
+            if (pageSizeSelect) {
+                pageSizeSelect.addEventListener("change", function() {
+                    rowsPerPage = pageSizeSelect.value === "all" ? "all" : parseInt(pageSizeSelect.value);
+                    refreshTable();
+                });
+            }
+
             if (rows.length > 0) {
+                // Rankeia inicialmente pelos maiores amplicons
+                sortRows(sortKey, "number");
+                updateSortHeadersUI();
                 displayRows(currentPage);
                 setupPagination();
             }
