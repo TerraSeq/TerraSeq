@@ -124,7 +124,14 @@ def _call_makeblastdb(fasta, log_file):
     return F"{db_basename}__BLAST"
 
 def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, out_file):
-    cmd = F"blastn -query {query} -db {db} -num_threads {nt} -word_size 7 -evalue {ev} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
+    # -task blastn-short: sem isso, o blastn usa "megablast" por padrao (task
+    # feito pra sequencias LONGAS e quase identicas, ex: genoma x genoma), que
+    # tem sensibilidade muito baixa pra sequencias curtas com mismatches --
+    # como primers (~20 pb), especialmente contra bancos de dados grandes.
+    # Definir so "-word_size 7" nao resolve, porque o algoritmo de
+    # busca/extensao usado continua sendo o do megablast. A NCBI recomenda
+    # blastn-short para qualquer query abaixo de 50 pb.
+    cmd = F"blastn -task blastn-short -query {query} -db {db} -num_threads {nt} -word_size 7 -evalue {ev} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
     
     if qcov_hsp_perc > 0:
         cmd += F" -qcov_hsp_perc {qcov_hsp_perc}"
