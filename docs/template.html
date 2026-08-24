@@ -61,6 +61,15 @@
         .sidebar { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.04); overflow: hidden; position: sticky; top: 90px;}
         .sidebar-header { background: var(--primary); color: white; padding: 15px 20px; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;}
         .sidebar-content { padding: 25px 20px; }
+
+        /* Em coluna única (mesmo breakpoint do .layout-grid) a sidebar não
+           pode ficar "grudada" (sticky): como ela é mais alta que a tela,
+           ficaria cobrindo a árvore e o gráfico pra sempre ao rolar a
+           página. Regra colocada DEPOIS de ".sidebar" de propósito — como
+           as duas têm a mesma especificidade, a ordem no arquivo decide. */
+        @media (max-width: 992px) {
+            .sidebar { position: static; top: auto; }
+        }
         
         .data-group { margin-bottom: 25px; }
         .data-group:last-child { margin-bottom: 0; }
@@ -110,7 +119,19 @@
 
         /* Gráfico e Tabela */
         .chart-container { position: relative; height: 280px; width: 100%; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);}
-        
+        .chart-canvas-wrap { height: 220px; width: 100%; }
+
+        /* Ajustes para telas de celular — depois das regras base de
+           propósito (mesma especificidade, então a ordem no arquivo decide
+           qual vale). */
+        @media (max-width: 600px) {
+            .silva-col { min-width: 220px; }
+            .silva-browser { height: 320px; }
+            /* Legenda do gráfico passa para embaixo (ver renderPieChart),
+               então o canvas precisa de mais altura pra caber os dois. */
+            .chart-canvas-wrap { height: 300px; }
+        }
+
         .table-container { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
         th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); }
@@ -153,7 +174,7 @@
 <body>
     <nav class="navbar">
         <a href="../../index.html" style="display:flex; align-items:center; text-decoration:none;">
-            <img src="docs/imagens/Logo2.png" alt="TerraSeq" style="height:80px; width:auto; display:block; filter: brightness(1.05);">
+            <img src="../../imagens/Logo2.png" alt="TerraSeq" style="height:80px; width:auto; display:block; filter: brightness(1.05);">
         </a>
         <a href="../../index.html" class="btn-voltar">⬅ Voltar ao Sistema</a>
     </nav>
@@ -268,7 +289,7 @@
                     
                     <div class="chart-container">
                         <h3 id="chart-title" style="color: var(--primary); font-weight: 600; font-size: 1rem; text-align: center; margin-top: 0;">Composição</h3>
-                        <div style="height: 220px; width: 100%;"><canvas id="dynamicChart"></canvas></div>
+                        <div class="chart-canvas-wrap"><canvas id="dynamicChart"></canvas></div>
                     </div>
                 </div>
 
@@ -332,12 +353,12 @@
         <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Universidade de Coimbra" class="footer-logo-item" title="Faculty of Sciences and Technology of the University of Coimbra">
         <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="CNPq" class="footer-logo-item" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="FAPES" class="footer-logo-item" title="Fundação de Amparo à Pesquisa e Inovação do Espírito Santo">
-        <img src="docs/imagens/footer.png" alt="Logo 2" class="footer-logo-item" title="Logo 2">
+        <img src="../../imagens/footer.png" alt="Logo 2" class="footer-logo-item" title="Logo 2">
     </div>
 
     <footer>
         <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
-            <img src="docs/imagens/Logo3.png" alt="TerraSeq" style="height:22px; width:auto; display:block; opacity:0.95;">
+            <img src="../../imagens/Logo3.png" alt="TerraSeq" style="height:22px; width:auto; display:block; opacity:0.95;">
             <span><strong>TerraSeq</strong></span>
             <span style="margin-left:2px;">- In silico primer optimization for Earth biodiversity assessment</span>
         </div>
@@ -827,10 +848,13 @@
         function renderPieChart(labels, data) {
             const ctx = document.getElementById('dynamicChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
+            // Em telas estreitas a legenda à direita espreme demais o gráfico
+            // (fica sobreposto/ilegível); embaixo ele tem espaço pra respirar.
+            const legendPosition = window.innerWidth < 600 ? 'bottom' : 'right';
             chartInstance = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'pie',
                 data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#0f4c75', '#3282b8', '#bbe1fa', '#10b981', '#f59e0b', '#cbd5e1'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { family: "'Segoe UI', sans-serif" } } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: legendPosition, labels: { boxWidth: 12, font: { family: "'Segoe UI', sans-serif" } } } } }
             });
         }
 
@@ -929,4 +953,3 @@
     </script>
 </body>
 </html>
-
