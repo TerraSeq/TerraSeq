@@ -1,0 +1,49 @@
+{
+    "request_id": "REQ-20260823-0066",
+    "metadata": {
+        "submitted_by": "Tiago Marques Gabriel",
+        "email": "tiagomarquesgabriel2405@gmail.com",
+        "submitted_at": "23/08/2026 às 23:28",
+        "target_region": "Outra",
+        "organism": "Geral",
+        "max_mismatches": 2,
+        "amplicon_min": 200,
+        "amplicon_max": 8000,
+        "e_value": 10.0,
+        "min_coverage": 40,
+        "max_hits": 30000,
+        "min_tm": 0.0,
+        "database": "refseqsoil"
+    },
+    "primers": {
+        "forward": "GTGCCAGCCGCCGCGGTAA",
+        "reverse": "CCGCCAATTCCTTTGAGTTT",
+        "pair_name": "Teste2"
+    },
+    "summary": {
+        "total_sequences_checked": 46190,
+        "total_matches": 0,
+        "estimated_coverage": 0.0,
+        "off_target_matches": 0,
+        "mean_amplicon_size": 0
+    },
+    "functional_tree": {
+        "Decompositores da Serrapilheira": {},
+        "Engenheiros do Ecossistema": {},
+        "Fora do Escopo Principal": {},
+        "Função Indefinida": {},
+        "Micropredadores": {},
+        "Microrganismos": {}
+    },
+    "taxonomy_tree": {
+        "name": "Root",
+        "rank": "root",
+        "matches": 0,
+        "coverage": 0.0,
+        "children": []
+    },
+    "leaf_metadata": {},
+    "warnings": [
+        "Cobertura geral baixa. Verifique os filos relevantes."
+    ]
+}
