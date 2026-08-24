@@ -123,6 +123,21 @@ def _call_makeblastdb(fasta, log_file):
         subprocess.run(F" makeblastdb -in {fasta} -dbtype nucl -out {db_basename}__BLAST", check=True, shell=True, stderr=log)
     return F"{db_basename}__BLAST"
 
+# Tamanho de banco de dados FIXO usado so para o calculo estatistico do
+# e-value (opcao -dbsize do blastn). Sem isso, o blastn usa o tamanho real
+# do(s) banco(s) combinados no "-db" para calcular a significancia -- e como
+# os bancos de solo sao montados concatenando um numero variavel de grupos
+# taxonomicos (de 1 ate 18+ bancos, alguns com genomas legitimamente enormes,
+# como carrapatos e centopeias), o mesmo primer/match pode "passar" no e-value
+# rodando contra um banco pequeno e "falhar" rodando contra o combinado
+# grande -- nao porque o alinhamento mudou, mas porque a estatistica de
+# significancia depende do tamanho do banco (E ~ tamanho_do_banco). Fixar um
+# valor de referencia deixa o resultado do e-value consistente e prossivel,
+# independente de quantos/quais bancos forem combinados numa busca.
+# Convencao comum em pipelines de checagem de primers: usar a escala de UM
+# genoma tipico (1 Gb) como referencia.
+DBSIZE_REFERENCIA = 1_000_000_000
+
 def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, out_file):
     # -task blastn-short: sem isso, o blastn usa "megablast" por padrao (task
     # feito pra sequencias LONGAS e quase identicas, ex: genoma x genoma), que
@@ -131,11 +146,11 @@ def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, ou
     # Definir so "-word_size 7" nao resolve, porque o algoritmo de
     # busca/extensao usado continua sendo o do megablast. A NCBI recomenda
     # blastn-short para qualquer query abaixo de 50 pb.
-    cmd = F"blastn -task blastn-short -query {query} -db {db} -num_threads {nt} -word_size 7 -evalue {ev} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
-    
+    cmd = F"blastn -task blastn-short -query {query} -db {db} -num_threads {nt} -word_size 7 -evalue {ev} -dbsize {DBSIZE_REFERENCIA} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
+
     if qcov_hsp_perc > 0:
         cmd += F" -qcov_hsp_perc {qcov_hsp_perc}"
-    
+
     cmd += F" > {out_file}"
     
     with open(log_file, "a") as log:
