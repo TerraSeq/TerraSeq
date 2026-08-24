@@ -1,0 +1,33 @@
+name: Deploy Pages (produção)
+
+# Publica a pasta docs/ da branch main na branch gh-pages, mantendo os
+# subdiretórios pr-preview/ criados pelo workflow de preview de PR
+# (keep_files: true faz o merge em vez de substituir tudo).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Publicar docs/ em gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          keep_files: true

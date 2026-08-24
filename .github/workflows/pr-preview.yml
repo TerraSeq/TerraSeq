@@ -1,0 +1,36 @@
+name: Preview de PR (GitHub Pages)
+
+# Publica uma prévia online da pasta docs/ de cada Pull Request, em um
+# subcaminho próprio (pr-preview/pr-<numero>/) dentro da branch gh-pages.
+# A action comenta automaticamente o link da prévia no PR e remove os
+# arquivos quando o PR é fechado/mesclado.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    paths:
+      - "docs/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Só roda para PRs do próprio repositório (branches, não forks), já que
+    # o GITHUB_TOKEN de PRs vindos de forks não tem permissão de escrita.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Publicar prévia
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./docs
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
