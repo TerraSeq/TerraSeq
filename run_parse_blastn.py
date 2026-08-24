@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from Bio.SeqUtils import MeltingTemp as mt
 from Bio.Seq import Seq
+from Bio.Data.IUPACData import ambiguous_dna_values as _IUPAC_AMBIGUOUS
 from reformat import _decode_fasta_header
 import numpy as np
 import subprocess, os
@@ -10,10 +11,25 @@ def _other_dir(dir):
         return "rev"
     else:
         return "fwd"
+
+def _iupac_match(primer_base, genome_base):
+    """
+    Compara uma base do primer (que pode ser um codigo de degenerescencia
+    IUPAC, ex: R = A ou G) contra uma base real do genoma. Retorna True se
+    a base do genoma eh uma das bases aceitas pelo codigo do primer.
+    Ex: _iupac_match('R', 'A') e _iupac_match('R', 'G') -> True
+        _iupac_match('R', 'C') -> False
+    """
+    aceitas = _IUPAC_AMBIGUOUS.get(primer_base.upper())
+    if aceitas is None:
+        return primer_base.upper() == genome_base.upper()
+    return genome_base.upper() in aceitas
+
 def _count_matches(seq1, seq2, shift = 0):
+    # seq1 = primer (pode ter bases degeneradas IUPAC), seq2 = sequencia do genoma
     count = 0
     for i in range(min([len(seq1), len(seq2)])):
-        if i+shift < len(seq1) and seq1[i+shift] == seq2[i]:
+        if i+shift < len(seq1) and _iupac_match(seq1[i+shift], seq2[i]):
             count += 1
     return count
 
@@ -26,27 +42,65 @@ def _find_3prime_mms(pseq, aseq): # find 3' end mismatches between primer and al
     return len(pseq)+best_shift - len(aseq)
 
 def _count_3prime_mms_in_last_5(pseq, aseq):
-    """Conta mismatches nos últimos 5 bp da extremidade 3'"""
+    """Conta mismatches nos últimos 5 bp da extremidade 3', respeitando bases
+    degeneradas IUPAC do primer (pseq) contra a sequência real do genoma (aseq)."""
     last_5_p = pseq[-5:] if len(pseq) >= 5 else pseq
     last_5_a = aseq[-5:] if len(aseq) >= 5 else aseq
-    return sum(1 for p, a in zip(last_5_p, last_5_a) if p != a)
+    return sum(1 for p, a in zip(last_5_p, last_5_a) if not _iupac_match(p, a))
+
+def _resolve_degenerate_bases(primer_seq, aligned_seq):
+    """
+    Não existe uma única Tm termodinâmica para uma posição degenerada --
+    fisicamente, um primer com base degenerada é uma MISTURA de moléculas
+    concretas (ex: 'S' é, na prática, um pool de moléculas com G e moléculas
+    com C nessa posição). Para calcular a Tm da molécula específica dessa
+    mistura que de fato anelou nesse alvo, substituímos cada base degenerada
+    do primer pela base real do genoma, sempre que ela for uma correspondência
+    IUPAC válida (ex: primer 'S' + genoma 'G' -> 'G'). Quando a base do genoma
+    NÃO é uma correspondência válida (mismatch real), a base do primer é
+    mantida, para que o Tm_NN calcule corretamente a penalidade de mismatch.
+    """
+    resolvido = [
+        a.upper() if _iupac_match(p, a) else p.upper()
+        for p, a in zip(primer_seq, aligned_seq)
+    ]
+    # Sobra do primer sem par no alinhamento (não deve ocorrer sem gaps, mas
+    # evita perder bases caso os dois lados tenham tamanhos diferentes).
+    resolvido.append(primer_seq[len(aligned_seq):].upper())
+    return "".join(resolvido)
 
 def _check_primer_quals(hit1, hit2, fwd_seq, rev_seq, tm_thresh = 45., size_max=9999, size_min=20, max_3prime_mm=0, Na=50, K=0, Tris=0, Mg=0, dNTPs=0, saltcorr=5):
     if hit1["sseqid"] == hit2["sseqid"] and hit1["sstrand"] != hit2["sstrand"]: # Check opposite strand annealing
         end_diff = int(hit2["sstart"]) - int(hit1["sstart"]) # amplicon size
         if (hit1["sstrand"] == "plus" and end_diff > 0) or (hit1["sstrand"] == "minus" and end_diff < 0): # primers are convergent
+            # c_seq deve ser o COMPLEMENTO simples de sseq (pareado base a base,
+            # na mesma ordem de leitura de qseq), conforme a própria documentação
+            # do Bio.SeqUtils.MeltingTemp.Tm_NN:
+            #   Primer (seq):      5' ATGC...
+            #   Template (c_seq):  3' TACG...
+            # Usar reverse_complement() (como antes) inverte a ordem da sequência
+            # e quebra o pareamento posição-a-posição que o Tm_NN espera --
+            # chegando a lançar ValueError mesmo em matches perfeitos e sem
+            # nenhuma base degenerada.
+            #
+            # Além disso, o Tm_NN não sabe calcular termodinâmica pra um código
+            # IUPAC literal (ex: 'S'), porque não existe um único valor de Tm
+            # pra uma posição degenerada -- por isso resolvemos cada base
+            # degenerada do primer pra base real do genoma antes de calcular.
+            qseq_fwd_resolvido = _resolve_degenerate_bases(hit1["qseq"], hit1["sseq"])
             try:
-                if hit1["qseq"] == hit1["sseq"]:
-                    tm_fwd = mt.Tm_NN(hit1["qseq"], nn_table = mt.DNA_NN4, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
+                if qseq_fwd_resolvido == hit1["sseq"]:
+                    tm_fwd = mt.Tm_NN(qseq_fwd_resolvido, nn_table = mt.DNA_NN4, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
                 else:
-                    tm_fwd = mt.Tm_NN(hit1["qseq"], c_seq = Seq(hit1["sseq"]).reverse_complement(), nn_table = mt.DNA_NN4, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
+                    tm_fwd = mt.Tm_NN(qseq_fwd_resolvido, c_seq = Seq(hit1["sseq"]).complement(), nn_table = mt.DNA_NN4, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
             except ValueError:
                 tm_fwd = 0
+            qseq_rev_resolvido = _resolve_degenerate_bases(hit2["qseq"], hit2["sseq"])
             try:
-                if hit2["qseq"] == hit2["sseq"]:
-                    tm_rev = mt.Tm_NN(hit2["qseq"], nn_table = mt.DNA_NN4, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
+                if qseq_rev_resolvido == hit2["sseq"]:
+                    tm_rev = mt.Tm_NN(qseq_rev_resolvido, nn_table = mt.DNA_NN4, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
                 else:
-                    tm_rev = mt.Tm_NN(hit2["qseq"], c_seq = Seq(hit2["sseq"]).reverse_complement(), nn_table = mt.DNA_NN4, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
+                    tm_rev = mt.Tm_NN(qseq_rev_resolvido, c_seq = Seq(hit2["sseq"]).complement(), nn_table = mt.DNA_NN4, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
             except ValueError:
                 tm_rev = 0
             threeprime_end_mm_fwd = _find_3prime_mms(fwd_seq, hit1["sseq"])
