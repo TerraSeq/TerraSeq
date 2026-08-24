@@ -1,0 +1,349 @@
+{
+    "request_id": "REQ-20260615-0051",
+    "metadata": {
+        "submitted_by": "tiago",
+        "email": "tiagomarquesgabriel2405@gmail.com",
+        "submitted_at": "15/06/2026 às 21:46",
+        "target_region": "X",
+        "organism": "Eukaryota",
+        "max_mismatches": 3,
+        "amplicon_min": 600,
+        "amplicon_max": 800,
+        "e_value": 10.0,
+        "min_coverage": 40,
+        "max_hits": 50,
+        "min_tm": 0.0,
+        "database": "mistura_teste"
+    },
+    "primers": {
+        "forward": "GGTCAACAAATCATAAAGATATTGG",
+        "reverse": "TAAACTTCAGGGTGACCAAAAAATCA"
+    },
+    "summary": {
+        "total_sequences_checked": 150000,
+        "total_matches": 6,
+        "estimated_coverage": 4e-05,
+        "off_target_matches": 0,
+        "mean_amplicon_size": 701.5
+    },
+    "functional_tree": {
+        "Decompositores da Serrapilheira": {},
+        "Engenheiros do Ecossistema": {
+            "Minhocas": {
+                "tamanho": "Macrofauna",
+                "especies": [
+                    {
+                        "especie": "Eisenia andrei",
+                        "id": "PP438738",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Eisenia andrei",
+                        "id": "NC_065212",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Eisenia andrei",
+                        "id": "OK513069",
+                        "matches": 1
+                    }
+                ]
+            }
+        },
+        "Fora do Escopo Principal": {},
+        "Função Indefinida": {},
+        "Micropredadores": {
+            "Nematoides": {
+                "tamanho": "Microfauna",
+                "especies": [
+                    {
+                        "especie": "Uncinaria stenocephala",
+                        "id": "PX548152",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Uncinaria stenocephala",
+                        "id": "PX548150",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Uncinaria stenocephala",
+                        "id": "PX548153",
+                        "matches": 1
+                    }
+                ]
+            }
+        },
+        "Microrganismos": {}
+    },
+    "taxonomy_tree": {
+        "name": "Root",
+        "rank": "root",
+        "matches": 6,
+        "coverage": 1.0,
+        "children": [
+            {
+                "name": "Eukaryota",
+                "rank": "domain",
+                "matches": 6,
+                "coverage": 1.0,
+                "children": [
+                    {
+                        "name": "Metazoa",
+                        "rank": "kingdom",
+                        "matches": 6,
+                        "coverage": 1.0,
+                        "children": [
+                            {
+                                "name": "Ecdysozoa",
+                                "rank": "clade",
+                                "matches": 3,
+                                "coverage": 0.5,
+                                "children": [
+                                    {
+                                        "name": "Nematoda",
+                                        "rank": "clade",
+                                        "matches": 3,
+                                        "coverage": 0.5,
+                                        "children": [
+                                            {
+                                                "name": "Chromadorea",
+                                                "rank": "clade",
+                                                "matches": 3,
+                                                "coverage": 0.5,
+                                                "children": [
+                                                    {
+                                                        "name": "Rhabditida",
+                                                        "rank": "clade",
+                                                        "matches": 3,
+                                                        "coverage": 0.5,
+                                                        "children": [
+                                                            {
+                                                                "name": "Rhabditina",
+                                                                "rank": "clade",
+                                                                "matches": 3,
+                                                                "coverage": 0.5,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Rhabditomorpha",
+                                                                        "rank": "clade",
+                                                                        "matches": 3,
+                                                                        "coverage": 0.5,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Strongyloidea",
+                                                                                "rank": "clade",
+                                                                                "matches": 3,
+                                                                                "coverage": 0.5,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Ancylostomatidae",
+                                                                                        "rank": "family",
+                                                                                        "matches": 3,
+                                                                                        "coverage": 0.5,
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "name": "Ancylostomatinae",
+                                                                                                "rank": "clade",
+                                                                                                "matches": 3,
+                                                                                                "coverage": 0.5,
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "name": "Uncinaria",
+                                                                                                        "rank": "genus",
+                                                                                                        "matches": 3,
+                                                                                                        "coverage": 0.5,
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "name": "Uncinaria stenocephala",
+                                                                                                                "rank": "species",
+                                                                                                                "matches": 3,
+                                                                                                                "coverage": 0.5,
+                                                                                                                "children": []
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Spiralia",
+                                "rank": "class",
+                                "matches": 3,
+                                "coverage": 0.5,
+                                "children": [
+                                    {
+                                        "name": "Lophotrochozoa",
+                                        "rank": "clade",
+                                        "matches": 3,
+                                        "coverage": 0.5,
+                                        "children": [
+                                            {
+                                                "name": "Annelida",
+                                                "rank": "clade",
+                                                "matches": 3,
+                                                "coverage": 0.5,
+                                                "children": [
+                                                    {
+                                                        "name": "Clitellata",
+                                                        "rank": "clade",
+                                                        "matches": 3,
+                                                        "coverage": 0.5,
+                                                        "children": [
+                                                            {
+                                                                "name": "Oligochaeta",
+                                                                "rank": "clade",
+                                                                "matches": 3,
+                                                                "coverage": 0.5,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Crassiclitellata",
+                                                                        "rank": "clade",
+                                                                        "matches": 3,
+                                                                        "coverage": 0.5,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Lumbricina",
+                                                                                "rank": "clade",
+                                                                                "matches": 3,
+                                                                                "coverage": 0.5,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Lumbricidae",
+                                                                                        "rank": "family",
+                                                                                        "matches": 3,
+                                                                                        "coverage": 0.5,
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "name": "Lumbricinae",
+                                                                                                "rank": "clade",
+                                                                                                "matches": 3,
+                                                                                                "coverage": 0.5,
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "name": "Eisenia",
+                                                                                                        "rank": "genus",
+                                                                                                        "matches": 3,
+                                                                                                        "coverage": 0.5,
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "name": "Eisenia andrei",
+                                                                                                                "rank": "species",
+                                                                                                                "matches": 3,
+                                                                                                                "coverage": 0.5,
+                                                                                                                "children": []
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "leaf_metadata": {
+        "Uncinaria stenocephala": {
+            "info": {
+                "acc": "PX548152",
+                "desc": "Uncinaria stenocephala isolate TSF_1.1 mitochondrion, complete genome",
+                "length": "13722"
+            },
+            "amplicons": [
+                {
+                    "acc": "PX548152",
+                    "size": "697",
+                    "tm": "73.86145180669916",
+                    "start": "55",
+                    "end": "752",
+                    "seq": "AATCATAAAGATATTGGTACATTATATTTTTTGTTTGGTTTGTGGTCAGGTATGGTTGGTACTAGTTTGTCTTTAATTATTCGTTTGGAGTTGGCAAAACCTGGTTTATTATTAGGTAATGGACAGTTATATAATTCTATTATCACTGCTCATGCAATTTTAATAATTTTTTTTATGGTTATACCTACAATGATTGGGGGTTTTGGAAATTGAATGGTTCCTTTGATGCTAGGTGCTCCTGATATAAGTTTTCCTCGTTTAAATAATTTGAGTTTTTGATTATTACCTACTGCTATGTTTTTAATTCTTGATTCTTGTTTTGTTGATATGGGTAGGGGGACTAGTTGAACTATTTATCCTCCTTTGAGGACTTTAGGACATCCTGGGAGAAGTGTTGATTTAGCTATTTTTAGTTTACATTGTGCTGGTTTAAGATCTATTTTAGGTGGTATTAATTTTATGTGTACTACTAAAAATTTGCGTAGAAGTTCTATTTCGTTAGAACATATAAGTTTATTTGTGTGAACAGTTTTTGTTACGGTTTTTTTGTTGGTTTTATCATTGCCTGTTTTAGCAGGTGCTATTACAATGCTTTTAACTGATCGTAATTTGAATACTTCTTTTTTTGATCCAAGAACAGGTGGTAATCCTTTAATTTACCAACATTTATTTTGATTTTTTGGTCATCCTGAGGTTTA"
+                },
+                {
+                    "acc": "PX548150",
+                    "size": "697",
+                    "tm": "73.74633444792192",
+                    "start": "55",
+                    "end": "752",
+                    "seq": "AATCATAAAGATATTGGTACATTATATTTTTTGTTTGGTTTGTGGTCAGGTATGGTTGGTACTAGTTTGTCTTTAATTATTCGTTTGGAGTTGGCAAAACCTGGTTTATTATTGGGTAATGGACAGTTATATAATTCTATTATTACTGCTCATGCAATTTTAATAATTTTTTTTATGGTTATACCTACAATGATTGGGGGTTTTGGAAATTGAATGGTTCCTTTGATGTTAGGTGCTCCTGATATAAGTTTTCCTCGTTTAAATAATTTGAGTTTTTGATTATTACCTACTGCTATGTTTTTAATTCTTGATTCTTGTTTTGTTGATATGGGTAGGGGGACTAGTTGAACTATTTATCCTCCTTTGAGGACTTTAGGACATCCTGGGAGAAGTGTTGATTTAGCTATTTTTAGTTTACATTGTGCTGGTTTAAGATCTATTTTAGGTGGTATTAATTTTATGTGTACTACTAAAAATTTGCGTAGAAGTTCTATTTCGTTAGAACATATAAGTTTATTTGTGTGAACAGTTTTTGTTACGGTTTTTTTGTTGGTTTTATCATTGCCTGTTTTAGCAGGTGCTATTACAATGCTTTTAACTGATCGTAATTTGAATACTTCTTTTTTTGATCCAAGAACAGGTGGTAATCCTTTAATTTATCAACATTTATTTTGATTTTTTGGTCATCCTGAGGTTTA"
+                },
+                {
+                    "acc": "PX548153",
+                    "size": "697",
+                    "tm": "74.01177140217135",
+                    "start": "55",
+                    "end": "752",
+                    "seq": "AATCATAAAGATATTGGTACATTATATTTTTTGTTTGGTTTGTGGTCAGGTATGGTTGGTACTAGTTTGTCTTTAATTATTCGTTTGGAGTTGGCAAAACCTGGTTTATTATTGGGTAATGGACAGTTATATAATTCTATTATTACTGCTCATGCAATTTTAATAATTTTTTTTATGGTTATACCTACAATGATTGGGGGTTTTGGAAATTGAATGGTTCCTTTGATGTTAGGTGCTCCTGATATAAGTTTTCCTCGTTTAAATAATTTGAGTTTTTGATTATTACCTACTGCTATGTTTTTAATTCTTGATTCTTGTTTTGTTGATATGGGTAGGGGGACTAGTTGAACTATTTATCCTCCTTTGAGGACTTTAGGACATCCTGGGAGAAGTGTTGATTTAGCTATTTTTAGTTTGCATTGTGCTGGTTTAAGATCTATTTTAGGTGGTATTAATTTTATGTGTACTACTAAAAATTTGCGTAGAAGTTCTATTTCGTTAGARCATATAAGTTTATTTGTGTGAACAGTTTTTGTTACGGTTTTTTTGTTGGTTTTATCATTGCCTGTTTTGGCAGGTGCTATTACAATGCTTTTAACTGATCGTAATTTGAATACTTCTTTTTTTGATCCAAGAACAGGTGGTAATCCTTTAATTTACCAACATTTATTTTGATTTTTTGGTCATCCTGAGGTTTA"
+                }
+            ]
+        },
+        "Eisenia andrei": {
+            "info": {
+                "acc": "PP438738",
+                "desc": "Eisenia andrei mitochondrion, complete genome",
+                "length": "15715"
+            },
+            "amplicons": [
+                {
+                    "acc": "PP438738",
+                    "size": "706",
+                    "tm": "78.97104520864923",
+                    "start": "16",
+                    "end": "722",
+                    "seq": "TCAACAAATCACAAAGATATTGGAACTCTCTATTTCATTCTCGGGGTCTGAGCAGGTATGGTTGGTGCTGGTATAAGCCTTCTCATTCGAATCGAGCTAAGGCAACCAGGTGCCTTCCTAGGAAGGGACCAACTATATAATACAATTGTTACAGCCCATGCATTTGTAATAATTTTCTTTCTGGTAATACCTGTATTTATTGGTGGATTTGGAAACTGACTTCTACCTCTTATACTAGGAGCTCCAGACATAGCCTTTCCACGTCTCAACAACATAAGATTTTGACTTCTGCCCCCTTCCCTAATTCTCCTAGTATCCTCTGCTGCAGTGGAAAAGGGTGCTGGAACAGGGTGGACAGTTTACCCACCCCTATCCAGTAACTTAGCGCACGCGGGGCCCTCAGTGGACCTGGCTATTTTTTCCCTCCATTTAGCAGGTGCCTCCTCAATTTTAGGGGCAATTAACTTCATTACTACAGTTATTAACATACGATGAAGTGGGCTTCGACTAGAACGAATCCCCCTATTTGTATGAGCTGTAGTTATTACCGTGGTGTTACTACTTTTATCTCTTCCAGTACTTGCGGGAGCTATCACTATACTATTGACAGATCGAAACCTAAATACCTCATTCTTTGACCCTGCTGGAGGTGGCGACCCTATTCTCTACCAACATTTATTCTGATTTTTTGGACACCCTGAAGTTTA"
+                },
+                {
+                    "acc": "NC_065212",
+                    "size": "706",
+                    "tm": "79.33633095081808",
+                    "start": "16",
+                    "end": "722",
+                    "seq": "TCAACAAATCACAAAGATATTGGAACTCTCTATTTCATTCTCGGGGTCTGAGCAGGTATGGTTGGTGCTGGTATAAGCCTTCTCATTCGAATCGAGCTAAGGCAACCAGGTGCCTTCCTAGGAAGGGACCAACTATACAATACAATTGTTACAGCCCATGCATTTGTAATAATTTTCTTTCTGGTTATGCCTGTATTTATTGGTGGATTTGGAAACTGACTTCTACCTCTTATACTGGGAGCTCCAGACATAGCCTTTCCACGTCTCAACAACATAAGATTTTGACTTCTGCCCCCTTCCCTAATTCTCCTAGTATCCTCTGCTGCAGTGGAGAAGGGTGCTGGAACAGGGTGGACAGTTTACCCACCCCTATCCAGTAACTTAGCGCACGCGGGGCCCTCAGTGGACCTGGCTATTTTTTCCCTCCATTTAGCAGGTGCCTCCTCAATTTTAGGGGCAATTAACTTCATTACTACAGTTATTAACATACGGTGAAGTGGGCTTCGACTAGAACGAATCCCCCTATTTGTATGAGCTGTAGTTATTACCGTGGTGTTACTACTTTTATCTCTTCCAGTACTTGCGGGAGCTATCACTATACTATTGACAGATCGAAACCTGAATACCTCATTCTTTGACCCTGCTGGAGGTGGCGATCCTATTCTCTACCAACATTTATTCTGATTTTTTGGACACCCTGAAGTTTA"
+                },
+                {
+                    "acc": "OK513069",
+                    "size": "706",
+                    "tm": "79.33633095081808",
+                    "start": "16",
+                    "end": "722",
+                    "seq": "TCAACAAATCACAAAGATATTGGAACTCTCTATTTCATTCTCGGGGTCTGAGCAGGTATGGTTGGTGCTGGTATAAGCCTTCTCATTCGAATCGAGCTAAGGCAACCAGGTGCCTTCCTAGGAAGGGACCAACTATACAATACAATTGTTACAGCCCATGCATTTGTAATAATTTTCTTTCTGGTTATGCCTGTATTTATTGGTGGATTTGGAAACTGACTTCTACCTCTTATACTGGGAGCTCCAGACATAGCCTTTCCACGTCTCAACAACATAAGATTTTGACTTCTGCCCCCTTCCCTAATTCTCCTAGTATCCTCTGCTGCAGTGGAGAAGGGTGCTGGAACAGGGTGGACAGTTTACCCACCCCTATCCAGTAACTTAGCGCACGCGGGGCCCTCAGTGGACCTGGCTATTTTTTCCCTCCATTTAGCAGGTGCCTCCTCAATTTTAGGGGCAATTAACTTCATTACTACAGTTATTAACATACGGTGAAGTGGGCTTCGACTAGAACGAATCCCCCTATTTGTATGAGCTGTAGTTATTACCGTGGTGTTACTACTTTTATCTCTTCCAGTACTTGCGGGAGCTATCACTATACTATTGACAGATCGAAACCTGAATACCTCATTCTTTGACCCTGCTGGAGGTGGCGATCCTATTCTCTACCAACATTTATTCTGATTTTTTGGACACCCTGAAGTTTA"
+                }
+            ]
+        }
+    },
+    "warnings": [
+        "Cobertura geral baixa. Verifique os filos relevantes.",
+        "Potenciais off-targets (Tolerância a mismatch alta)."
+    ]
+}

@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eDNA SoilCheck | Validação de Primers</title>
+    <style>
+        :root {
+            --primary-color: #0f4c75;
+            --secondary-color: #3282b8;
+            --accent-color: #bbe1fa;
+            --bg-color: #f8f9fa;
+            --text-color: #2b2b2b;
+        }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        nav { background-color: var(--primary-color); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        nav h2 { margin: 0; font-weight: 600; font-size: 1.5rem; letter-spacing: 1px; }
+        nav ul { list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; }
+        nav a { color: var(--accent-color); text-decoration: none; font-weight: 500; transition: 0.3s; }
+        nav a:hover { color: white; }
+        .brand-logo { display: flex; align-items: center; height: 44px; overflow: hidden; }
+        .brand-logo img { height: 44px; width: auto; max-width: 220px; object-fit: contain; display: block; filter: brightness(1.05); transform: scale(1.2); transform-origin: left center; }
+        .hero { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; text-align: center; padding: 60px 20px; }
+        .hero h1 { font-size: 2.8rem; margin-bottom: 10px; }
+        .hero p { font-size: 1.2rem; max-width: 800px; margin: 0 auto 30px auto; opacity: 0.9; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .section-title { text-align: center; color: var(--primary-color); font-size: 2rem; margin-bottom: 40px; border-bottom: 3px solid var(--secondary-color); display: inline-block; padding-bottom: 10px; }
+        .center-text { text-align: center; }
+        .submission-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 20px; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center; transition: transform 0.3s; border-top: 5px solid var(--secondary-color); }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { color: var(--primary-color); font-size: 1.5rem; }
+        .card p { color: #666; margin-bottom: 25px; }
+        .btn { display: inline-block; padding: 12px 25px; border-radius: 6px; font-weight: 600; text-decoration: none; transition: 0.3s; }
+        .btn-primary { background-color: var(--secondary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-color); }
+        .btn-outline { border: 2px solid var(--secondary-color); color: var(--secondary-color); }
+        .btn-outline:hover { background-color: var(--secondary-color); color: white; }
+        .results-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 20px; }
+        .results-table th, .results-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .results-table th { background-color: var(--primary-color); color: white; font-weight: 600; }
+        .results-table tr:hover { background-color: #f1f7fa; }
+        .status-badge { background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
+        footer { background: #222; color: #aaa; text-align: center; padding: 30px 20px; margin-top: 40px; font-size: 0.9em; }
+        
+        /* Estilos da Nova Aba 'Sobre' - Estilo SILVA/DSMZ */
+        .sobre-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 30px;}
+        
+        .equipe-card { 
+            display: flex; 
+            background: white; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            border: 1px solid #ddd;
+            overflow: hidden;
+            height: 140px;
+            position: relative;
+        }
+        
+        .equipe-info {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .equipe-info h4 { color: var(--primary-color); margin: 0 0 5px 0; font-size: 1.1rem;}
+        .equipe-info p.cargo { color: #555; font-size: 0.85rem; margin: 0;}
+        .equipe-info p.data { color: #999; font-size: 0.8rem; font-style: italic; margin: 2px 0 10px 0;}
+        .equipe-info a.perfil-link { color: var(--secondary-color); font-size: 0.85rem; text-decoration: none; font-weight: 600;}
+        .equipe-info a.perfil-link:hover { text-decoration: underline;}
+        
+        .equipe-foto-container {
+            width: 120px;
+            height: 100%;
+            position: relative;
+            background-color: #eee;
+            clip-path: polygon(25% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+        
+        .equipe-foto-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        .no-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background-color: #ddd;
+            color: #888;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .no-photo svg {
+            width: 50px;
+            height: 50px;
+            fill: #aaa;
+            margin-bottom: 5px;
+        }
+        .inst-box { background: white; padding: 25px; border-radius: 8px; border: 1px solid #eee; text-align: center;}
+        .inst-box h4 { color: var(--secondary-color); margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;}
+
+        /* Estilos para o alinhamento das Instituições e Logos */
+        .colab-container {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: flex-start;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        .colab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .colab-item p {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+        }
+        .inst-logo {
+            max-width: 130px;
+            max-height: 70px;
+            object-fit: contain;
+            margin-top: 5px;
+        }
+        /* Estilos dos Cards de Fomento (Com suporte a Logo) */
+        .fomento-card { 
+            background: #f1f7fa; 
+            padding: 20px; 
+            border-left: 4px solid var(--primary-color); 
+            border-radius: 4px; 
+            margin-bottom: 20px; 
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .fomento-text {
+            flex: 1;
+        }
+        .fomento-card h4 { margin: 0 0 10px 0; color: var(--primary-color);}
+        .fomento-card p { margin: 5px 0; font-size: 0.95rem; color: #444;}
+        
+        .fomento-logo {
+            max-width: 140px;
+            max-height: 80px;
+            object-fit: contain;
+        }
+
+        /* Ajuste para telas pequenas (Celular) */
+        @media (max-width: 768px) {
+            .fomento-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .fomento-logo {
+                margin-top: 15px;
+            }
+        }
+
+        /* Estilos da Faixa de Logos do Rodapé (Logo Banner) */
+        /* Estilos do Acordeão (Collapsible) para a seção Sobre */
+        .sobre-accordion {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .sobre-accordion summary {
+            background-color: white;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 18px 25px;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .sobre-accordion summary::-webkit-details-marker {
+            display: none; 
+        }
+        .sobre-accordion summary::after {
+            content: '▼';
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            transition: transform 0.3s ease;
+        }
+        .sobre-accordion[open] summary {
+            border-bottom: 1px solid #ddd;
+            background-color: #f1f7fa;
+        }
+        .sobre-accordion[open] summary::after {
+            transform: rotate(180deg);
+        }
+        .accordion-content {
+            padding: 25px;
+            background-color: white;
+        }
+
+        .footer-logo-banner {
+            background-color: #e5e5e5;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            border-top: 1px solid #d1d5db;
+        }
+        
+        .footer-logo-item {
+            max-width: 140px;
+            max-height: 65px;
+            object-fit: contain;
+            filter: grayscale(100%) opacity(0.7);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .footer-logo-item:hover {
+            filter: grayscale(0%) opacity(1);
+            transform: scale(1.05);
+        }
+        
+        footer { 
+            background: #222; 
+            color: #aaa; 
+            text-align: center; 
+            padding: 20px; 
+            font-size: 0.9em; 
+            margin-top: 0;
+        }
+        .footer-logos { display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; flex-wrap: wrap;}
+
+        /* Estilos da Paginação (Integrado ao visual do site) */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 0 0 8px 8px;
+            gap: 5px;
+            border-top: 1px solid #eee;
+        }
+        .page-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid transparent;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .page-btn:hover {
+            background-color: #f1f7fa;
+            border: 1px solid var(--accent-color);
+        }
+        .page-btn.active {
+            background-color: var(--secondary-color);
+            color: white;
+            border: 1px solid var(--secondary-color);
+        }
+        .page-btn.arrow {
+            font-size: 1.2rem;
+            padding: 6px 12px;
+        }
+        .page-info {
+            margin-left: auto;
+            color: #666;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Barra de ferramentas da tabela (Resultados por página) */
+        .table-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .page-size-label {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 600;
+        }
+        .page-size-select {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: white;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Cabeçalhos ordenáveis da tabela de resultados */
+        .results-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .results-table th.sortable:hover {
+            background-color: var(--secondary-color);
+        }
+        .sort-arrow {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 0.75em;
+            opacity: 0.5;
+        }
+        .results-table th.sortable.sort-asc .sort-arrow::after { content: "▲"; opacity: 1; }
+        .results-table th.sortable.sort-desc .sort-arrow::after { content: "▼"; opacity: 1; }
+        .results-table th.sortable:not(.sort-asc):not(.sort-desc) .sort-arrow::after { content: "⇅"; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#inicio" style="display:flex; align-items:center; text-decoration:none;">
+            <img src="imagens/Logo2.png" alt="TerraSeq" style="max-height: 100px; width:auto; display:block; filter: brightness(1.05);">
+        </a>
+        <ul>
+            <li><a href="#inicio">Início</a></li>
+            <li><a href="#submeter">Testar Primer</a></li>
+            <li><a href="#resultados">Resultados</a></li>
+            <li><a href="#sobre">Equipe & Sobre</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero" id="inicio">
+        <h1>Validação in silico de Primers</h1>
+        <p>Uma plataforma automatizada para avaliação de cobertura taxonômica e simulação de PCR contra genomas completos.</p>
+    </header>
+
+    <section class="container" id="submeter">
+        <div class="center-text">
+            <h2 class="section-title">Escolha sua via de Submissão</h2>
+            <p>O nosso pipeline suporta duas arquiteturas diferentes para recebimento e processamento de ensaios.</p>
+        </div>
+        
+        <div class="submission-grid">
+            <div class="card">
+                <h3>📊 Google Forms</h3>
+                <p>Preencha um formulário web simples e receba os resultados diretamente no seu e-mail.</p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSd061rHejG0NuOxotzHSfdCpYhioZG284lNUP0x_P54UUymNg/viewform?usp=dialog" target="_blank" class="btn btn-primary">Formulário de Análise</a>
+            </div>
+
+            <div class="card">
+                <h3>💻 GitHub Issues</h3>
+                <p>Submeta seus parâmetros via Issues e acompanhe o log de execução público.</p>
+                <a href="https://github.com/tiagogabrielsi/pipeline_genoma/issues/new/choose" target="_blank" class="btn btn-outline">Abrir Nova Issue</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" id="resultados">
+        <div class="center-text">
+            <h2 class="section-title">Acervo de Primers Avaliados</h2>
+            <p>Histórico de análises já processadas e validadas pelo pipeline contra nossos bancos de genomas de referência.</p>
+        </div>
+
+        <div class="table-toolbar">
+            <label for="page-size-select" class="page-size-label">Resultados por página:</label>
+            <select id="page-size-select" class="page-size-select">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="all">Todos</option>
+            </select>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort-key="id" data-sort-type="text">ID da Requisição<span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="primername" data-sort-type="text">Nome do Par de Primers<span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="alvo" data-sort-type="text">Alvo<span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="banco" data-sort-type="text">Banco<span class="sort-arrow"></span></th>
+                        <th>Primers (5'→3')</th>
+                        <th class="sortable" data-sort-key="amplicon" data-sort-type="number">Tamanho do Amplicon<span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="date" data-sort-type="text">Data<span class="sort-arrow"></span></th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                    <tr data-amplicon="5989" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0046</strong></td>
+                        <td>Par 18S</td>
+                        <td>18S</td>
+                        <td>Protozoa</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC</td>
+                        <td>5989 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0046/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="5989" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0047</strong></td>
+                        <td>Par 18s</td>
+                        <td>18s</td>
+                        <td>Protozoa</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC</td>
+                        <td>5989 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0047/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="704" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0048</strong></td>
+                        <td>Par Gene COI (DNA Barcoding)</td>
+                        <td>Gene COI (DNA Barcoding)</td>
+                        <td>Acari</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="704" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0048</strong></td>
+                        <td>Par Gene COI (DNA Barcoding)</td>
+                        <td>Gene COI (DNA Barcoding)</td>
+                        <td>Formigas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="704" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0048</strong></td>
+                        <td>Par Gene COI (DNA Barcoding)</td>
+                        <td>Gene COI (DNA Barcoding)</td>
+                        <td>Minhocas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0048/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="704" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0049</strong></td>
+                        <td>Par Gene COI (DNA Barcoding)</td>
+                        <td>Gene COI (DNA Barcoding)</td>
+                        <td>Minhocas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0049/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="703" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0050</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>703 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0050/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="703" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0050</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>703 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0050/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="702" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="702" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="702" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="702" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="702" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="702" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0051</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0051/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="702" data-date="2026-06-15">
+                        <td><strong>REQ-20260615-0052</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>702 bp</td>
+                        <td>15/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260615-0052/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-16">
+                        <td><strong>REQ-20260616-0053</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>16/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-16">
+                        <td><strong>REQ-20260616-0053</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>Minhocas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>16/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-16">
+                        <td><strong>REQ-20260616-0053</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>Minhocas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>16/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-16">
+                        <td><strong>REQ-20260616-0053</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>Minhocas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>16/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260616-0053/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="704" data-date="2026-06-16">
+                        <td><strong>REQ-20260616-ISSUE0017</strong></td>
+                        <td>Par Outra</td>
+                        <td>Outra</td>
+                        <td>Minhocas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>704 bp</td>
+                        <td>16/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260616-ISSUE0017/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="701" data-date="2026-06-16">
+                        <td><strong>REQ-20260616-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>Mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>701 bp</td>
+                        <td>16/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260616-0055/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="4512" data-date="2026-06-16">
+                        <td><strong>REQ-20260616-0045</strong></td>
+                        <td>Par 18s</td>
+                        <td>18s</td>
+                        <td>Fungi</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC</td>
+                        <td>4512 bp</td>
+                        <td>16/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260616-0045/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="701" data-date="2026-06-25">
+                        <td><strong>REQ-20260625-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>Mistura_teste</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>701 bp</td>
+                        <td>25/06/2026</td>
+                        <td><span class="status-badge">Concluído</span></td>
+                        <td><a href="reports/REQ-20260625-0055/" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="648" data-date="2026-06-26">
+                        <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>RefSeq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
+                        <td>26/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="648" data-date="2026-06-26">
+                        <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>Banco_Solo_Unificado</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
+                        <td>26/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="648" data-date="2026-06-26">
+                        <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>Banco_Solo_Unificado</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
+                        <td>26/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="648" data-date="2026-06-26">
+                        <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>RefSeq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
+                        <td>26/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="648" data-date="2026-06-26">
+                        <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>refseq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGYCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGYCAATTYMTTTRAGTTT</td>
+                        <td>648 bp</td>
+                        <td>26/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="648" data-date="2026-06-26">
+                        <td><strong>REQ-20260626-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>refseq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>648 bp</td>
+                        <td>26/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260626-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="416" data-date="2026-06-27">
+                        <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>refseq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
+                        <td>27/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="416" data-date="2026-06-27">
+                        <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>refseq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
+                        <td>27/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="416" data-date="2026-06-27">
+                        <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>refseq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
+                        <td>27/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="416" data-date="2026-06-27">
+                        <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>refseq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
+                        <td>27/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="416" data-date="2026-06-27">
+                        <td><strong>REQ-20260627-0055</strong></td>
+                        <td>Par X</td>
+                        <td>X</td>
+                        <td>refseq</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCCGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCGCCAATTCCTTTGAGTTT</td>
+                        <td>416 bp</td>
+                        <td>27/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260627-0055/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0056</strong></td>
+                        <td>Par COI</td>
+                        <td>COI</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0056/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0056</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GTGCCAGCMGCCGCGGTAA<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GGACTACHVGGGTWTCTAAT</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0056/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0056</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0056/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0056</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0056/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0057</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0057/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0057</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0057/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0058/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0058/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-29">
+                        <td><strong>REQ-20260629-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>29/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260629-0058/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-30">
+                        <td><strong>REQ-20260630-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>30/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0058/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="706" data-date="2026-06-30">
+                        <td><strong>REQ-20260630-0058</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>706 bp</td>
+                        <td>30/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0058/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="705" data-date="2026-06-30">
+                        <td><strong>REQ-20260630-0059</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
+                        <td>30/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0059/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="705" data-date="2026-06-30">
+                        <td><strong>REQ-20260630-0059</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
+                        <td>30/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0059/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="705" data-date="2026-06-30">
+                        <td><strong>REQ-20260630-0059</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
+                        <td>30/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0059/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="705" data-date="2026-06-30">
+                        <td><strong>REQ-20260630-0059</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>Formigas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
+                        <td>30/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0059/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="705" data-date="2026-06-30">
+                        <td><strong>REQ-20260630-0060</strong></td>
+                        <td>Par 16S rRNA V4</td>
+                        <td>16S rRNA V4</td>
+                        <td>Formigas</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>705 bp</td>
+                        <td>30/06/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260630-0060/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="0" data-date="2026-07-13">
+                        <td><strong>REQ-20260713-0061</strong></td>
+                        <td>Par 18S</td>
+                        <td>18S</td>
+                        <td>RefSeqSoil</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC</td>
+                        <td>N/D</td>
+                        <td>13/07/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260713-0061/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="703" data-date="2026-07-14">
+                        <td><strong>REQ-20260714-0062</strong></td>
+                        <td>Par COI</td>
+                        <td>COI</td>
+                        <td>Isoptera</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;"><span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAAACTTCAGGGTGACCAAAAAATCA</td>
+                        <td>703 bp</td>
+                        <td>14/07/2026</td>
+                        <td><span class="status-badge">
+                                Concluído
+                            </span></td>
+                        <td><a href="reports/REQ-20260714-0062/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a></td>
+                    </tr>
+
+                    <tr data-amplicon="703" data-date="2026-08-23">
+                        <td><strong>REQ-20260823-0062</strong></td>
+                        <td>Par COI</td>
+                        <td>COI</td>
+                        <td>Isoptera</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGTCAACAAATCATAAAGATATTGG<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TAAAACTTCAGGGTGACCAAAAAATCA
+                        </td>
+                        <td>703 bp</td>
+                        <td>23/08/2026</td>
+                        <td>
+                            <span class="status-badge">
+                                Concluído
+                            </span>
+                        </td>
+                        <td>
+                            <a href="reports/REQ-20260823-0062/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr data-amplicon="0" data-date="2026-08-23">
+                        <td><strong>REQ-20260823-0063</strong></td>
+                        <td>Par 18S</td>
+                        <td>18S</td>
+                        <td>Protozoa</td>
+                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
+                        </td>
+                        <td>N/D</td>
+                        <td>23/08/2026</td>
+                        <td>
+                            <span class="status-badge">
+                                Concluído
+                            </span>
+                        </td>
+                        <td>
+                            <a href="reports/REQ-20260823-0063/"
+                               class="btn btn-primary"
+                               style="padding: 6px 12px; font-size: 0.85em;">
+                               Ver Relatório
+                            </a>
+                        </td>
+                    </tr>
+
+<!-- NOVAS_LINHAS -->
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar" id="pagination-container">
+            <!-- Os botões serão inseridos pelo JavaScript -->
+        </div>
+    </section>
+
+    <!-- Nova Seção: Equipe & Sobre -->
+    <section class="container" id="sobre" style="margin-top: 40px;">
+        <div class="center-text">
+            <h2 class="section-title">Sobre o Projeto</h2>
+            <p>Conheça a equipe de pesquisa e as instituições que apoiam a plataforma.</p>
+        </div>
+
+        <h3 style="color: var(--primary-color); text-align: center; margin-top: 20px;">Nossa Equipe</h3>
+        <div class="sobre-grid">
+            
+            <div class="equipe-card">
+                <div class="equipe-info">
+                    <h4>Tiago Marques Gabriel</h4>
+                    <p class="cargo">Desenvolvedor / Pesquisador</p>
+                    <a href="" target="_blank" class="perfil-link">Sobre ↗</a>
+                </div>
+                <div class="equipe-foto-container">
+                    <div class="no-photo">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        NO PHOTO
+                    </div>
+                </div>
+            </div>
+
+            <div class="equipe-card">
+                <div class="equipe-info">
+                    <h4>Prof. Dr. Leandro Fonseca de Souza</h4>
+                    <p class="cargo">Pesquisador / Orientador</p>
+                    <a href="" target="_blank" class="perfil-link">Sobre ↗</a>
+                </div>
+                <div class="equipe-foto-container">
+                    <div class="no-photo">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        NO PHOTO
+                    </div>
+                </div>
+            </div>
+
+            <div class="equipe-card">
+                <div class="equipe-info">
+                    <h4>Profa. Dra. Liana Hilda Golin Mengarda</h4>
+                    <p class="cargo">Pesquisadora / Coordenadora</p>
+                    <a href="#" target="_blank" class="perfil-link">Sobre ↗</a>
+                </div>
+                <div class="equipe-foto-container">
+                    <div class="no-photo">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        NO PHOTO
+                    </div>
+                </div>
+            </div>
+
+            <div class="equipe-card">
+                <div class="equipe-info">
+                    <h4>Prof. Dr. Eliezer de Souza da Silva</h4>
+                    <p class="cargo">Pesquisador Colaborador</p>
+                    <a href="#" target="_blank" class="perfil-link">Sobre ↗</a>
+                </div>
+                <div class="equipe-foto-container">
+                    <div class="no-photo">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        NO PHOTO
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;">Instituições Envolvidas</h3>
+        <div class="sobre-grid">
+            <div class="inst-box">
+                <h4>Instituição Executora</h4>
+                <p style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">Universidade Federal do Espírito Santo - UFES</p>
+                <img src="https://www.ufes.br/themes/custom/ufes_Varbase/images/marca_ufes.png" alt="Logo UFES" class="inst-logo">
+            </div>
+
+            <div class="inst-box">
+                <h4>Instituições Colaboradoras</h4>
+                <div class="colab-container">
+                    
+                    <div class="colab-item">
+                        <p>Embrapa</p>
+                        <img src="data:image/png;base64,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" alt="Logo Embrapa" class="inst-logo">
+                    </div>
+
+                    <div class="colab-item">
+                        <p>Universidade de Coimbra</p>
+                        <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Logo Univ. de Coimbra" class="inst-logo">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;">Agências de Fomento (Apoio)</h3>
+        <div>
+            <div class="fomento-card">
+                <div class="fomento-text">
+                    <h4>CNPq</h4>
+                    <p><strong>Projeto:</strong> Sistemas Agroflorestais na cafeicultura e seu potencial em conservar a diversidade biológica edáfica da mata atlântica: combinando short reads Ilumina e long reads Nanopore no estudo do microbioma do solo.</p>
+                    <p><strong>Coordenador:</strong> Leandro Fonseca de Souza</p>
+                    <p><em>Edital CNPq Universal 2024</em></p>
+                </div>
+                <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="Logo CNPq" class="fomento-logo">
+            </div>
+
+            <div class="fomento-card">
+                <div class="fomento-text">
+                    <h4>FAPES</h4>
+                    <p><strong>Projeto:</strong> Qualidade biológica do solo na Cafeicultura em Sistemas de produção agroflorestal e convencional: eDNA como ferramenta de estudo e bioindicadora de micro, meso e macro organismos.</p>
+                    <p><strong>Coordenadora:</strong> Liana Hilda Golin Mengarda</p>
+                    <p><em>Edital FAPES Inovagro 2024</em></p>
+                </div>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="Logo FAPES" class="fomento-logo">
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-logo-banner">
+        <img src="https://www.ufes.br/themes/custom/ufes_Varbase/images/marca_ufes.png" alt="Logo UFES" alt="UFES" class="footer-logo-item" title="Universidade Federal do Espírito Santo">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQ4AAACUCAMAAABV5TcGAAAA4VBMVEX///8Adz0ASZQAQZBAZaEAaSDJ4NQAYwybwasARZIAR5MAO477/P0AOY0ALokAQ5FkhrUAXwAANowAczWquNKzuNF2j7kAPo+lss0AM4vv8vYAbizu8/AAeDqtzLsAK4gATI/M0+K/zN55oYEAJoYnVJkAcknf7OaFmr/d5e8AG4N1p4g2WZwAIYXW6d8ge0RFil0mg1BRmHBLcKg5hFNaeay71sddkGeKrZNenHdsgbEACn+YpcYsdTmHtpxpmXVebKU8kmUAWRkASW4AcFAAalYAZGUAXHIAUoMAV3wAVyO7tyRiAAANcElEQVR4nO1caWOiShZFFhVEiWKLLNGR1qdE4xpNaxvTPfvM//9BA0jduiguaejkmanzKRKEqsO95y5VyHEMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyfFE7+FzHuf/TQfwf6z9XCL6FarerzYl796AlkC/Wbnftl2FJ1sus7Hz2HLFH8dTYC6Hb1Z8v5PDayetLTEZLTpVnr01jI+DktHQEh6/wnIcT5mkI8APak+EkiTRotpdDtdf6jZ5IJipMs6PANZNr6DIqaXksj6E/FTyAg/Qy0NOJjsrt9PtR1VnTkdL14+/6yy4qNgI/WR88mNVqTzMzDz0BuPr7ks9LSkA/71uVDzUxLA9izj5jCBbzpYq8RHTpFCj6q7y8fncbdeXhvudpeS/XpqgWQUvBx/+7RpVkql87AHL2JjlWopfqQHnGqKeiwh6dv9VugDgz+HGoD6y2X64daOkFGnso6ci/vXM15m9JZOsz62+x1rgcp9pgeWKcq6/R3No+OKJylw+i87XrDgI4ponCWKtboT+9rHnVeOceG9jbp8H0jmMOafnZS1vyTYrbzvYBt7axxlDZvkg6OG7/4dOzo51VKOvTnbOd7HtagTC2hcgTz+/atoc6n4wVl17u0dEzHp++VObwlBBZZrB+j+UZf4bipnntxYh/T4V29pTPSIjYUvpGUoL75ir45TNDHl5Rs5O7fM7bUIa7IvXomV1zZODiOU9Ohv75fZqpuTUrHm/0iEY5koySsGPqKLRUKBck+5ze6fw5K2HQ9/E5Bkux3FA+vAUmYIF77FDr1QaOxdfEhyx0sF3dbN7jETEKpgp+G2NXJerdarYrDXIEQokt0hTbQWrswGRZXpPOsFwr3P9e7lv+l1m4+O1XHec3BnT+OxNCnevXtwK/GBif+f2JmNAnTlsn33IgEyyAj8wnsmuVSudblm+RGrthulwTBqHUrA9XPSymv6tQuzCk745/7OKNPW2NYvh/aur0OLWAVmcm0Fcu99sJcX5BxjIK6wQ+Jj2bJKNfa5lGR6W3F2mOlXC4Jwf+7/PZaRtwaScIUbZtM2MifaIja0uO8uy4EZu1xE47D5R9oYttWrOJP+u3+yyxu6pHzvNLYo66l5+icMKM91TPekHEI7YGqDrrg5Uq520SGrbrioynIKHeSK+3mdZb/pQ0XVdzEM9wRuXKpobqjWNJmNixObbQ1fKw0yiMlbe0OrxdWdPZXOmVHB27mvmSsT3XAfhDOFaNpLU2cS8uosOosK8c1qfLQuIYPlIQpimcdwT9lS5J4RRi4vXL8LqZrLWoHSX6lgZKwhIIjKOnsb/SzA1mK86TbR/QReCJhXRa3SzN+T00mlZXbIw9MMQxBgLE9NK+gAyVhCu/r4wECExsQrVV6d4vD4rc8WAiHJY9SOX/PsIhBqVV+Rf5aTSTEhjNe5ZGjUSuVxZHAa/5k0Z0DzQrP4smEhN5ys/nBky8p3Wvo6FEfU0rlA7Qbvifi+t8QgsPYNwyBl0s1o4bsUxDj9+j7ahlzAF86n1b0I7Wloj1HXxvahYJOrWtL7yDLgixuNguNDj7KEjyxDKMI/MeCh8k/XJFGuKUz5azCN2P24w9DbGy3gxGWKd7obbbb7ZKKqRmTZKc1nM3msSX5lXSiDnmV6OF+2CaRqAw1kDEIoh8+La9p0EOVwFvUbYWM3dgrYQfG2k2WRgyUhCVAG7mBjYIxyEqjowbKrSEOa4t6oDDeAvjo4gaJ881PvnQ7Jgn9qv6aqJfPa6p3UQSCToGFHoshuvsTG1TYK4FjW4Yg72FG0tmB9sUVdFh35zphwsKfaBOupyiNKHyL1F0MMZq8S0KUUkNBXv22z7v0Z2QeTvWoxeX4HpVvvbSgUtobR04CjcEJ0uhLRJtH40stEI9OrReBj1yDmv8VzuKNYjHykA5fOrgtGKQgkgsOYGRKidQ5HjFTYYRC2ipalIuJhSMdFKn94vB5Op0+6a9fCZ59i/JRBWGpg8opxoDcQeVh/OXAHLwOIDqlDub/cJENzoOsIwEK74uARZN4fkC+RpvNxoJQ5BG7LTfo9dUhWXWJ0WHjT34mMs3Z+wWZkAOpUC3cP82HAaj3DNBjoWY/ggdTiiUWquW5Ie7IUI0DgU+A6iI6jjo/bc1/8h3QBHkEo7iDQZjQHPK60aE2qothiTJOR3WKlbWlowaRX8v83K3G/b6zBwyVBrjyhk6cWncZTCYon374mXwImF5twF2CNUBSVG8e4osVZDXERqmvcCPw2DZQ5BI6sI9+g4ptilIztYr7fWNc50p6sZ+4k5IGOLlHEyoV0grejOioL0Y9WRMETQslFeZ3jZLScKCYCa0f/5Qm5JzGDxiEAgmRRm6iNk1yIaqkdOdcTErHVaykP6lt6NXdqV2lLsg3eiycRQPj3ihd0dC0WB4Aj/tyFefBvPjSXeIZKrUfGc7oQKAVQDogRpXu6ITovspYC6cloYodrdHZk9ONDRrgDOQrnUd4nO0gwjW6KKuUBZSjy72LbHCdLny5nZzS0zUphQdNaMrkLmVYobOIU5mo1dyiSyw471jHOsvQ8rGf4slIfzym9IB6KxqSaty78kfSI9HNr6/MWk8UF0BiKbl7gQEG7uMxOSrTTirqld1R/QISPXIpnITRPdl4kZLLTdGHn2BAM5yaFCdVH5CzW+ixoKSX5iKlO4sTwZIFfhCO1gIXa3+5TAeq35Rk13KBXm1EzlBpaUl7AvUoRska5VXdUSVFU+1X8aIU2I+NYs9qJgXHC0AiCnC4o/udWrdLF4wUYRkNogPP+8TjjtFBU35hkXxGE8IblQ4PahaNpKSc2ohKJ0GkvNIXGPRXdNEdLlvHxFfsIXWV/P3+iwU45EIwUxAddXAOjfcsyD+BDVTCVC63O7wHIPdEVKaRWJHhDBp7SxvCudqLLKbUSKBDn+C0S9LRpyLEFepOzuueI3sOc2hSRUd0UF+pbVVQNJknNmtBlmYsLtNRp0lYN3ldmkZ7RQa/GMTrhP2NicRX8Ho/STtimzRaBbwoRTZe6nNUzEYUSUAbDnCUjjo9yHe4JUTiBbSCIPCYV6wloiTMbH45hst1erAmpcFTh1peoUoKES/Ga2vfGLexcqhP+hM6hWzaxr7S3xuHRA95G9ylIgd7KAezrBGlI7JZahx85XISxuGdDObx8mx3w7ngnDRuWz+oqsFNSMSTeSxZ/WfJL+4Lc7wfsijFdgaRRSn7G2qezoOvSWtKIt50oUVpGFVX3hh1/CcHJV40LGtDw3DpspJatcT0jaLO0UgsgJK6o2Or5IhTGctYhMqvZ7N1rPXTn+h4UWqlAx1oMSL/Ool/zcWbLuSl63mdpgg5lsY3VaRo/rhcS/XqG2r8NCyeBk3pEiH3OlYDOsUl8AuaH9K9DlA7mAcrGv18Pr5i8qrnbHRkpydYx/5reKmgiTvWijxaLkWNLqaGyWCnRxkzRpvNclSmHB48pURAFEqGz6iHpBusrQE5Ke07QDlbc+ksnIQueiCueDPgHOgYHp8NBKHHohhh+o3axooRBrNY60YzSoasKMBQ7QolXZzfIqctuY5CricL0HEBVQtbqXuQBCBQeEDraC3Rz8v0nI4WpVTY7aA/HW24duAVDhTg+MbB7hy5HIX25WEn6/sW6DCvWHU67yu80uC+gP3QNI1aDG6AQBJGJct5/XrQEHW+BpPHSVie7mCPe0v4fXhjoQN1vCxbgy4epQEPvhNf75Ef6xYkEpXL2/2s75pwDqW6OmjDMiDUTfVeKfpe7QfM3YzWC8076qP5mR1/AyN69aeAzAC/HGXHG4bjdRXSDtql8gOctXmkotnuUXOsP0AKrWjdssu5D2T4D5fjrNsTz8OzGiPyNwqp8P8RSAfHk9PQU1gVcObAtabS3hKqpNHlOFzs7RccWftDW5da5Dy6fU3zA5xaLwXr40Kp8iDGdqRYYrcS/sPshgOhM8xoq0Ya+HTkbGneyo/H+eLchq0MuSpFfL+HXZgNW6txfrWbhZscpOisv/4NzKEczl91GwtxMagfhYtwW8WiUf/42R9hrwtBI7hakK7cH+bnbIVqoRDfFnP/97+AKph/woleh3663caIjn9AaFf4m30fzMnmnVof/0TrGB89q19HKyM6Jv8COszkHTk3gVU2rxjf//FvUNLHN+6P/zNhnM1LpPd/0Nrj+81KR9AMS/UiC9DxD7otuvzRc0qDVTYvkSIlvbw68CdGNj9fkfuPoEQ4sRh0K2hlIKb3k3//heB2k7AQzmsW5vEH4L83/pZxK92LX3vcAwq3/lJ+dj/YEEB677dIs0Y/9cs9GPr9R88nLVovWfJR/ejppMYuSzoKN/8LFinfKo5Det+XSH8LMuQDb9K+VTjPmfGhf8TveWQNZ3j2Jbi34OZ/7iWAustlxIe9uny3G0Bxlo3DvPvPefweqKt1Jg4T2xtyy+gXn7LoBr3ccD8sBrW/y6Un5OX2EzECZ7yzr12AOgX9EyRiANUpzgpSGlV979+++e3oF+fhOuUv4umziAeCml+1ir+Iz5CIMTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDD8X+N/hN5km/bWPsgAAAAASUVORK5CYII=" alt="Embrapa" class="footer-logo-item" title="Empresa Brasileira de Pesquisa Agropecuária">
+        <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Universidade de Coimbra" class="footer-logo-item" title="Faculty of Sciences and Technology of the University of Coimbra">
+        <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="CNPq" class="footer-logo-item" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="FAPES" class="footer-logo-item" title="Fundação de Amparo à Pesquisa e Inovação do Espírito Santo">
+        <img src="imagens/footer.png" alt="Logo 2" class="footer-logo-item" title="Logo 2">
+    </div>
+
+    <footer>
+        <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
+            <img src="imagens/Logo3.png" alt="TerraSeq" style="height:22px; width:auto; display:block; opacity:0.95;">
+            <span><strong>TerraSeq</strong></span>
+            <span style="margin-left:2px;">- In silico primer optimization for Earth biodiversity assessment</span>
+        </div>
+        <small>© 2026 Developed by the TerraSeq Team</small>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const tableBody = document.getElementById("results-body");
+            if (!tableBody) return;
+
+            let rows = Array.from(tableBody.querySelectorAll("tr"));
+
+            const pageSizeSelect = document.getElementById("page-size-select");
+            let rowsPerPage = 10;
+            let currentPage = 1;
+            let sortKey = "amplicon";
+            let sortDir = "desc";
+
+            // Índice da coluna (0-based) correspondente a cada chave ordenável
+            const COLUMN_INDEX = { id: 0, primername: 1, alvo: 2, banco: 3, date: 6 };
+
+            function getSortValue(row, key, type) {
+                if (key === "amplicon") {
+                    return parseFloat(row.dataset.amplicon) || 0;
+                }
+                if (key === "date") {
+                    return row.dataset.date || "";
+                }
+                const cell = row.children[COLUMN_INDEX[key]];
+                const text = cell ? cell.textContent.trim().toLowerCase() : "";
+                return type === "number" ? (parseFloat(text) || 0) : text;
+            }
+
+            function sortRows(key, type) {
+                const dir = sortDir === "asc" ? 1 : -1;
+                rows.sort((a, b) => {
+                    const va = getSortValue(a, key, type);
+                    const vb = getSortValue(b, key, type);
+                    if (va < vb) return -1 * dir;
+                    if (va > vb) return 1 * dir;
+                    return 0;
+                });
+                rows.forEach(row => tableBody.appendChild(row));
+            }
+
+            function updateSortHeadersUI() {
+                document.querySelectorAll(".results-table th.sortable").forEach(th => {
+                    th.classList.remove("sort-asc", "sort-desc");
+                    if (th.dataset.sortKey === sortKey) {
+                        th.classList.add(sortDir === "asc" ? "sort-asc" : "sort-desc");
+                    }
+                });
+            }
+
+            function displayRows(page) {
+                const total = rows.length;
+                const perPage = rowsPerPage === "all" ? total : rowsPerPage;
+                const start = (page - 1) * perPage;
+                const end = start + perPage;
+
+                rows.forEach((row, index) => {
+                    row.style.display = index >= start && index < end ? "" : "none";
+                });
+            }
+
+            function updatePaginationInfo() {
+                const infoText = document.getElementById("page-info-text");
+                if (!infoText) return;
+
+                const total = rows.length;
+                const perPage = rowsPerPage === "all" ? total : rowsPerPage;
+                const start = total === 0 ? 0 : (currentPage - 1) * perPage + 1;
+                const end = Math.min(currentPage * perPage, total);
+                infoText.innerText = `${start} - ${end} de ${total}`;
+            }
+
+            function updatePaginationUI() {
+                const buttons = document.querySelectorAll("#pagination-container .page-btn:not(.arrow)");
+                buttons.forEach(btn => {
+                    btn.classList.toggle("active", parseInt(btn.innerText) === currentPage);
+                });
+                updatePaginationInfo();
+            }
+
+            function getTotalPages() {
+                const perPage = rowsPerPage === "all" ? rows.length : rowsPerPage;
+                return Math.max(1, Math.ceil(rows.length / perPage));
+            }
+
+            function setupPagination() {
+                const paginationContainer = document.getElementById("pagination-container");
+                if (!paginationContainer) return;
+
+                paginationContainer.innerHTML = "";
+                const totalPages = getTotalPages();
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement("button");
+                    btn.classList.add("page-btn");
+                    if (i === currentPage) btn.classList.add("active");
+                    btn.innerText = i;
+
+                    btn.addEventListener("click", function() {
+                        currentPage = i;
+                        displayRows(currentPage);
+                        updatePaginationUI();
+                    });
+
+                    paginationContainer.appendChild(btn);
+                }
+
+                const nextBtn = document.createElement("button");
+                nextBtn.classList.add("page-btn", "arrow");
+                nextBtn.innerHTML = "❯";
+                nextBtn.addEventListener("click", function() {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        displayRows(currentPage);
+                        updatePaginationUI();
+                    }
+                });
+                paginationContainer.appendChild(nextBtn);
+
+                const infoDiv = document.createElement("div");
+                infoDiv.classList.add("page-info");
+                infoDiv.id = "page-info-text";
+                paginationContainer.appendChild(infoDiv);
+
+                updatePaginationInfo();
+            }
+
+            function refreshTable() {
+                currentPage = 1;
+                displayRows(currentPage);
+                setupPagination();
+            }
+
+            // --- Ordenação por clique no cabeçalho ---
+            document.querySelectorAll(".results-table th.sortable").forEach(th => {
+                th.addEventListener("click", function() {
+                    const key = th.dataset.sortKey;
+                    const type = th.dataset.sortType;
+                    if (sortKey === key) {
+                        sortDir = sortDir === "asc" ? "desc" : "asc";
+                    } else {
+                        sortKey = key;
+                        sortDir = type === "number" ? "desc" : "asc";
+                    }
+                    sortRows(sortKey, type);
+                    updateSortHeadersUI();
+                    refreshTable();
+                });
+            });
+
+            // --- Controle de "Resultados por página" ---
+            if (pageSizeSelect) {
+                pageSizeSelect.addEventListener("change", function() {
+                    rowsPerPage = pageSizeSelect.value === "all" ? "all" : parseInt(pageSizeSelect.value);
+                    refreshTable();
+                });
+            }
+
+            if (rows.length > 0) {
+                // Rankeia inicialmente pelos maiores amplicons
+                sortRows(sortKey, "number");
+                updateSortHeadersUI();
+                displayRows(currentPage);
+                setupPagination();
+            }
+        });
+    </script>
+
+</body>
+</html>

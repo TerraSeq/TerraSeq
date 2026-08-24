@@ -1,0 +1,49 @@
+{
+    "request_id": "REQ-20260710-0061",
+    "metadata": {
+        "submitted_by": "Tiago G",
+        "email": "tiagogabriel3542@gmail.com",
+        "submitted_at": "10/07/2026 às 12:14",
+        "target_region": "COI",
+        "organism": "Eukaryota",
+        "max_mismatches": 4,
+        "amplicon_min": 500,
+        "amplicon_max": 800,
+        "e_value": 10.0,
+        "min_coverage": 80,
+        "max_hits": 800,
+        "min_tm": 0.0,
+        "database": "formigas"
+    },
+    "primers": {
+        "forward": "GGWACWGGWTGAACWGTWTAYCCYCC",
+        "reverse": "TAIACYTCIGGRTGICCRAARAAYCA"
+    },
+    "summary": {
+        "total_sequences_checked": 213,
+        "total_matches": 0,
+        "estimated_coverage": 0.0,
+        "off_target_matches": 0,
+        "mean_amplicon_size": 0
+    },
+    "functional_tree": {
+        "Decompositores da Serrapilheira": {},
+        "Engenheiros do Ecossistema": {},
+        "Fora do Escopo Principal": {},
+        "Função Indefinida": {},
+        "Micropredadores": {},
+        "Microrganismos": {}
+    },
+    "taxonomy_tree": {
+        "name": "Root",
+        "rank": "root",
+        "matches": 0,
+        "coverage": 0.0,
+        "children": []
+    },
+    "leaf_metadata": {},
+    "warnings": [
+        "Cobertura geral baixa. Verifique os filos relevantes.",
+        "Potenciais off-targets (Tolerância a mismatch alta)."
+    ]
+}

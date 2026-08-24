@@ -1,0 +1,235 @@
+{
+    "request_id": "REQ-20260714-0062",
+    "metadata": {
+        "submitted_by": "Tiago",
+        "email": "tiagomarquesgabriel2405@gmail.com",
+        "submitted_at": "14/07/2026 às 03:03",
+        "target_region": "COI",
+        "organism": "Geral",
+        "max_mismatches": 3,
+        "amplicon_min": 100,
+        "amplicon_max": 1000,
+        "e_value": 10.0,
+        "min_coverage": 0,
+        "max_hits": 30000,
+        "min_tm": 0.0,
+        "database": "isoptera"
+    },
+    "primers": {
+        "forward": "GGTCAACAAATCATAAAGATATTGG",
+        "reverse": "TAAAACTTCAGGGTGACCAAAAAATCA"
+    },
+    "summary": {
+        "total_sequences_checked": 50,
+        "total_matches": 2,
+        "estimated_coverage": 0.04,
+        "off_target_matches": 0,
+        "mean_amplicon_size": 703.0
+    },
+    "functional_tree": {
+        "Decompositores da Serrapilheira": {},
+        "Engenheiros do Ecossistema": {
+            "Cupins": {
+                "tamanho": "Macrofauna",
+                "especies": [
+                    {
+                        "especie": "Hodotermopsis sjostedti",
+                        "id": "JBQAZP010000356",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Hodotermopsis sjostedti",
+                        "id": "JBQAZP010000014",
+                        "matches": 1
+                    }
+                ]
+            }
+        },
+        "Fora do Escopo Principal": {},
+        "Função Indefinida": {},
+        "Micropredadores": {},
+        "Microrganismos": {}
+    },
+    "taxonomy_tree": {
+        "name": "Root",
+        "rank": "root",
+        "matches": 2,
+        "coverage": 1.0,
+        "children": [
+            {
+                "name": "Eukaryota",
+                "rank": "domain",
+                "matches": 2,
+                "coverage": 1.0,
+                "children": [
+                    {
+                        "name": "Metazoa",
+                        "rank": "kingdom",
+                        "matches": 2,
+                        "coverage": 1.0,
+                        "children": [
+                            {
+                                "name": "Ecdysozoa",
+                                "rank": "clade",
+                                "matches": 2,
+                                "coverage": 1.0,
+                                "children": [
+                                    {
+                                        "name": "Arthropoda",
+                                        "rank": "clade",
+                                        "matches": 2,
+                                        "coverage": 1.0,
+                                        "children": [
+                                            {
+                                                "name": "Altocrustacea",
+                                                "rank": "clade",
+                                                "matches": 2,
+                                                "coverage": 1.0,
+                                                "children": [
+                                                    {
+                                                        "name": "Allotriocarida",
+                                                        "rank": "clade",
+                                                        "matches": 2,
+                                                        "coverage": 1.0,
+                                                        "children": [
+                                                            {
+                                                                "name": "Hexapoda",
+                                                                "rank": "clade",
+                                                                "matches": 2,
+                                                                "coverage": 1.0,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Insecta",
+                                                                        "rank": "clade",
+                                                                        "matches": 2,
+                                                                        "coverage": 1.0,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Pterygota",
+                                                                                "rank": "phylum",
+                                                                                "matches": 2,
+                                                                                "coverage": 1.0,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Neoptera",
+                                                                                        "rank": "clade",
+                                                                                        "matches": 2,
+                                                                                        "coverage": 1.0,
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "name": "Polyneoptera",
+                                                                                                "rank": "clade",
+                                                                                                "matches": 2,
+                                                                                                "coverage": 1.0,
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "name": "Dictyoptera",
+                                                                                                        "rank": "clade",
+                                                                                                        "matches": 2,
+                                                                                                        "coverage": 1.0,
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "name": "Blattodea",
+                                                                                                                "rank": "clade",
+                                                                                                                "matches": 2,
+                                                                                                                "coverage": 1.0,
+                                                                                                                "children": [
+                                                                                                                    {
+                                                                                                                        "name": "Blattoidea",
+                                                                                                                        "rank": "clade",
+                                                                                                                        "matches": 2,
+                                                                                                                        "coverage": 1.0,
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "name": "Termitoidae",
+                                                                                                                                "rank": "family",
+                                                                                                                                "matches": 2,
+                                                                                                                                "coverage": 1.0,
+                                                                                                                                "children": [
+                                                                                                                                    {
+                                                                                                                                        "name": "Termopsidae",
+                                                                                                                                        "rank": "family",
+                                                                                                                                        "matches": 2,
+                                                                                                                                        "coverage": 1.0,
+                                                                                                                                        "children": [
+                                                                                                                                            {
+                                                                                                                                                "name": "Hodotermopsis",
+                                                                                                                                                "rank": "genus",
+                                                                                                                                                "matches": 2,
+                                                                                                                                                "coverage": 1.0,
+                                                                                                                                                "children": [
+                                                                                                                                                    {
+                                                                                                                                                        "name": "Hodotermopsis sjostedti",
+                                                                                                                                                        "rank": "species",
+                                                                                                                                                        "matches": 2,
+                                                                                                                                                        "coverage": 1.0,
+                                                                                                                                                        "children": []
+                                                                                                                                                    }
+                                                                                                                                                ]
+                                                                                                                                            }
+                                                                                                                                        ]
+                                                                                                                                    }
+                                                                                                                                ]
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "leaf_metadata": {
+        "Hodotermopsis sjostedti": {
+            "info": {
+                "acc": "JBQAZP010000356",
+                "desc": "Hodotermopsis sjostedti isolate AMA-20-018 scaffold_362:0-6943, whole genome shotgun sequence",
+                "length": "6943"
+            },
+            "amplicons": [
+                {
+                    "acc": "JBQAZP010000356",
+                    "size": "703",
+                    "tm": "75.97",
+                    "start": "1242",
+                    "end": "1945",
+                    "seq": "TCAACTAATCATAAAGATATTGGAACATTATATTTTATCTTCGGAGCTTTTGCAGGAATAGTTGGAACTTCTCTCAGAATACTAATTCGTACAGAGTTAGGCCAACCAGGACCATTTATTGGAGATGATCAAATTTACAATGTGGTTGTAACAGCCCACGCTTTCGTTATGATTTTTTTCATGGTAATGCCAGTTATGATCGGGGGATTTGGAAATTTTTTAGTTCCATTGATATTAGGAGCTCCTGATATGGCATTCCCTCGAATAAACAACATGAGATTTTGGTTATTACCACCCTCGTTAACACTACTATTGACTAGAAGAATAGTAGAAAGAGGAGCTGGTACAGGATTTACAGTTTATCCCCCTCTGGCAAGAGGTATTGCCCATATAGGAGCTTCGGTAGATTTAGCAATTTTTTCATTACATTTGGCGGGGGTATCATCAATTCTAGGGGCGGTAAATTTCATCTCAACAACTATTAATATAAAACCCATCAATATGAAACCGGACCAGATTCCATTATTTGTATGGGCTGTGGCCATTACAGCCTTATTATTATTATTATCGTTACCAGTTCTAGCAGGAGCTATTACAATATTATTAACTGATCGTAATTTAAATACATCATTTTTTGATCCAGCAGGAGGAGGGGACCCAATTTTATATCAACATTTATTTTGATTTTTTGGTCACCCAGAAGT"
+                },
+                {
+                    "acc": "JBQAZP010000014",
+                    "size": "703",
+                    "tm": "76.07",
+                    "start": "13182664",
+                    "end": "13181961",
+                    "seq": "TCAACTAATCATAAAGATATTGGAACATTATATTTTATTTTTAGGGCTTGAGCAGGAATAGTTGGTACCTCTCTTAGAATACTAATTCGTACAGAATTAGGTCAACCAGGACCATTTATTGGAGATGATCAAATTTATAATGTGATCGTAACAGCCCATGCTTTCGTTATAATCTTTTTTATAGTAATGCCAGTTATGATTGGGGGATTTGGAAATTGGCTAGTTCCATTAATATTAGGGGCTCCTGATATAGCATTTCCTCGAATGAACAACATGAGATTTTGGTTATTACCACCTTCATTAACACTATTATTAACTAGAAGAATGGTAGAAAGAGGGGCTGGTACGGGATGAACAGTTTACCCCCCTCTGGCAAGAGGTATCGCCCATATAGGGGCTTCGGTAGATTTAGCAATTTTTTCACTACATTTGGCTGGTGTGTCGTCAATCCTAGGGGCGGTAAATTTCATCTCAACAACTATTAATATAAAACCTATCAATATAAAACCAGACCAAATTCCATTATTTGTGTGGGCCGTGGCCATTACAGCTTTATTACTACTTTTATCACTGCCGGTTCTAGCAGGAGCTATTACAATATTATTAACTGATCGTAACTTAAATACATCATTTTTTGATCCAGCGGGAGGGGGTGATCCAATTTTATATCAGCATTTATTTTGATTTTTTGGTCACCCAGAAGT"
+                }
+            ]
+        }
+    },
+    "warnings": [
+        "Cobertura geral baixa. Verifique os filos relevantes.",
+        "Potenciais off-targets (Tolerância a mismatch alta)."
+    ]
+}

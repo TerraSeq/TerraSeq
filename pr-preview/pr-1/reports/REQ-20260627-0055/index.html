@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eDNA SoilCheck | Relatório In Silico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root { 
+            /* Paleta Oficial eDNA SoilCheck */
+            --primary: #0f4c75; 
+            --secondary: #3282b8; 
+            --accent: #bbe1fa; 
+            --bg-color: #f0f4f8; 
+            --card-bg: #ffffff; 
+            --text-main: #2d3748; 
+            --text-light: #718096; 
+            --border: #e2e8f0; 
+            --success: #059669; 
+            --warning: #d97706;
+        }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; line-height: 1.6; color: var(--text-main); margin: 0; padding: 0; background-color: var(--bg-color); }
+        
+        /* Navbar Padrão */
+        .navbar { background-color: var(--primary); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;}
+        .navbar h2 { margin: 0; font-weight: 600; font-size: 1.5rem; letter-spacing: 0.5px; }
+        .btn-voltar { color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.2s; background: rgba(255,255,255,0.1);}
+        .btn-voltar:hover { background: white; color: var(--primary);}
+
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        
+        /* Header do Relatório (Título) */
+        .report-header { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;}
+        .report-header h1 { color: var(--primary); font-size: 2rem; margin: 0 0 5px 0; }
+        .report-header p { color: var(--text-light); margin: 0; font-size: 1.05rem; }
+        .badge-status { background: #d1fae5; color: #065f46; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; border: 1px solid #34d399;}
+
+        /* Linha de Estatísticas Rápidas (KPIs) */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: var(--card-bg); padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;}
+        .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--secondary); }
+        .kpi-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .kpi-value { font-size: 2.2rem; font-weight: 700; color: var(--primary); line-height: 1; }
+        
+        /* NOVO LAYOUT: GRID PRINCIPAL (Sidebar + Conteúdo) */
+        .layout-grid { display: grid; grid-template-columns: 320px 1fr; gap: 30px; align-items: start; }
+        
+        /* Responsividade do Grid */
+        @media (max-width: 992px) {
+            .layout-grid { grid-template-columns: 1fr; }
+        }
+
+        /* SIDEBAR (Parâmetros e Metadados) */
+        .sidebar { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.04); overflow: hidden; position: sticky; top: 90px;}
+        .sidebar-header { background: var(--primary); color: white; padding: 15px 20px; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;}
+        .sidebar-content { padding: 25px 20px; }
+        
+        .data-group { margin-bottom: 25px; }
+        .data-group:last-child { margin-bottom: 0; }
+        .data-group-title { font-size: 0.85rem; color: var(--primary); font-weight: 700; text-transform: uppercase; border-bottom: 2px solid var(--bg-color); padding-bottom: 5px; margin-bottom: 15px; }
+        
+        .data-row { margin-bottom: 12px; }
+        .data-label { display: block; font-size: 0.75rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; margin-bottom: 2px;}
+        .data-value { font-size: 0.95rem; color: var(--text-main); font-weight: 500; }
+        .data-value.mono { font-family: monospace; color: var(--secondary); font-size: 1.1rem; background: var(--bg-color); padding: 4px 8px; border-radius: 4px; display: inline-block; word-break: break-all; border: 1px solid var(--border);}
+        
+        /* Grid interno para parâmetros pequenos na sidebar */
+        .param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        /* ÁREA PRINCIPAL (Resultados) */
+        /* ÁREA PRINCIPAL (Resultados) */
+        .main-content { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+        .panel { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.04); padding: 25px; min-width: 0; }
+        .panel-title { font-size: 1.25rem; color: var(--primary); font-weight: 600; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+        /* Botões e Filtros da Árvore */
+        .tree-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; justify-content: space-between;}
+        .btn-tree { background: white; border: 1px solid var(--border); color: var(--text-light); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;}
+        .btn-tree:hover { border-color: var(--secondary); color: var(--secondary); }
+        .btn-tree.active { background: var(--secondary); color: white; border-color: var(--secondary); }
+
+        /* Navegador SILVA/Taxonômico */
+        .silva-browser { display: flex; overflow-x: auto; gap: 0; height: 380px; background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; }
+        .silva-col { min-width: 260px; max-width: 300px; background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .silva-col-header { background: #f8fafc; padding: 12px 15px; font-weight: 700; font-size: 0.85rem; color: var(--primary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; text-transform: uppercase;}
+        .silva-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
+        .silva-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; transition: background 0.1s; }
+        .silva-item:hover { background: #f1f7fa; }
+        .silva-item.active { background: var(--secondary); color: white; font-weight: 600;}
+        .silva-item.active .taxon-name, .silva-item.active .stat-rel, .silva-item.active .stat-glob { color: white !important;}
+        .silva-item.empty { color: #cbd5e1; cursor: default; pointer-events: none; }
+        .taxon-name { color: var(--text-main); }
+        .stat-rel { color: var(--text-light); margin-right: 5px; font-size: 0.8rem; }
+        .stat-glob { color: var(--primary); font-weight: 700; font-size: 0.8rem;}
+
+        /* Card de Metadados da Espécie (Dentro da árvore) */
+        .meta-card { display: none; background: #fffcf2; border: 1px solid #fde68a; border-radius: 6px; margin-top: 15px; padding: 20px; border-left: 4px solid var(--warning);}
+        .meta-header { display: flex; align-items: center; gap: 10px; color: var(--warning); font-weight: 700; font-size: 1.1em; border-bottom: 1px solid #fde68a; padding-bottom: 10px; margin-bottom: 12px;}
+        .meta-row { display: grid; grid-template-columns: 100px 1fr; margin-bottom: 8px; font-size: 0.9rem; }
+        .meta-label { color: var(--text-light); font-weight: 600; }
+        .btn-full { display: inline-block; margin-top: 10px; padding: 8px 16px; background: var(--warning); color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; cursor: pointer; border: none; transition: 0.2s;}
+        .btn-full:hover { background: #b45309; }
+
+        /* Gráfico e Tabela */
+        .chart-container { position: relative; height: 280px; width: 100%; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);}
+        
+        .table-container { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); }
+        th { background: #f8fafc; color: var(--text-light); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; position: sticky; top: 0; z-index: 1;}
+        tr:hover { background-color: #f1f7fa; }
+
+        .search-box { width: 100%; padding: 10px 15px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; font-size: 0.95em; box-sizing: border-box; background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 15px center; padding-left: 45px;}
+        .search-box:focus { border-color: var(--secondary); outline: none; }
+
+        /* Overlay do Relatório Completo */
+        #full-report-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 76, 117, 0.9); z-index: 9999; overflow-y: auto; padding: 40px 20px; }
+        .report-content { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; padding: 40px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.3);}
+        .close-report { position: absolute; top: 15px; right: 25px; font-size: 35px; cursor: pointer; color: #94a3b8; font-weight: bold; line-height: 1;}
+        .close-report:hover { color: #ef4444; }
+        
+        .report-header-blue { background: var(--primary); color: white; padding: 20px; border-radius: 6px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; font-size: 1.1em;}
+        .btn-download-fasta { background: white; color: var(--primary); border: none; padding: 8px 12px; font-size: 0.8em; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
+        .btn-download-fasta:hover { background: var(--bg-color); }
+        .btn-download-fasta:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        .product-card { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 20px; overflow: hidden; }
+        .product-header { background: #f8fafc; color: var(--primary); padding: 12px 20px; font-weight: 600; font-size: 0.95em; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);}
+        .product-body { padding: 20px; background: white; }
+        .badge-row { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .badge { padding: 6px 12px; border-radius: 4px; color: white; font-size: 0.8em; font-weight: bold; }
+        .badge-green { background: #ef4444; } /* Vermelho para o Tamanho */
+        .badge-blue { background: var(--secondary); } /* Azul para a Tm */
+        .badge-orange { background: var(--warning); } /* Laranja para a Posição */
+        .seq-box { background: #f8fafc; border: 1px solid var(--border); padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; max-height: 150px; overflow-y: auto; border-radius: 4px; color: var(--text-main);}
+        
+        /* Rodapé Institucional */
+        .footer-logo-banner { background-color: #e5e5e5; padding: 30px 20px; display: flex; justify-content: center; align-items: center; gap: 50px; flex-wrap: wrap; border-top: 1px solid #d1d5db; margin-top: 50px;}
+        .footer-logo-item { max-width: 120px; max-height: 55px; object-fit: contain; filter: grayscale(100%) opacity(0.7); transition: all 0.3s ease; cursor: pointer;}
+        .footer-logo-item:hover { filter: grayscale(0%) opacity(1); transform: scale(1.05);}
+        footer { background: #1e293b; color: #94a3b8; text-align: center; padding: 20px; font-size: 0.85em; margin-top: 0;}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h2>🌿 eDNA SoilCheck</h2>
+        <a href="../../index.html" class="btn-voltar">⬅ Voltar ao Sistema</a>
+    </nav>
+
+    <div class="container">
+        
+        <div class="report-header">
+            <div>
+                <h1>Relatório In Silico PCR</h1>
+                <p>Auditoria de cobertura taxonômica e validação de marcadores</p>
+            </div>
+            <div>
+                <span class="badge-status">✔ Análise Concluída</span>
+            </div>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Organismos Únicos</div>
+                <div class="kpi-value" id="uni-org">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Matches Validados</div>
+                <div class="kpi-value" id="tot-match">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Cobertura Estimada</div>
+                <div class="kpi-value" id="est-cov" style="color: var(--success);">0%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Média do Amplicon</div>
+                <div class="kpi-value" id="mean-amp">0 bp</div>
+            </div>
+        </div>
+
+        <div class="layout-grid">
+            
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    📊 Detalhes da Execução
+                </div>
+                <div class="sidebar-content">
+                    
+                    <div class="data-group">
+                        <div class="data-group-title">Rastreabilidade</div>
+                        <div class="data-row"><span class="data-label">ID da Requisição</span><span class="data-value" id="req-id">-</span></div>
+                        <div class="data-row"><span class="data-label">Data da Simulação</span><span class="data-value" id="sub-date">-</span></div>
+                        <div class="data-row"><span class="data-label">Pesquisador</span><span class="data-value" id="sub-by">-</span></div>
+                    </div>
+
+                    <div class="data-group">
+                        <div class="data-group-title">Marcadores (5' → 3')</div>
+                        <div class="data-row">
+                            <span class="data-label">Primer Forward</span>
+                            <span class="data-value mono" id="fwd">-</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Primer Reverse</span>
+                            <span class="data-value mono" id="rev">-</span>
+                        </div>
+                    </div>
+
+                    <div class="data-group">
+                        <div class="data-group-title">Parâmetros BLAST</div>
+                        <div class="data-row"><span class="data-label">Banco Alvo</span><span class="data-value" style="font-weight: 700; color: var(--primary);" id="param-banco">-</span></div>
+                        
+                        <div class="param-grid" style="margin-top: 15px;">
+                            <div class="data-row"><span class="data-label">Mismatch (3')</span><span class="data-value" id="param-mismatches">-</span></div>
+                            <div class="data-row"><span class="data-label">E-value Max</span><span class="data-value" id="param-evalue">-</span></div>
+                            <div class="data-row"><span class="data-label">Tm Mínima</span><span class="data-value" id="param-tm">-</span></div>
+                            <div class="data-row"><span class="data-label">Cob. Mínima</span><span class="data-value" id="param-cobertura">-</span></div>
+                            <div class="data-row"><span class="data-label">Hits (Limite)</span><span class="data-value" id="param-hits">-</span></div>
+                        </div>
+                        <div class="data-row" style="margin-top: 10px;"><span class="data-label">Janela do Amplicon</span><span class="data-value" id="param-tamanho">-</span></div>
+                    </div>
+
+                </div>
+            </aside>
+
+            <main class="main-content">
+                
+                <div class="panel">
+                    <h2 class="panel-title">Navegador Taxonômico e Funcional</h2>
+                    
+                    <div class="tree-controls">
+                        <div style="display: flex; gap: 10px;">
+                            <button id="btn-taxa" class="btn-tree active" onclick="switchTree('taxa')">🌳 Visão Taxonômica</button>
+                            <button id="btn-func" class="btn-tree" onclick="switchTree('func')">♻️ Visão Funcional</button>
+                        </div>
+                        
+                        <div id="func-view-toggles" style="display: none; align-items: center; gap: 8px;">
+                            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-light); text-transform: uppercase;">Agrupar por:</span>
+                            <button id="btn-via1" class="btn-tree active" style="padding: 4px 10px; font-size: 0.8rem;" onclick="changeFuncView('via1')">Papel Ecológico</button>
+                            <button id="btn-via2" class="btn-tree" style="padding: 4px 10px; font-size: 0.8rem;" onclick="changeFuncView('via2')">Tamanho</button>
+                        </div>
+                    </div>
+
+                    <div class="silva-browser" id="silva-browser"></div>
+                    <div class="silva-browser" id="functional-browser" style="display: none;"></div>
+                    
+                    <div id="species-card" class="meta-card">
+                        <div class="meta-header">🦠 <span id="meta-title"></span></div>
+                        <div id="meta-content"></div>
+                        <button class="btn-full" onclick="openFullReport()">Ver Relatório de Alinhamento</button>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3 id="chart-title" style="color: var(--primary); font-weight: 600; font-size: 1rem; text-align: center; margin-top: 0;">Composição</h3>
+                        <div style="height: 220px; width: 100%;"><canvas id="dynamicChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2 class="panel-title">Inventário de Cobertura</h2>
+                    <input type="text" id="search-taxa" class="search-box" placeholder="Filtrar organismo na tabela...">
+                    
+                    <div class="table-container">
+                        <table id="table-all-taxa">
+                            <thead>
+                                <tr>
+                                    <th>Táxon Identificado</th>
+                                    <th>Nível Hierárquico</th>
+                                    <th>Qtd. Matches</th>
+                                    <th>Representação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+        </div> </div>
+
+    <div id="full-report-overlay">
+        <div class="report-content">
+            <span class="close-report" onclick="closeFullReport()">&times;</span>
+            <div class="report-header-blue">
+                <span>📋 DETALHES DA SIMULAÇÃO IN SILICO</span>
+                <button class="btn-download-fasta" id="btn-download-genome">📥 Baixar Genoma (.fasta)</button>
+            </div>
+            
+            <div style="margin-bottom: 30px; background: #f8fafc; padding: 25px; border-radius: 8px; border: 1px solid var(--border);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;">Organismo Alvo</span><br>
+                        <span id="rep-specie" style="font-size: 1.3em; font-weight: 700; color: var(--primary);">-</span>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;">Tipo/Grupo</span><br>
+                        <span id="rep-type" style="font-weight: 600; font-size: 1.1em; color: var(--text-main);">-</span>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;">Primers Utilizados (Fwd / Rev)</span><br>
+                        <span id="rep-primers" style="font-family: monospace; color: var(--secondary); font-weight: 700; font-size: 1.1em; background: white; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; display: inline-block; margin-top: 5px;">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--primary); border-bottom: 2px solid var(--bg-color); padding-bottom: 10px;">Amplicons Gerados</h3>
+            <div id="amplicons-list"></div>
+        </div>
+    </div>
+
+    <div class="footer-logo-banner">
+        <img src="https://www.ufes.br/themes/custom/ufes_Varbase/images/marca_ufes.png" alt="UFES" class="footer-logo-item" title="Universidade Federal do Espírito Santo">
+        <img src="data:image/png;base64,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" alt="Embrapa" class="footer-logo-item" title="Empresa Brasileira de Pesquisa Agropecuária">
+        <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Universidade de Coimbra" class="footer-logo-item" title="Faculty of Sciences and Technology of the University of Coimbra">
+        <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="CNPq" class="footer-logo-item" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="FAPES" class="footer-logo-item" title="Fundação de Amparo à Pesquisa e Inovação do Espírito Santo">
+    </div>
+
+    <footer>
+        <p>🧬 <strong>eDNA SoilCheck - Plataforma de Bioinformática para Análise do Solo</strong></p>
+        <small>&copy; 2026 Desenvolvido no Laboratório de Bioinformática.</small>
+    </footer>
+
+    <script>
+        let fullData = null; let leafMetadata = {}; let globalTotal = 0; let currentPath = [];
+        let currentSpecies = ""; let globalPrimers = ""; let globalType = ""; let chartInstance = null;
+        
+        let functionalData = null;
+        let currentActiveTree = 'taxa'; 
+        let currentFuncView = 'via1'; 
+
+        function formatPercent(value) {
+            let p = value * 100;
+            if (p > 0 && p < 0.1) return "< 0.1%";
+            return p.toFixed(1) + "%";
+        }
+
+        function triggerDownloadFasta(filename, text) {
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function openFullReport() {
+            const speciesData = leafMetadata[currentSpecies];
+            document.getElementById('rep-specie').textContent = currentSpecies;
+            document.getElementById('rep-primers').textContent = globalPrimers;
+            document.getElementById('rep-type').textContent = globalType;
+            
+            const btnGenome = document.getElementById('btn-download-genome');
+            btnGenome.onclick = async () => {
+                const originalText = btnGenome.innerHTML;
+                try {
+                    btnGenome.innerHTML = "⏳ Buscando no NCBI...";
+                    btnGenome.disabled = true;
+                    
+                    const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${speciesData.info.acc}&rettype=fasta&retmode=text`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) throw new Error("Falha ao consultar servidor NCBI");
+                    const fastaText = await response.text();
+                    
+                    triggerDownloadFasta(`${speciesData.info.acc}_completo.fasta`, fastaText);
+                } catch (err) {
+                    console.error(err);
+                    alert("Não foi possível extrair a sequência completa automaticamente do NCBI. Baixando arquivo estruturado de referência.");
+                    
+                    let fallbackText = `>${speciesData.info.acc} ${speciesData.info.desc} | Length: ${speciesData.info.length} bp\n; Falha na busca automática. Baixe manualmente em: https://www.ncbi.nlm.nih.gov/nuccore/${speciesData.info.acc}\n`;
+                    triggerDownloadFasta(`${speciesData.info.acc}_ref.fasta`, fallbackText);
+                } finally {
+                    btnGenome.innerHTML = originalText;
+                    btnGenome.disabled = false;
+                }
+            };
+
+            const list = document.getElementById('amplicons-list');
+            list.innerHTML = "";
+
+            if (!speciesData.amplicons || speciesData.amplicons.length === 0) {
+                list.innerHTML = "<p>Nenhum detalhe de amplicon encontrado no log do BLAST.</p>";
+            } else {
+                speciesData.amplicons.forEach((amp, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <div class="product-header">
+                            <span>Produto #${index + 1} - ${speciesData.info.acc}</span>
+                            <button class="btn-download-fasta" onclick="downloadProductFasta('${speciesData.info.acc}', ${index+1}, '${amp.size}', '${amp.tm}', '${amp.seq}')">📥 Baixar FASTA</button>
+                        </div>
+                        <div class="product-body">
+                            <div class="badge-row">
+                                <span class="badge badge-green">📏 Tamanho: ${amp.size} bp</span>
+                                <span class="badge badge-blue">🌡️ Tm: ${amp.tm}°C</span>
+                                <span class="badge badge-orange" style="background: var(--warning);">📍 Posição: ${amp.start} - ${amp.end}</span>
+                            </div>
+                            <div class="seq-box">${amp.seq}</div>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            }
+
+            document.getElementById('full-report-overlay').style.display = 'block';
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function downloadProductFasta(acc, prodNum, size, tm, seq) {
+            let cleanSeq = seq.replace(/[^A-Za-z]/g, '').toUpperCase();
+            let formattedSeq = "";
+            for(let i = 0; i < cleanSeq.length; i += 60) {
+                formattedSeq += cleanSeq.substring(i, i + 60) + "\n";
+            }
+            let text = `>${acc}_amplicon_${prodNum} [organism=${currentSpecies}] [size=${size}bp] [tm=${tm}°C]\n${formattedSeq}`;
+            triggerDownloadFasta(`${acc}_amp_${prodNum}.fasta`, text);
+        }
+
+        function closeFullReport() {
+            document.getElementById('full-report-overlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        function changeFuncView(val) {
+            currentFuncView = val;
+            
+            document.getElementById('btn-via1').classList.remove('active');
+            document.getElementById('btn-via2').classList.remove('active');
+            document.getElementById(val === 'via1' ? 'btn-via1' : 'btn-via2').classList.add('active');
+
+            document.getElementById('species-card').style.display = 'none';
+            document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Papéis Ecológicos` : `Grupos Biológicos`;
+            renderFunctionalBrowser();
+        }
+
+        function switchTree(type) {
+            currentActiveTree = type;
+            const btnTaxa = document.getElementById('btn-taxa');
+            const btnFunc = document.getElementById('btn-func');
+            const browserTaxa = document.getElementById('silva-browser');
+            const browserFunc = document.getElementById('functional-browser');
+            const viewToggles = document.getElementById('func-view-toggles');
+            
+            document.getElementById('species-card').style.display = 'none';
+            
+            if(type === 'taxa') {
+                btnTaxa.classList.add('active');
+                btnFunc.classList.remove('active');         
+                browserTaxa.style.display = 'flex';
+                browserFunc.style.display = 'none';
+                viewToggles.style.display = 'none';
+                document.getElementById('chart-title').innerHTML = `Composição Taxonômica`;
+                updateChart(fullData); 
+            } else {
+                btnFunc.classList.add('active');
+                btnTaxa.classList.remove('active');        
+                browserTaxa.style.display = 'none';
+                browserFunc.style.display = 'flex';
+                viewToggles.style.display = 'flex';            
+                document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Papéis Ecológicos` : `Grupos Biológicos`;
+                renderFunctionalBrowser(); 
+            }
+        }
+
+        function renderBrowser() {
+            const browser = document.getElementById('silva-browser');
+            browser.innerHTML = '';
+            let rootChildren = [];
+            const domains = ["Archaea", "Bacteria", "Eukaryota", "Unclassified", "Viruses"];
+            domains.forEach(d => {
+                let match = null;
+                if (fullData.name === d) match = fullData;
+                if (fullData.name === "Root") match = fullData.children.find(c => c.name === d);
+                rootChildren.push(match || { name: d, matches: 0, coverage: 0, children: [], rank: "domain" });
+            });
+            browser.appendChild(createColumn(rootChildren, globalTotal, 0, "Domínio"));
+
+            let currentLevelNodes = rootChildren;
+            for (let i = 0; i < currentPath.length; i++) {
+                let selectedName = currentPath[i];
+                let selectedNode = currentLevelNodes.find(n => n.name === selectedName);
+
+                if (selectedNode && selectedNode.children && selectedNode.children.length > 0) {
+                    currentLevelNodes = selectedNode.children;
+                    let nextRank = selectedNode.name;
+                    browser.appendChild(createColumn(currentLevelNodes, selectedNode.matches, i + 1, nextRank));
+                }
+            }
+        }
+
+        function createColumn(nodes, parentCount, depth, rankName) {
+            const col = document.createElement('div');
+            col.className = 'silva-col';
+            col.innerHTML = `<div class="silva-col-header"><span>${rankName}</span> <span>${nodes.length}</span></div>`;
+            const ul = document.createElement('ul');
+            ul.className = 'silva-list';
+
+            nodes.sort((a, b) => b.matches - a.matches).forEach(node => {
+                const li = document.createElement('li');
+                li.className = 'silva-item';
+                if (node.matches === 0) li.classList.add('empty');
+                if (currentPath[depth] === node.name) li.classList.add('active');
+
+                let relPerc = parentCount > 0 ? formatPercent(node.matches / parentCount) : "0.0%";
+                let globPerc = globalTotal > 0 ? formatPercent(node.matches / globalTotal) : "0.0%";
+                const isLeaf = !node.children || node.children.length === 0;
+
+                li.innerHTML = `
+                    <div class="taxon-name">${isLeaf && node.matches > 0 ? '<span style="color:#d97706; margin-right:5px;">🦠</span>' : ''}${node.name}</div>
+                    <div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>
+                `;
+
+                if (node.matches > 0) {
+                    li.onclick = () => {
+                        currentPath = currentPath.slice(0, depth);
+                        if(!isLeaf) currentPath.push(node.name);
+                        renderBrowser();
+                        updateChart(node);
+                        if (isLeaf) showSpeciesCard(node.name);
+                        else document.getElementById('species-card').style.display = 'none';
+                    };
+                }
+                ul.appendChild(li);
+            });
+            col.appendChild(ul);
+            return col;
+        }
+        
+        function renderFunctionalBrowser() {
+            const browser = document.getElementById('functional-browser');
+            browser.innerHTML = '';
+            
+            const col1 = document.createElement('div');
+            col1.className = 'silva-col';
+            const ul1 = document.createElement('ul');
+            ul1.className = 'silva-list';
+            
+            let labelsFunc = [];
+            let dataFunc = [];
+
+            if (currentFuncView === 'via1') {
+                col1.innerHTML = `<div class="silva-col-header">Papel Ecológico <span>${Object.keys(functionalData).length}</span></div>`;
+
+                Object.keys(functionalData).forEach(funcao => {
+                    const gruposNessaFuncao = functionalData[funcao];
+                    let totalMatchesFuncao = 0;
+                    
+                    Object.values(gruposNessaFuncao).forEach(dadosGrupo => {
+                        dadosGrupo.especies.forEach(esp => { totalMatchesFuncao += esp.matches; });
+                    });
+
+                    if(totalMatchesFuncao > 0) {
+                        labelsFunc.push(funcao);
+                        dataFunc.push(totalMatchesFuncao);
+                    }
+
+                    const li = document.createElement('li');
+                    li.className = 'silva-item';
+                    if (totalMatchesFuncao === 0) li.classList.add('empty');
+                    
+                    let globPerc = globalTotal > 0 ? formatPercent(totalMatchesFuncao / globalTotal) : "0.0%";
+                    li.innerHTML = `<div class="taxon-name">♻️ ${funcao}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    
+                    if (totalMatchesFuncao > 0) {
+                        li.onclick = () => {
+                            renderFunctionalGroups(gruposNessaFuncao, totalMatchesFuncao, browser);
+                            Array.from(ul1.children).forEach(c => c.classList.remove('active'));
+                            li.classList.add('active');
+                            document.getElementById('species-card').style.display = 'none';
+                        };
+                    }
+                    ul1.appendChild(li);
+                });
+            } else {
+                let gruposPorTamanho = {};
+                
+                Object.keys(functionalData).forEach(funcao => {
+                    Object.keys(functionalData[funcao]).forEach(grupo => {
+                        let tamanho = functionalData[funcao][grupo].tamanho;
+                        let especies = functionalData[funcao][grupo].especies;
+                        let totalMatchesGrupo = 0;
+                        especies.forEach(esp => { totalMatchesGrupo += esp.matches; });
+
+                        if(totalMatchesGrupo > 0) {
+                            if(!gruposPorTamanho[tamanho]) gruposPorTamanho[tamanho] = [];
+                            gruposPorTamanho[tamanho].push({
+                                grupo: grupo,
+                                funcao: funcao,
+                                matches: totalMatchesGrupo,
+                                especies: especies
+                            });
+                        }
+                    });
+                });
+
+                const keys = Object.keys(gruposPorTamanho);
+                col1.innerHTML = `<div class="silva-col-header">Tamanho Biológico <span>${keys.length}</span></div>`;
+
+                keys.sort((a,b) => b.localeCompare(a)).forEach(tamanho => {
+                    let totalMatchesTamanho = 0;
+                    gruposPorTamanho[tamanho].forEach(g => { totalMatchesTamanho += g.matches; });
+                    
+                    labelsFunc.push(tamanho);
+                    dataFunc.push(totalMatchesTamanho);
+
+                    const li = document.createElement('li');
+                    li.className = 'silva-item';
+                    let globPerc = globalTotal > 0 ? formatPercent(totalMatchesTamanho / globalTotal) : "0.0%";
+                    
+                    li.innerHTML = `<div class="taxon-name">📏 ${tamanho}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    
+                    li.onclick = () => {
+                        renderTamanhoGroups(gruposPorTamanho[tamanho], totalMatchesTamanho, browser);
+                        Array.from(ul1.children).forEach(c => c.classList.remove('active'));
+                        li.classList.add('active');
+                        document.getElementById('species-card').style.display = 'none';
+                    };
+                    ul1.appendChild(li);
+                });
+            }
+
+            col1.appendChild(ul1);
+            browser.appendChild(col1);
+            
+            renderPieChart(labelsFunc, dataFunc);
+        }
+
+        function renderFunctionalGroups(gruposData, parentMatches, browserRef) {
+            while (browserRef.children.length > 1) { browserRef.removeChild(browserRef.lastChild); }
+            
+            const col2 = document.createElement('div');
+            col2.className = 'silva-col';
+            col2.innerHTML = `<div class="silva-col-header">Grande Grupo <span>${Object.keys(gruposData).length}</span></div>`;
+            const ul2 = document.createElement('ul');
+            ul2.className = 'silva-list';
+
+            Object.keys(gruposData).forEach(grupo => {
+                const especiesData = gruposData[grupo].especies;
+                let totalMatchesGrupo = 0;
+                especiesData.forEach(esp => { totalMatchesGrupo += esp.matches; });
+
+                const li = document.createElement('li');
+                li.className = 'silva-item';
+                let globPerc = parentMatches > 0 ? formatPercent(totalMatchesGrupo / parentMatches) : "0.0%";
+                li.innerHTML = `<div class="taxon-name">📂 ${grupo}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                
+                li.onclick = () => {
+                     renderFunctionalSpecies(especiesData, totalMatchesGrupo, browserRef);
+                     Array.from(ul2.children).forEach(c => c.classList.remove('active'));
+                     li.classList.add('active');
+                     document.getElementById('species-card').style.display = 'none';
+                };
+                ul2.appendChild(li);
+            });
+            col2.appendChild(ul2);
+            browserRef.appendChild(col2);
+        }
+
+        function renderTamanhoGroups(listaGrupos, parentMatches, browserRef) {
+            while (browserRef.children.length > 1) { browserRef.removeChild(browserRef.lastChild); }
+            
+            const col2 = document.createElement('div');
+            col2.className = 'silva-col';
+            col2.innerHTML = `<div class="silva-col-header">Grupos Identificados <span>${listaGrupos.length}</span></div>`;
+            const ul2 = document.createElement('ul');
+            ul2.className = 'silva-list';
+
+            listaGrupos.sort((a,b) => b.matches - a.matches).forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'silva-item';
+                let globPerc = parentMatches > 0 ? formatPercent(item.matches / parentMatches) : "0.0%";
+                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;">📂 ${item.grupo}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal;">♻️ ${item.funcao}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+
+                li.onclick = () => {
+                     renderFunctionalSpecies(item.especies, item.matches, browserRef);
+                     Array.from(ul2.children).forEach(c => c.classList.remove('active'));
+                     li.classList.add('active');
+                     document.getElementById('species-card').style.display = 'none';
+                };
+                ul2.appendChild(li);
+            });
+            col2.appendChild(ul2);
+            browserRef.appendChild(col2);
+        }
+        
+        function renderFunctionalSpecies(especiesData, parentMatches, browserRef) {
+            while (browserRef.children.length > 2) { browserRef.removeChild(browserRef.lastChild); }
+            
+            let especiesAgrupadas = {};
+            especiesData.forEach(esp => {
+                if (!especiesAgrupadas[esp.especie]) {
+                    especiesAgrupadas[esp.especie] = { especie: esp.especie, matches: 0 };
+                }
+                especiesAgrupadas[esp.especie].matches += esp.matches;
+            });
+            let listaFinal = Object.values(especiesAgrupadas);
+
+            const col3 = document.createElement('div');
+            col3.className = 'silva-col';
+            col3.innerHTML = `<div class="silva-col-header">Espécies Afetadas <span>${listaFinal.length}</span></div>`;
+            const ul3 = document.createElement('ul');
+            ul3.className = 'silva-list';
+
+            listaFinal.sort((a,b) => b.matches - a.matches).forEach(esp => {
+                const li = document.createElement('li');
+                li.className = 'silva-item';
+                let globPerc = parentMatches > 0 ? formatPercent(esp.matches / parentMatches) : "0.0%";
+                li.innerHTML = `<div class="taxon-name"><span style="color:#d97706; margin-right:5px;">🦠</span>${esp.especie}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                
+                li.onclick = () => {
+                     showSpeciesCard(esp.especie); 
+                     Array.from(ul3.children).forEach(c => c.classList.remove('active'));
+                     li.classList.add('active');
+                };
+                ul3.appendChild(li);
+            });
+            col3.appendChild(ul3);
+            browserRef.appendChild(col3);
+        }
+
+        function showSpeciesCard(name) {
+            currentSpecies = name;
+            document.getElementById('meta-title').textContent = name;
+            const info = leafMetadata[name].info;
+            document.getElementById('meta-content').innerHTML = `
+                <div class="meta-row"><span class="meta-label">ID / Accession</span><a href="https://www.ncbi.nlm.nih.gov/nuccore/${info.acc}" target="_blank" style="color: var(--secondary); text-decoration: none; font-weight: 700;">${info.acc} ↗</a></div>
+                <div class="meta-row"><span class="meta-label">Descrição</span><span style="color: var(--text-main); font-size: 0.9em;">${info.desc}</span></div>
+                <div class="meta-row"><span class="meta-label">Tamanho Genoma</span><span style="color:var(--primary); font-weight:bold;">${info.length} bp</span></div>
+            `;
+            document.getElementById('species-card').style.display = 'block';
+        }
+
+        function updateChart(targetNode) {
+            let title = document.getElementById('chart-title');
+            let itemsToPlot = targetNode.children;
+            if (!itemsToPlot || itemsToPlot.length === 0) {
+                title.innerHTML = `${targetNode.name}`;
+                renderPieChart([targetNode.name], [targetNode.matches]);
+                return;
+            }
+            title.innerHTML = `Subdivisão: ${targetNode.name}`;
+            let sorted = [...itemsToPlot].sort((a,b) => b.matches - a.matches);
+            let top5 = sorted.slice(0, 5);
+            let others = sorted.slice(5).reduce((sum, c) => sum + c.matches, 0);
+            let labels = top5.map(c => c.name);
+            let data = top5.map(c => c.matches);
+            if (others > 0) { labels.push("Outros Táxons"); data.push(others); }
+            renderPieChart(labels, data);
+        }
+
+        function renderPieChart(labels, data) {
+            const ctx = document.getElementById('dynamicChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#0f4c75', '#3282b8', '#bbe1fa', '#10b981', '#f59e0b', '#cbd5e1'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { family: "'Segoe UI', sans-serif" } } } } }
+            });
+        }
+
+        let allTaxaList = [];
+        function extractAllTaxa(node, depth) {
+            if (node.name !== "Root" && node.matches > 0) {
+                allTaxaList.push({
+                    name: node.name,
+                    depth: depth,
+                    matches: node.matches,
+                    isLeaf: (!node.children || node.children.length === 0)
+                });
+            }
+            if (node.children) {
+                node.children.forEach(c => extractAllTaxa(c, depth + 1));
+            }
+        }
+
+        document.getElementById('search-taxa').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#table-all-taxa tbody tr');
+            
+            rows.forEach(row => {
+                const taxonName = row.querySelector('td').textContent.toLowerCase();
+                if (taxonName.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        fetch('result.json').then(r => r.json()).then(data => {
+            fullData = data.taxonomy_tree; 
+            leafMetadata = data.leaf_metadata || {}; 
+            functionalData = data.functional_tree; 
+            
+            let csvTotalMatches = data.summary.total_matches; 
+            globalTotal = fullData.matches > 0 ? fullData.matches : csvTotalMatches;
+
+            globalPrimers = `${data.primers.forward} / ${data.primers.reverse}`; 
+            globalType = data.metadata.organism;
+                    
+            document.getElementById('tot-match').textContent = csvTotalMatches;
+            document.getElementById('uni-org').textContent = data.summary.unique_organisms || Object.keys(leafMetadata).length;
+            document.getElementById('req-id').textContent = data.request_id;
+            document.getElementById('sub-date').textContent = data.metadata.submitted_at;
+            document.getElementById('sub-by').textContent = data.metadata.submitted_by;
+            document.getElementById('fwd').textContent = data.primers.forward;
+            document.getElementById('rev').textContent = data.primers.reverse;
+            document.getElementById('est-cov').textContent = formatPercent(data.summary.estimated_coverage);
+            document.getElementById('mean-amp').textContent = data.summary.mean_amplicon_size + ' bp';
+
+            if(data.metadata) {
+                document.getElementById('param-banco').textContent = data.metadata.database || "Protozoa";
+                document.getElementById('param-evalue').textContent = data.metadata.e_value !== undefined ? data.metadata.e_value : "-";
+                document.getElementById('param-mismatches').textContent = data.metadata.max_mismatches !== undefined ? data.metadata.max_mismatches : "-";
+                document.getElementById('param-tm').textContent = (data.metadata.min_tm !== undefined ? data.metadata.min_tm : "-") + " °C";
+                document.getElementById('param-tamanho').textContent = `${data.metadata.amplicon_min || 0} - ${data.metadata.amplicon_max || 9999} bp`;
+                document.getElementById('param-cobertura').textContent = (data.metadata.min_coverage !== undefined ? data.metadata.min_coverage : "-") + "%";
+                document.getElementById('param-hits').textContent = data.metadata.max_hits !== undefined ? data.metadata.max_hits : "-";
+            }
+
+            extractAllTaxa(fullData, 0);
+            allTaxaList.sort((a, b) => b.matches - a.matches || a.depth - b.depth);
+                    
+            const tbody = document.querySelector('#table-all-taxa tbody');
+            allTaxaList.forEach(taxon => {
+                let icon = taxon.isLeaf ? '<span style="color:var(--warning); margin-right:5px;">🦠</span>' : '';
+                let isBold = taxon.depth <= 2 ? 'font-weight: 700; color: var(--primary);' : 'font-weight: 500;';
+                        
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="${isBold}">${icon}${taxon.name}</td>
+                        <td style="color: var(--text-light); font-size: 0.85em;">Nível ${taxon.depth}</td>
+                        <td style="font-weight: 600;">${taxon.matches}</td>
+                        <td style="font-weight: 600;"><span style="color:var(--success); background: #d1fae5; padding: 2px 8px; border-radius: 4px;">${formatPercent(taxon.matches / globalTotal)}</span></td>
+                    </tr>
+                `;
+            });
+
+            renderBrowser(); 
+            updateChart(fullData); 
+        });
+    </script>
+</body>
+</html>

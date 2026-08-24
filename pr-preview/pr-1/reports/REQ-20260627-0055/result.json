@@ -1,0 +1,619 @@
+{
+    "request_id": "REQ-20260627-0055",
+    "metadata": {
+        "submitted_by": "tiago forms",
+        "email": "tiagomarquesgabriel2405@gmail.com",
+        "submitted_at": "27/06/2026 às 21:21",
+        "target_region": "X",
+        "organism": "Eukaryota",
+        "max_mismatches": 2,
+        "amplicon_min": 200,
+        "amplicon_max": 8000,
+        "e_value": 10.0,
+        "min_coverage": 40,
+        "max_hits": 50,
+        "min_tm": 0.0,
+        "database": "refseq"
+    },
+    "primers": {
+        "forward": "GTGCCAGCCGCCGCGGTAA",
+        "reverse": "CCGCCAATTCCTTTGAGTTT"
+    },
+    "summary": {
+        "total_sequences_checked": 150000,
+        "total_matches": 15,
+        "estimated_coverage": 0.0001,
+        "off_target_matches": 0,
+        "mean_amplicon_size": 416.0
+    },
+    "functional_tree": {
+        "Decompositores da Serrapilheira": {},
+        "Engenheiros do Ecossistema": {},
+        "Fora do Escopo Principal": {},
+        "Função Indefinida": {},
+        "Micropredadores": {},
+        "Microrganismos": {
+            "Archaea": {
+                "tamanho": "Microrganismos",
+                "especies": [
+                    {
+                        "especie": "Halorubrum ezzemoulense",
+                        "id": "NZ_JAQMSA010000035",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Natronoglomus mannanivorans",
+                        "id": "NZ_JAOPKB010000037",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Halorubrum ezzemoulense",
+                        "id": "NZ_JAQMRX010000049",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Haloparvum alkalitolerans",
+                        "id": "NZ_JBNLIA010000026",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Methanofollis formosanus",
+                        "id": "NZ_CP037968",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Halorubrum ezzemoulense",
+                        "id": "NZ_JAQMRW010000030",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Halorubrum ezzemoulense",
+                        "id": "NZ_JAQMRV010000045",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Halorubrum ejinorense",
+                        "id": "NZ_BAAADQ010000017",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Methanobacterium formicicum",
+                        "id": "NZ_JBXWLU010000154",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Halorubrum ezzemoulense",
+                        "id": "NZ_JAQMRN010000027",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Haloplanus salilacus",
+                        "id": "NZ_CP147505",
+                        "matches": 2
+                    },
+                    {
+                        "especie": "Halarchaeum salinum",
+                        "id": "NZ_BAAABL010000094",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Halorubrum aquaticum",
+                        "id": "NZ_BAAADP010000007",
+                        "matches": 1
+                    },
+                    {
+                        "especie": "Natrinema thermophila",
+                        "id": "NZ_PDBS01000001",
+                        "matches": 3
+                    },
+                    {
+                        "especie": "Halorubrum ezzemoulense",
+                        "id": "NZ_JAQMSB010000031",
+                        "matches": 1
+                    }
+                ]
+            }
+        }
+    },
+    "taxonomy_tree": {
+        "name": "Root",
+        "rank": "root",
+        "matches": 18,
+        "coverage": 1.0,
+        "children": [
+            {
+                "name": "Archaea",
+                "rank": "domain",
+                "matches": 15,
+                "coverage": 0.8333,
+                "children": [
+                    {
+                        "name": "Methanobacteriati",
+                        "rank": "clade",
+                        "matches": 15,
+                        "coverage": 0.8333,
+                        "children": [
+                            {
+                                "name": "Methanobacteriota",
+                                "rank": "phylum",
+                                "matches": 15,
+                                "coverage": 0.8333,
+                                "children": [
+                                    {
+                                        "name": "Stenosarchaea group",
+                                        "rank": "clade",
+                                        "matches": 14,
+                                        "coverage": 0.7778,
+                                        "children": [
+                                            {
+                                                "name": "Halobacteria",
+                                                "rank": "class",
+                                                "matches": 13,
+                                                "coverage": 0.7222,
+                                                "children": [
+                                                    {
+                                                        "name": "Halobacteriales",
+                                                        "rank": "order",
+                                                        "matches": 13,
+                                                        "coverage": 0.7222,
+                                                        "children": [
+                                                            {
+                                                                "name": "Haloferacaceae",
+                                                                "rank": "family",
+                                                                "matches": 10,
+                                                                "coverage": 0.5556,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Halorubrum",
+                                                                        "rank": "genus",
+                                                                        "matches": 8,
+                                                                        "coverage": 0.4444,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Halorubrum ezzemoulense",
+                                                                                "rank": "species",
+                                                                                "matches": 6,
+                                                                                "coverage": 0.3333,
+                                                                                "children": []
+                                                                            },
+                                                                            {
+                                                                                "name": "Halorubrum ejinorense",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0556,
+                                                                                "children": []
+                                                                            },
+                                                                            {
+                                                                                "name": "Halorubrum aquaticum",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0556,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "name": "Haloparvum",
+                                                                        "rank": "genus",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0556,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Haloparvum alkalitolerans",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0556,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "name": "Haloplanus",
+                                                                        "rank": "genus",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0556,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Haloplanus salilacus",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0556,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "name": "Natrialbaceae",
+                                                                "rank": "family",
+                                                                "matches": 2,
+                                                                "coverage": 0.1111,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Natronoglomus",
+                                                                        "rank": "genus",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0556,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Natronoglomus mannanivorans",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0556,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "name": "Natrinema",
+                                                                        "rank": "genus",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0556,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Natrinema thermophila",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0556,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "name": "Halobacteriaceae",
+                                                                "rank": "family",
+                                                                "matches": 1,
+                                                                "coverage": 0.0556,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Halarchaeum salinum",
+                                                                        "rank": "species",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0556,
+                                                                        "children": []
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "Methanomicrobia",
+                                                "rank": "class",
+                                                "matches": 1,
+                                                "coverage": 0.0556,
+                                                "children": [
+                                                    {
+                                                        "name": "Methanomicrobiales",
+                                                        "rank": "order",
+                                                        "matches": 1,
+                                                        "coverage": 0.0556,
+                                                        "children": [
+                                                            {
+                                                                "name": "Methanomicrobiaceae",
+                                                                "rank": "family",
+                                                                "matches": 1,
+                                                                "coverage": 0.0556,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Methanofollis",
+                                                                        "rank": "genus",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0556,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Methanofollis formosanus",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0556,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Methanomada group",
+                                        "rank": "clade",
+                                        "matches": 1,
+                                        "coverage": 0.0556,
+                                        "children": [
+                                            {
+                                                "name": "Methanobacteria",
+                                                "rank": "class",
+                                                "matches": 1,
+                                                "coverage": 0.0556,
+                                                "children": [
+                                                    {
+                                                        "name": "Methanobacteriales",
+                                                        "rank": "order",
+                                                        "matches": 1,
+                                                        "coverage": 0.0556,
+                                                        "children": [
+                                                            {
+                                                                "name": "Methanobacteriaceae",
+                                                                "rank": "family",
+                                                                "matches": 1,
+                                                                "coverage": 0.0556,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Methanobacterium",
+                                                                        "rank": "genus",
+                                                                        "matches": 1,
+                                                                        "coverage": 0.0556,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Methanobacterium formicicum",
+                                                                                "rank": "species",
+                                                                                "matches": 1,
+                                                                                "coverage": 0.0556,
+                                                                                "children": []
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "leaf_metadata": {
+        "Halorubrum ezzemoulense": {
+            "info": {
+                "acc": "NZ_JAQMSA010000035",
+                "desc": "Halorubrum ezzemoulense strain UG_113 UG_113_35, whole genome shotgun sequence",
+                "length": "5363"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_JAQMSA010000035",
+                    "size": "416",
+                    "tm": "86.60610949802998",
+                    "start": "4716",
+                    "end": "4300",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCCCAAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCCGCGCAAGTCCATCGGGAAATCCACCTGCTCAACAGGTGGGCGCCCGGTAGAAACTGCGTGGCTTGGGACCGGAAGGCGCGACGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCGCCGATGGCGAAAGCACGTCGCGAGAACGGATCCGACAGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACAATGTCTGCTAGGTGTGGCTCCCACTACGAGTGGGTGCTGTGCCGCAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                },
+                {
+                    "acc": "NZ_JAQMRX010000049",
+                    "size": "416",
+                    "tm": "86.45426558385628",
+                    "start": "455",
+                    "end": "871",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCCCAAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCCGCGCAAGTCCATCGGGAAATCCACCTGCTCAACAGGTGGGCGCCCGGTAGAAACTGCGTGGCTTGGGACCGGAAGGCGCGACGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCGCCGATGGCGAAAGCACGTCGCGAGAACGGATCCGACAGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACAATGTCTGCTAGGTGTGGCTCCCACTACGAGTGGGTGCTGTGCCGTAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                },
+                {
+                    "acc": "NZ_JAQMRW010000030",
+                    "size": "416",
+                    "tm": "86.60610949802998",
+                    "start": "648",
+                    "end": "1064",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCCCAAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCCGCGCAAGTCCATCGGGAAATCCACCTGCTCAACAGGTGGGCGCCCGGTAGAAACTGCGTGGCTTGGGACCGGAAGGCGCGACGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCGCCGATGGCGAAAGCACGTCGCGAGAACGGATCCGACAGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACAATGTCTGCTAGGTGTGGCTCCCACTACGAGTGGGTGCTGTGCCGCAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                },
+                {
+                    "acc": "NZ_JAQMRV010000045",
+                    "size": "416",
+                    "tm": "86.45426558385634",
+                    "start": "4714",
+                    "end": "4298",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCCCAAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCCGCGCAAGTCCATCGGGAAATCCACCTGCTCAACAGGTGGGCGCCCGGTAGAAACTGCGTGGCTTGGGACCGGAAGGCGCGACGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCGCCGATGGCGAAAGCACGTCGCGAGAACGGATCCGACAGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACAATGTCTGCTAGGTGTGGCTCCCACTACGAGTGGGTGCTGTGCCGTAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                },
+                {
+                    "acc": "NZ_JAQMRN010000027",
+                    "size": "416",
+                    "tm": "86.60610949802998",
+                    "start": "648",
+                    "end": "1064",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCCCAAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCCGCGCAAGTCCATCGGGAAATCCACCTGCTCAACAGGTGGGCGCCCGGTAGAAACTGCGTGGCTTGGGACCGGAAGGCGCGACGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCGCCGATGGCGAAAGCACGTCGCGAGAACGGATCCGACAGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACAATGTCTGCTAGGTGTGGCTCCCACTACGAGTGGGTGCTGTGCCGCAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                },
+                {
+                    "acc": "NZ_JAQMSB010000031",
+                    "size": "416",
+                    "tm": "86.45426558385634",
+                    "start": "4716",
+                    "end": "4300",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCCCAAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCCGCGCAAGTCCATCGGGAAATCCACCTGCTCAACAGGTGGGCGCCCGGTAGAAACTGCGTGGCTTGGGACCGGAAGGCGCGACGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCGCCGATGGCGAAAGCACGTCGCGAGAACGGATCCGACAGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACAATGTCTGCTAGGTGTGGCTCCCACTACGAGTGGGTGCTGTGCCGTAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Natronoglomus mannanivorans": {
+            "info": {
+                "acc": "NZ_JAOPKB010000037",
+                "desc": "Natronoglomus mannanivorans strain AArc-m2/3/4 NODE_37, whole genome shotgun sequence",
+                "length": "5807"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_JAOPKB010000037",
+                    "size": "416",
+                    "tm": "85.79916428295195",
+                    "start": "4711",
+                    "end": "4295",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCACAAGTGATGACCGCTATTATTGGGCCTAAAGCGTCCGTAGCCGGCCACGCAAGTCCGTCGGGAAATCTGCTCGCCTAACGAGCAGGCGTCCGACGGAAACTGTGTGGCTTGGGACCGGAAGATCCAGAGGGTACGTCTGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCACCGGTGGCGAAAGCGCTCTGGAAGGACGGATCCGACGGTGAGGGACGAAAGCTAGGGTCACGAACCGGATTAGATACCCGGGTAGTCCTAGCTGTAAACGATGCTCGCTAGGTTTGGCGCTGGCTACGAGCCAGCGCTGTGCCGTAGGGAAGCCGTGAAGCGAGCCGCCTGGGAAGTACGTCTGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Haloparvum alkalitolerans": {
+            "info": {
+                "acc": "NZ_JBNLIA010000026",
+                "desc": "Haloparvum alkalitolerans strain MK62-1 JCM30442_ctg026, whole genome shotgun sequence",
+                "length": "1444"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_JBNLIA010000026",
+                    "size": "416",
+                    "tm": "85.45304710515745",
+                    "start": "1063",
+                    "end": "647",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCTCGAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCTTTTCAAGTCCGTCGGGAAATCTCCCCGCTCAACGGGGAGGCGTCCGGCGGAAACTGAAGAGCTTGGGACCGGAAGGCGTGACGGGTACGTCCGGGGTAGGAGTGAAATCCTGTAATCCTGGACGGACCGCCGATGGGGAAACCACGTCACGAGGACGGATCCGACAGTGAGGGACGAAAGCTAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTAGCCGTAAACGATGCCTGTTAGGTGTGACTCCCACTACGAGTGGGTGTTGTGCCGTAGGGAAGCCGCTAAACAGGCCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Methanofollis formosanus": {
+            "info": {
+                "acc": "NZ_CP037968",
+                "desc": "Methanofollis formosanus strain ML15 chromosome",
+                "length": "2965921"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_CP037968",
+                    "size": "416",
+                    "tm": "84.22635646139298",
+                    "start": "2137757",
+                    "end": "2138173",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCGGCTCGAGTGGTGGCCACTATTACTGGGCTTAAAGCGTCCGTAGCTGGGTAGTTAAGTCTCTTGGGAAATCTTCCGGCTTAACCGAAAGGCGTCTAAGAGATACTGGCTACCTAGGGATCGGGAGAGGTGAGAGGTACTCTGGGGGTAGGAGTGAAATCCTGTAATCCTTAGGGGACCACCTGTGGCGAAGGCGTCTCACCAGAACGACTCCGACAGTGAGGGACGAAAGCTGGGGGAGCAAACCGGATTAGATACCCGGGTAGTCCCAGCCGTAAACGATGCGTGTTAGGTGTATCGGTGACCACGAGTTACCGAGGTGCCGAAGGGAAACCGTGAAACGCGCCGCCTGGGAAGTACGGTCGCAAGGCTGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Halorubrum ejinorense": {
+            "info": {
+                "acc": "NZ_BAAADQ010000017",
+                "desc": "Halorubrum ejinorense strain JCM 14265 sequence17, whole genome shotgun sequence",
+                "length": "1849"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_BAAADQ010000017",
+                    "size": "416",
+                    "tm": "86.16797954243668",
+                    "start": "397",
+                    "end": "813",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCCCAAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCCGCGCAAGTCCATCGGGAAATCCACCTGCTCAACAGGTGGGCGCCCGGTAGAAACTGCGTGGCTTGGGACCGGAAGGCGCGACGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCGCCGATGGCGAAAGCACGTCGCGAGAACGGATCCGACAGTGAGGGACGAAAGCTAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTAGCCGTAAACAATGTCTGCTAGGTGTGGCTCCCACTACGAGTGGGTGCTGTGCCGTAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Methanobacterium formicicum": {
+            "info": {
+                "acc": "NZ_JBXWLU010000154",
+                "desc": "MAG: Methanobacterium formicicum isolate Sediment_SLB k141_17361, whole genome shotgun sequence",
+                "length": "15321"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_JBXWLU010000154",
+                    "size": "416",
+                    "tm": "84.8677726104516",
+                    "start": "10907",
+                    "end": "11323",
+                    "seq": "GTGCCAGCCGCCGCGGTAACACCGGCAGCTCAAGTGGTGGCCGTTTTTATTGGGCCTAAAGCGTTCGTAGCCGGCTTGATAAGTCTCTGGTGAAATTTCACGGCTTAACCGTGAGAATTGCTGGAGATACTATTGGGCTTGAGGCCGGGAGAGGTTAGCGGTACTCCCGGGGTAGGGGTGAAATCCTATAATCCCGGGAGGACCACCTGTGGCGAAGGCGGCTAACTGGAACGGACCTGACGGTGAGTAACGAAAGCCAGGGGCGCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACGATGTGGACTTGGTGTTGGGATGGCTCCGAGCTGCCCCAGTGCCGAAGGGAAGCTGTTAAGTCCACCGCCTGGGAAGTACGGTCGCAAGACTGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Haloplanus salilacus": {
+            "info": {
+                "acc": "NZ_CP147505",
+                "desc": "Haloplanus salilacus strain CK5-1 chromosome, complete genome",
+                "length": "3243851"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_CP147505",
+                    "size": "416",
+                    "tm": "86.19864191708672",
+                    "start": "194238",
+                    "end": "193822",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCTCGAGTGATGGCCGATTTTATTGGGCCTAAAGCGTCCGTAGCCGGCCGAGCAAGTTCATCGGGAAATCCGCCAGCCCAACTGGCGGGCGTCCGGTGAAAACTGCACGGCTCGGGACCGGAAGACCCGAAGGGTACGTCTTGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCACCGATGGCGAAAGCACTTCGGGAAGACGGATCCGACGGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACGATGTCTGCTAGGTGCGGCTCCCACTACGAGTGGGTGCTGTGCCGTAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                },
+                {
+                    "acc": "NZ_CP147505",
+                    "size": "416",
+                    "tm": "86.19864191708672",
+                    "start": "2947402",
+                    "end": "2946986",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCTCGAGTGATGGCCGATTTTATTGGGCCTAAAGCGTCCGTAGCCGGCCGAGCAAGTTCATCGGGAAATCCGCCAGCCCAACTGGCGGGCGTCCGGTGAAAACTGCACGGCTCGGGACCGGAAGACCCGAAGGGTACGTCTTGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCACCGATGGCGAAAGCACTTCGGGAAGACGGATCCGACGGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACGATGTCTGCTAGGTGCGGCTCCCACTACGAGTGGGTGCTGTGCCGTAGGGAAGCCGCTAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Halarchaeum salinum": {
+            "info": {
+                "acc": "NZ_BAAABL010000094",
+                "desc": "Halarchaeum salinum strain JCM 16330 sequence094, whole genome shotgun sequence",
+                "length": "1731"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_BAAABL010000094",
+                    "size": "416",
+                    "tm": "85.16164216670836",
+                    "start": "588",
+                    "end": "1004",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCTCGAGTGATGACCGATTTTATTGGGCCTAAAGCGTCCGTAGCTGGCCAGGCAAGTCCGTTGGGAAATCCACCTGCTTAACAGGTGGGCGTCCAGCGGAAACTGCTTGGCTTGGGACCGGAAGATCCAAGGGGTACGTCCGGGGTAGGAGTGAAATCCTGTAATCCTGGACGGACCGCCGATGGCGAAAGCACCTTGGAAGGACGGATCCGACAGTGAGGGACGAAAGCTAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTAGCTGTAAACGATGTCCGCTAGGTGTGGCACAGGCTACGAGCCTGTGCTGTGCCGTAGGGAAGCCGAGAAGCGGACCGCCTGGGAAGTACGTCTGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Halorubrum aquaticum": {
+            "info": {
+                "acc": "NZ_BAAADP010000007",
+                "desc": "Halorubrum aquaticum strain JCM 14031 sequence7, whole genome shotgun sequence",
+                "length": "3911"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_BAAADP010000007",
+                    "size": "416",
+                    "tm": "86.6254139696681",
+                    "start": "3152",
+                    "end": "2736",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCCCGAGTGATGGCCGATCTTATTGGGCCTAAAGCGTCCGTAGCTGGCCGCACAAGTCCATCGGGAAATCCACCCGCTCAACGGGTGGACGTCCGGTGGAAACTGTACGGCTTGGGACCGGAAGGCGCGACGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCGCCGATGGCGAAAGCACGTCGCGAGAACGGATCCGACAGTGAGGGACGAAAGCCAGGGTCTCGAACCGGATTAGATACCCGGGTAGTCCTGGCCGTAAACAATGCCTGCTAGGTGTGGCTCCCACTACGAGTGGGTGCTGTGCCGTAGGGAAGCCGCTAAGCAGGCCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        },
+        "Natrinema thermophila": {
+            "info": {
+                "acc": "NZ_PDBS01000001",
+                "desc": "Natrinema thermophila strain CBA1119 contig00001, whole genome shotgun sequence",
+                "length": "4087412"
+            },
+            "amplicons": [
+                {
+                    "acc": "NZ_PDBS01000001",
+                    "size": "416",
+                    "tm": "86.01561304062142",
+                    "start": "982686",
+                    "end": "982270",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCACGAGTGATGACCGCTATTATTGGGCCTAAAGCGTCCGTAGCTGGCCAGGCAAGTCTATCGGGAAATCTGCGCGCTTAACGCGCAGGCGTCCGGTGGAAACTGCGTGGCTTGGGACCGGAAGACCAGAGGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCACCGGTGGCGAAAGCGCCTCTGGAAGACGGATCCGACGGTGAGGGACGAAAGCTCGGGTCACGAACCGGATTAGATACCCGGGTAGTCCGAGCTGTAAACGATGTCTGCTAGGTGTGGCACAGGCTACGAGCCTGTGCTGTGCCGTAGGGAAGCCGAGAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                },
+                {
+                    "acc": "NZ_PDBS01000001",
+                    "size": "416",
+                    "tm": "86.01561304062153",
+                    "start": "1758843",
+                    "end": "1759259",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCACGAGTGATGACCGCTATTATTGGGCCTAAAGCGTCCGTAGCTGGCCAGGCAAGTCTATCGGGAAATCTGCGCGCTTAACGCGCAGGCGTCCGGTGGAAACTGCGTGGCTTGGGACCGGAAGACCAGAGGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCACCGGTGGCGAAAGCGCCTCTGGAAGACGGATCCGACGGTGAGGGACGAAAGCTCGGGTCACGAACCGGATTAGATACCCGGGTAGTCCGAGCTGTAAACGATGTCTGCTAGGTGTGGCACAGGCTACGAGCCTGTGCTGTGCCGTAGGGAAGCCGAGAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                },
+                {
+                    "acc": "NZ_PDBS01000001",
+                    "size": "416",
+                    "tm": "86.01561304062142",
+                    "start": "3913817",
+                    "end": "3913401",
+                    "seq": "GTGCCAGCCGCCGCGGTAATACCGGCAGCACGAGTGATGACCGCTATTATTGGGCCTAAAGCGTCCGTAGCTGGCCAGGCAAGTCTATCGGGAAATCTGCGCGCTTAACGCGCAGGCGTCCGGTGGAAACTGCGTGGCTTGGGACCGGAAGACCAGAGGGGTACGTCCGGGGTAGGAGTGAAATCCCGTAATCCTGGACGGACCACCGGTGGCGAAAGCGCCTCTGGAAGACGGATCCGACGGTGAGGGACGAAAGCTCGGGTCACGAACCGGATTAGATACCCGGGTAGTCCGAGCTGTAAACGATGTCTGCTAGGTGTGGCACAGGCTACGAGCCTGTGCTGTGCCGTAGGGAAGCCGAGAAGCAGACCGCCTGGGAAGTACGTCCGCAAGGATGAAACTTAAAGGAATTGGCGG"
+                }
+            ]
+        }
+    },
+    "warnings": [
+        "Cobertura geral baixa. Verifique os filos relevantes."
+    ]
+}
