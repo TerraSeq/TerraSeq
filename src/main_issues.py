@@ -231,14 +231,34 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
 
 def publicar_no_github(req_id):
     print("🚀 Iniciando publicação no GitHub Pages...")
+    raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
     try:
-        raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         subprocess.run(["git", "add", "docs/"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
         subprocess.run(["git", "commit", "-m", f"Report {req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
-        subprocess.run(["git", "push"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as e:
+        print(f"   ⚠️ Erro ao commitar as mudanças: {e}")
+        return
+
+    try:
+        subprocess.run(["git", "push"], cwd=raiz_projeto, check=True, capture_output=True, text=True)
         print("   🌐 Relatório pushado com sucesso!")
-    except Exception as e:
-        print(f"   ⚠️ Erro ao empurrar pro Git: {e}")
+        return
+    except subprocess.CalledProcessError:
+        # Push rejeitado (branch remota avançou, ex: outra pessoa ou o
+        # próprio Claude publicando algo direto no main). Tenta sincronizar
+        # sozinho em vez de deixar o relatório preso localmente.
+        print("   ⚠️ Push rejeitado (remoto avançou). Tentando sincronizar automaticamente...")
+
+    try:
+        subprocess.run(["git", "pull", "--no-edit"], cwd=raiz_projeto, check=True, capture_output=True, text=True)
+        subprocess.run(["git", "push"], cwd=raiz_projeto, check=True, capture_output=True, text=True)
+        print("   🌐 Sincronizado com o GitHub e relatório pushado com sucesso!")
+    except subprocess.CalledProcessError as e:
+        print(f"   🔥 Falha ao sincronizar automaticamente com o GitHub (exit code {e.returncode}):")
+        print(e.stdout or "")
+        print(e.stderr or "")
+        print("   ⚠️ O relatório está salvo localmente (commitado), mas precisa de um 'git pull'/merge manual para ir ao ar.")
         
 
 def atualizar_vitrine_html(req, req_id, resultado_json=None):
