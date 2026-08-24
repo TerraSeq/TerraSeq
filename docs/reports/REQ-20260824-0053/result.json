@@ -1,0 +1,183 @@
+{
+    "request_id": "REQ-20260824-0053",
+    "metadata": {
+        "submitted_by": "tiago",
+        "email": "tiagomarquesgabriel2405@gmail.com",
+        "submitted_at": "24/08/2026 às 00:04",
+        "target_region": "X",
+        "organism": "Eukaryota",
+        "max_mismatches": 3,
+        "amplicon_min": 600,
+        "amplicon_max": 800,
+        "e_value": 10.0,
+        "min_coverage": 40,
+        "max_hits": 50,
+        "min_tm": 0.0,
+        "database": "minhocas"
+    },
+    "primers": {
+        "forward": "GGTCAACAAATCATAAAGATATTGG",
+        "reverse": "TAAACTTCAGGGTGACCAAAAAATCA",
+        "pair_name": "Par X"
+    },
+    "summary": {
+        "total_sequences_checked": 25,
+        "total_matches": 1,
+        "estimated_coverage": 0.04,
+        "off_target_matches": 0,
+        "mean_amplicon_size": 706.0
+    },
+    "functional_tree": {
+        "Decompositores da Serrapilheira": {},
+        "Engenheiros do Ecossistema": {
+            "Minhocas": {
+                "tamanho": "Macrofauna",
+                "especies": [
+                    {
+                        "especie": "Eisenia fetida",
+                        "id": "SACV01161626",
+                        "matches": 1
+                    }
+                ]
+            }
+        },
+        "Fora do Escopo Principal": {},
+        "Função Indefinida": {},
+        "Micropredadores": {},
+        "Microrganismos": {}
+    },
+    "taxonomy_tree": {
+        "name": "Root",
+        "rank": "root",
+        "matches": 1,
+        "coverage": 1.0,
+        "children": [
+            {
+                "name": "Eukaryota",
+                "rank": "domain",
+                "matches": 1,
+                "coverage": 1.0,
+                "children": [
+                    {
+                        "name": "Metazoa",
+                        "rank": "kingdom",
+                        "matches": 1,
+                        "coverage": 1.0,
+                        "children": [
+                            {
+                                "name": "Spiralia",
+                                "rank": "class",
+                                "matches": 1,
+                                "coverage": 1.0,
+                                "children": [
+                                    {
+                                        "name": "Lophotrochozoa",
+                                        "rank": "clade",
+                                        "matches": 1,
+                                        "coverage": 1.0,
+                                        "children": [
+                                            {
+                                                "name": "Annelida",
+                                                "rank": "clade",
+                                                "matches": 1,
+                                                "coverage": 1.0,
+                                                "children": [
+                                                    {
+                                                        "name": "Clitellata",
+                                                        "rank": "clade",
+                                                        "matches": 1,
+                                                        "coverage": 1.0,
+                                                        "children": [
+                                                            {
+                                                                "name": "Oligochaeta",
+                                                                "rank": "clade",
+                                                                "matches": 1,
+                                                                "coverage": 1.0,
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Crassiclitellata",
+                                                                        "rank": "clade",
+                                                                        "matches": 1,
+                                                                        "coverage": 1.0,
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Lumbricina",
+                                                                                "rank": "clade",
+                                                                                "matches": 1,
+                                                                                "coverage": 1.0,
+                                                                                "children": [
+                                                                                    {
+                                                                                        "name": "Lumbricidae",
+                                                                                        "rank": "family",
+                                                                                        "matches": 1,
+                                                                                        "coverage": 1.0,
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "name": "Lumbricinae",
+                                                                                                "rank": "clade",
+                                                                                                "matches": 1,
+                                                                                                "coverage": 1.0,
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "name": "Eisenia",
+                                                                                                        "rank": "genus",
+                                                                                                        "matches": 1,
+                                                                                                        "coverage": 1.0,
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "name": "Eisenia fetida",
+                                                                                                                "rank": "species",
+                                                                                                                "matches": 1,
+                                                                                                                "coverage": 1.0,
+                                                                                                                "children": []
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "leaf_metadata": {
+        "Eisenia fetida": {
+            "info": {
+                "acc": "SACV01161626",
+                "desc": "Eisenia fetida isolate Indian Scaffold161626, whole genome shotgun sequence",
+                "length": "17711"
+            },
+            "amplicons": [
+                {
+                    "acc": "SACV01161626",
+                    "size": "706",
+                    "tm": "79.25",
+                    "start": "8084",
+                    "end": "7378",
+                    "seq": "TCAACAAATCACAAAGATATTGGAACTCTCTATTTCATTCTCGGGGTCTGAGCAGGTATGGTTGGTGCTGGTATAAGCCTTCTCATTCGAATCGAGCTAAGGCAACCAGGTGCCTTCCTAGGAAGGGACCAACTATACAATACAATTGTTACAGCCCATGCATTTGTAATAATTTTCTTTCTGGTTATGCCTGTATTTATTGGTGGATTTGGAAACTGACTTCTACCTCTTATACTGGGAGCTCCAGACATAGCCTTTCCACGTCTCAACAACATAAGATTTTGACTTCTGCCCCCTTCCCTAATTCTCCTAGTATCCTCTGCTGCAGTGGAAAAGGGTGCTGGAACAGGGTGGACAGTTTACCCGCCCCTATCCAGTAACTTAGCGCACGCGGGGCCCTCAGTGGACCTGGCTATTTTTTCCCTCCATTTAGCAGGTGCCTCCTCAATTTTAGGGGCAATTAACTTCATTACTACAGTTATTAACATACGGTGAAGTGGGCTTCGACTAGAACGAATCCCCCTATTTGTATGAGCTGTAGTTATTACCGTGGTGTTACTACTTTTATCTCTTCCAGTACTTGCGGGAGCTATCACTATACTATTGACAGATCGAAACCTGAATACCTCATTCTTTGACCCTGCTGGAGGTGGCGATCCTATTCTCTACCAACATTTATTCTGATTTTTTGGACACCCTGAAGTTTA"
+                }
+            ]
+        }
+    },
+    "warnings": [
+        "Cobertura geral baixa. Verifique os filos relevantes.",
+        "Potenciais off-targets (Tolerância a mismatch alta)."
+    ]
+}
