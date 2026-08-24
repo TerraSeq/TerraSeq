@@ -466,7 +466,15 @@ def run_pipeline(req, req_id):
     # 1. Inicia o cronômetro
     inicio_blast = time.time() 
     
-    subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
+    try:
+        subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"\n🔥 primer_blast_local.py falhou (exit code {e.returncode}). Saída do processo:")
+        print("--- STDOUT ---")
+        print(e.stdout or "(vazio)")
+        print("--- STDERR ---")
+        print(e.stderr or "(vazio)")
+        raise
     
     # 2. Para o cronômetro e calcula a diferença
     fim_blast = time.time() 
