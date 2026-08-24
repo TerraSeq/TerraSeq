@@ -61,6 +61,15 @@
         .sidebar { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.04); overflow: hidden; position: sticky; top: 90px;}
         .sidebar-header { background: var(--primary); color: white; padding: 15px 20px; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;}
         .sidebar-content { padding: 25px 20px; }
+
+        /* Em coluna única (mesmo breakpoint do .layout-grid) a sidebar não
+           pode ficar "grudada" (sticky): como ela é mais alta que a tela,
+           ficaria cobrindo a árvore e o gráfico pra sempre ao rolar a
+           página. Regra colocada DEPOIS de ".sidebar" de propósito — como
+           as duas têm a mesma especificidade, a ordem no arquivo decide. */
+        @media (max-width: 992px) {
+            .sidebar { position: static; top: auto; }
+        }
         
         .data-group { margin-bottom: 25px; }
         .data-group:last-child { margin-bottom: 0; }
@@ -110,7 +119,19 @@
 
         /* Gráfico e Tabela */
         .chart-container { position: relative; height: 280px; width: 100%; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);}
-        
+        .chart-canvas-wrap { height: 220px; width: 100%; }
+
+        /* Ajustes para telas de celular — depois das regras base de
+           propósito (mesma especificidade, então a ordem no arquivo decide
+           qual vale). */
+        @media (max-width: 600px) {
+            .silva-col { min-width: 220px; }
+            .silva-browser { height: 320px; }
+            /* Legenda do gráfico passa para embaixo (ver renderPieChart),
+               então o canvas precisa de mais altura pra caber os dois. */
+            .chart-canvas-wrap { height: 300px; }
+        }
+
         .table-container { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
         th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); }
@@ -268,7 +289,7 @@
                     
                     <div class="chart-container">
                         <h3 id="chart-title" style="color: var(--primary); font-weight: 600; font-size: 1rem; text-align: center; margin-top: 0;">Composição</h3>
-                        <div style="height: 220px; width: 100%;"><canvas id="dynamicChart"></canvas></div>
+                        <div class="chart-canvas-wrap"><canvas id="dynamicChart"></canvas></div>
                     </div>
                 </div>
 
@@ -827,10 +848,13 @@
         function renderPieChart(labels, data) {
             const ctx = document.getElementById('dynamicChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
+            // Em telas estreitas a legenda à direita espreme demais o gráfico
+            // (fica sobreposto/ilegível); embaixo ele tem espaço pra respirar.
+            const legendPosition = window.innerWidth < 600 ? 'bottom' : 'right';
             chartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#0f4c75', '#3282b8', '#bbe1fa', '#10b981', '#f59e0b', '#cbd5e1'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { family: "'Segoe UI', sans-serif" } } } } }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: legendPosition, labels: { boxWidth: 12, font: { family: "'Segoe UI', sans-serif" } } } } }
             });
         }
 
