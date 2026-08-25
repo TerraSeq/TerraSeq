@@ -527,7 +527,17 @@ def run_pipeline(req, req_id):
     total_matches = 0
     soma_amplicon = 0
     bacterias_encontradas = set()
-    
+
+    # Limite global (não por espécie) de caracteres de sequência de amplicon
+    # guardados no result.json. Sem isso, buscas com muitos hits geram um
+    # JSON gigante -- já aconteceu de passar dos 145MB, estourando o limite
+    # de 100MB por arquivo do GitHub e travando o push do relatório. O corte
+    # é só na sequência (o resto do hit -- acc/size/tm/start/end -- continua
+    # sendo salvo pra TODOS os hits, então nenhuma estatística é perdida, só
+    # deixa de ter a sequência completa pros hits além do orçamento).
+    ORCAMENTO_MAX_CARACTERES_SEQ = 15_000_000
+    caracteres_seq_acumulados = 0
+
     if os.path.exists(arquivo_pass):
         with open(arquivo_pass, mode='r', encoding='utf-8') as f:
             leitor = csv.DictReader(f)
@@ -535,14 +545,14 @@ def run_pipeline(req, req_id):
                 total_matches += 1
                 sid = linha.get('Subject_ID', 'Desconhecido')
                 bacterias_encontradas.add(sid)
-                
+
                 size_val = extrair_campo_flexivel(linha, "size", "0")
                 try: soma_amplicon += int(size_val)
                 except: pass
-                
+
                 if sid not in hits_data_map:
                     hits_data_map[sid] = []
-                
+
                 partes_sid = sid.split('|')
                 acc_limpo = partes_sid[1] if len(partes_sid) > 1 and partes_sid[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes_sid[0]
                 acc_limpo = acc_limpo.split('.')[0]
@@ -552,7 +562,13 @@ def run_pipeline(req, req_id):
                     if chave and "amplicon_tm" in chave.lower().strip():
                         tm_real = valor
                         break
-        
+
+                seq_amplicon = linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível'))
+                if caracteres_seq_acumulados < ORCAMENTO_MAX_CARACTERES_SEQ:
+                    caracteres_seq_acumulados += len(seq_amplicon)
+                else:
+                    seq_amplicon = "Sequência omitida (limite de tamanho do relatório atingido) — dados brutos disponíveis no servidor."
+
                 hits_data_map[sid].append({
                     "acc": acc_limpo,
                     "size": extrair_campo_flexivel(linha, "size", "N/A"),
@@ -560,7 +576,7 @@ def run_pipeline(req, req_id):
                     "start": extrair_campo_flexivel(linha, "start", "N/A"),
                     "end": extrair_campo_flexivel(linha, "end", "N/A"),
                     # Tenta pegar as colunas exatas do amplicon primeiro!
-                    "seq": linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível'))
+                    "seq": seq_amplicon
                 })
 
     media_amplicon = (soma_amplicon / total_matches) if total_matches > 0 else 0
@@ -614,7 +630,13 @@ def run_pipeline(req, req_id):
 
     print("📝 Salvando arquivos de saída (JSON/HTML)...")
     with open(os.path.join(pasta_resultado, "result.json"), 'w', encoding='utf-8') as f:
-        json.dump(resultado_json, f, indent=4, ensure_ascii=False)
+        # Sem indent: result.json só é lido por código (JS do relatório), nunca
+        # manualmente -- indentado, o mesmo conteúdo pode passar de 2-3x o
+        # tamanho por causa dos espaços/quebras de linha repetidos em milhares
+        # de entradas. Compacto ajuda a ficar dentro do limite de 100MB por
+        # arquivo do GitHub (ver ORCAMENTO_MAX_CARACTERES_SEQ acima, que já
+        # limita a maior parte do peso -- as sequências de amplicon).
+        json.dump(resultado_json, f, ensure_ascii=False, separators=(',', ':'))
 
     shutil.copy(os.path.join(raiz_projeto, "docs/template.html"), os.path.join(pasta_resultado, "index.html"))
     return f"docs/reports/{req_id}", resultado_json
