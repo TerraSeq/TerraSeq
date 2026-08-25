@@ -161,22 +161,30 @@ def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, ou
 def _blast_to_dict(file):
     '''
     Coverts the output BLASTN with FMT=6 to a dictionary of hits by query key.
-    Agrupa FWD e REV sob a mesma chave de ensaio.
+    Agrupa FWD e REV sob a mesma chave de ensaio, e dentro de cada direção
+    agrupa novamente por sseqid (sequência-alvo).
+
+    O agrupamento por sseqid aqui é essencial pra performance/memória: um par
+    de primers só forma um amplicon se FWD e REV anelarem na MESMA sequência
+    (ver _evaluate_hit_loc). Sem indexar por sseqid, seria preciso cruzar
+    TODO hit fwd com TODO hit rev do ensaio pra descobrir quais têm o mesmo
+    sseqid -- com e-value permissivo e bancos combinados grandes, isso já
+    gerou bilhões de combinações inúteis e derrubou o processo por falta de
+    memória (a esmagadora maioria dos hits fwd/rev cai em sequências
+    diferentes e é descartada de qualquer forma).
     '''
     hit_keys = ["sseqid", "qstart", "qend", "sstart", "send", "evalue", "pident", "qcovs", "qseq", "sseq", "sstrand"]
     hit_dict = {}
     with open(file, "r") as ifile:
         line = ifile.readline()
-        line_num = 0
         while line != "":
-            line_num += 1
             spl = line.strip().split("\t")
             if len(spl) < 12:
                 line = ifile.readline()
                 continue
-                
+
             qseqid = spl[0]
-            
+
             # Extrai a direção (fwd ou rev) do qseqid
             parts = qseqid.split("|")
             if len(parts) >= 2:
@@ -191,28 +199,33 @@ def _blast_to_dict(file):
             else:
                 line = ifile.readline()
                 continue
-            
+
             # Inicializa o dicionário para esta chave se necessário
             if assay_key not in hit_dict:
-                hit_dict[assay_key] = {"fwd": [], "rev": []}
-            
-            # Adiciona o hit
+                hit_dict[assay_key] = {"fwd": {}, "rev": {}}
+
+            # Adiciona o hit, indexado pela sequência-alvo (sseqid)
             hit_data = {x: y for x, y in zip(hit_keys, spl[1:])}
-            hit_dict[assay_key][dir].append(hit_data)
-            
+            hit_dict[assay_key][dir].setdefault(hit_data["sseqid"], []).append(hit_data)
+
             line = ifile.readline()
     return hit_dict
 
 def _evaluate_hit_loc(hit_dict, primer_dict, tm_thresh = 45., size_max=9999, size_min=20, max_3prime_mm=0, Na=50, K=0, Tris=0, Mg=0, dNTPs=0, saltcorr=5):
     buffer_passing, buffer_all = "Assay_name_and_target,Forward_primer_seq,Reverse_primer_seq,Subject_ID,Tm_forward,Tm_reverse,Amplicon_size,Start,End\n", "Assay_name_and_target,Forward_primer_seq,Reverse_primer_seq,Tm_forward,Tm_reverse,amplicon_size\n"
     for assay_num_target in hit_dict:
-        for x in hit_dict[assay_num_target]["fwd"]:
-            for y in hit_dict[assay_num_target]["rev"]:
-                fwd_seq, rev_seq = primer_dict[F"{assay_num_target}|fwd"], primer_dict[F"{assay_num_target}|rev"] # get primer sequences
-                passing, tm_fwd, tm_rev, amp_size, threep_f_mm, threep_r_mm, start, end = _check_primer_quals(x, y, fwd_seq, rev_seq, tm_thresh=tm_thresh, size_max=size_max, size_min=size_min, max_3prime_mm=max_3prime_mm, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
-                if passing:
-                    buffer_passing += F"{assay_num_target},{fwd_seq},{rev_seq},{x['sseqid']},{tm_fwd},{tm_rev},{amp_size},{start},{end}\n"
-                buffer_all += F"{assay_num_target},{fwd_seq},{rev_seq},{x['sseqid']},{tm_fwd},{tm_rev},{amp_size}\n"
+        fwd_by_sseqid = hit_dict[assay_num_target]["fwd"]
+        rev_by_sseqid = hit_dict[assay_num_target]["rev"]
+        fwd_seq, rev_seq = primer_dict[F"{assay_num_target}|fwd"], primer_dict[F"{assay_num_target}|rev"] # get primer sequences
+        # Só faz sentido comparar hits fwd/rev que caíram na MESMA sequência --
+        # ver motivo em _blast_to_dict.
+        for sseqid in fwd_by_sseqid.keys() & rev_by_sseqid.keys():
+            for x in fwd_by_sseqid[sseqid]:
+                for y in rev_by_sseqid[sseqid]:
+                    passing, tm_fwd, tm_rev, amp_size, threep_f_mm, threep_r_mm, start, end = _check_primer_quals(x, y, fwd_seq, rev_seq, tm_thresh=tm_thresh, size_max=size_max, size_min=size_min, max_3prime_mm=max_3prime_mm, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
+                    if passing:
+                        buffer_passing += F"{assay_num_target},{fwd_seq},{rev_seq},{x['sseqid']},{tm_fwd},{tm_rev},{amp_size},{start},{end}\n"
+                    buffer_all += F"{assay_num_target},{fwd_seq},{rev_seq},{x['sseqid']},{tm_fwd},{tm_rev},{amp_size}\n"
     return buffer_passing, buffer_all
 
 def _pull_amp_seqs(buffer_passing, fasta, log_file, Na=50, K=0, Tris=0, Mg=0, dNTPs=0, saltcorr=5):
