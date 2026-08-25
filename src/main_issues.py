@@ -9,6 +9,7 @@ import csv
 import sys
 import requests
 from Bio import Entrez
+import taxonomia_local
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -155,53 +156,73 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
     functional_roles = {funcao: {} for funcao in FUNCOES_ECOLOGICAS}
 
     for index, subject_id in enumerate(lista_ids, 1):
-        print(f"   ⏳ Baixando dados [{index}/{total_organismos}]: {subject_id}...", end="\r")
+        print(f"   ⏳ Classificando [{index}/{total_organismos}]: {subject_id}...", end="\r")
         try:
             # Mesmo tratamento do main.py: pega o campo certo em formatos
             # tipo "gb|JBAMJC...|" (senão pegaria "gb" como se fosse o ID).
             partes = subject_id.split('|')
             acc = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
             acc = acc.split('.')[0]  # Remove a versão do Accession (.1)
-            handle = Entrez.efetch(db="nucleotide", id=acc, retmode="xml")
-            records = Entrez.read(handle)
-            handle.close()
-            if records:
+
+            # 1ª tentativa: manifesto local (accession -> taxId), gerado por
+            # scripts_auxiliares/gerar_manifesto_taxid.py -- não consulta o
+            # NCBI pela rede, é instantâneo. Só cai pro Entrez (mais lento,
+            # com limite de taxa) se a sequência não estiver mapeada
+            # localmente (ex: banco novo, ainda sem manifesto gerado).
+            taxid, nome_local, desc_local = taxonomia_local.info_por_accession(acc)
+            if taxid:
+                linhagem = taxonomia_local.linhagem_por_taxid(taxid)
+                especie = nome_local or (linhagem[-1] if linhagem else "Desconhecido")
+                if linhagem and linhagem[0].lower() == "cellular organisms":
+                    linhagem.pop(0)
+                acc_final = acc
+                desc_final = desc_local or "Descrição indisponível"
+                length_final = "N/A"
+            else:
+                handle = Entrez.efetch(db="nucleotide", id=acc, retmode="xml")
+                records = Entrez.read(handle)
+                handle.close()
+                if not records:
+                    raise ValueError("Sequência não encontrada no NCBI")
                 rec = records[0]
                 linhagem = rec["GBSeq_taxonomy"].split("; ")
                 especie = rec["GBSeq_organism"]
                 linhagem.append(especie)
                 if linhagem[0].lower() == "cellular organisms":
                     linhagem.pop(0)
-                paths.append(linhagem)
+                acc_final = rec.get("GBSeq_primary-accession", acc)
+                desc_final = rec.get("GBSeq_definition", "Descrição indisponível")
+                length_final = rec.get("GBSeq_length", "N/A")
+                time.sleep(0.4)  # só precisa respeitar o limite de taxa do NCBI no fallback
 
-                if especie not in meta_dict:
-                    meta_dict[especie] = {
-                        "info": {
-                            "acc": rec.get("GBSeq_primary-accession", acc),
-                            "desc": rec.get("GBSeq_definition", "Descrição indisponível"),
-                            "length": rec.get("GBSeq_length", "N/A")
-                        },
-                        "amplicons": []
-                    }
-                
-                grupo, tamanho, funcao = classificar_ecologia(linhagem)
-                
-                if grupo not in functional_roles[funcao]:
-                    functional_roles[funcao][grupo] = {"tamanho": tamanho, "especies": []}
-                    
-                functional_roles[funcao][grupo]["especies"].append({
-                    "especie": especie,
-                    "id": acc,
-                    "matches": len(hits_data_map.get(subject_id, []))
-                })
-                
-                if subject_id in hits_data_map:
-                    meta_dict[especie]["amplicons"].extend(hits_data_map[subject_id])
-                    
+            paths.append(linhagem)
+
+            if especie not in meta_dict:
+                meta_dict[especie] = {
+                    "info": {
+                        "acc": acc_final,
+                        "desc": desc_final,
+                        "length": length_final
+                    },
+                    "amplicons": []
+                }
+
+            grupo, tamanho, funcao = classificar_ecologia(linhagem)
+
+            if grupo not in functional_roles[funcao]:
+                functional_roles[funcao][grupo] = {"tamanho": tamanho, "especies": []}
+
+            functional_roles[funcao][grupo]["especies"].append({
+                "especie": especie,
+                "id": acc,
+                "matches": len(hits_data_map.get(subject_id, []))
+            })
+
+            if subject_id in hits_data_map:
+                meta_dict[especie]["amplicons"].extend(hits_data_map[subject_id])
+
         except Exception:
             paths.append(["Unclassified"])
-        
-        time.sleep(0.4) 
 
     print(f"\n   ✅ Árvore construída com sucesso para {total_organismos} organismos!")
 
