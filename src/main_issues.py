@@ -407,9 +407,10 @@ def run_pipeline(req, req_id):
     )
     try:
         indices = [f.split('.')[0] for f in os.listdir(DIRETORIO_BLAST) if f.endswith('.nsq') or f.endswith('.00.nsq')]
-        bancos_locais_unicos = set([os.path.join(DIRETORIO_BLAST, b) for b in indices])
-        string_banco_completo = " ".join(bancos_locais_unicos)
+        bancos_locais_unicos = sorted(set(indices))
+        string_banco_completo = " ".join(os.path.join(DIRETORIO_BLAST, b) for b in bancos_locais_unicos)
     except FileNotFoundError:
+        bancos_locais_unicos = []
         string_banco_completo = ""
 
     # Mapeamento dinâmico EXCLUSIVO para agrupar os Protozoários
@@ -417,29 +418,51 @@ def run_pipeline(req, req_id):
     bancos_protozoa = [os.path.join(DIRETORIO_BLAST, b) for b in tags_protozoarios]
     string_protozoa_completo = " ".join(bancos_protozoa)
 
-    # Dicionário: "nome_no_forms/issue": ("arquivo_fasta", "total_estimado_para_cobertura")
+    # Contagem REAL de genomas/organismos por grupo, lida do manifesto gerado
+    # por scripts_auxiliares/gerar_manifesto_taxid.py (a partir dos
+    # assembly_data_report.jsonl reais). Substitui os números fixos que
+    # existiam aqui antes -- eles tinham ficado desatualizados: a soma dos
+    # 18 grupos individuais (25.195) nem batia com o total combinado do
+    # "refseqsoil" (46.190) que deveriam somar. Só cai pro número antigo,
+    # abaixo, se o manifesto daquele grupo específico ainda não existir.
+    VALORES_ANTIGOS_FALLBACK = {
+        "bacteria": 22550, "archaea": 822, "nematoda": 248, "tardigrada": 6,
+        "rotifera": 20, "acari": 145, "collembola": 139, "oligochaeta": 25,
+        "formicidae": 213, "isopoda": 14, "myriapoda": 68, "enchytraeidae": 8,
+        "isoptera": 50, "platyhelminthes": 103, "amoebozoa": 51, "sar": 599,
+        "discoba": 111, "metamonada": 23,
+    }
+
+    def _contagem_real(grupo_taxid):
+        real = taxonomia_local.contagem_organismos_grupo(grupo_taxid)
+        return real if real is not None else VALORES_ANTIGOS_FALLBACK.get(grupo_taxid, 0)
+
+    total_protozoa = sum(_contagem_real(g) for g in tags_protozoarios)
+    total_refseqsoil = sum(_contagem_real(g) for g in bancos_locais_unicos)
+
+    # Dicionário: "nome_no_forms/issue": ("arquivo_fasta", "total_real_de_organismos")
     BANCOS_DISPONIVEIS = {
-        "fungi": ("fungi_all.fasta", 500000),
-        "protozoa": (string_protozoa_completo, 784),
-        "bacteria": (os.path.join(DIRETORIO_BLAST, "bacteria"), 22550),
-        "archaea": (os.path.join(DIRETORIO_BLAST, "archaea"), 822),
-        "nematoda": (os.path.join(DIRETORIO_BLAST, "nematoda"), 248),
-        "tardigrada": (os.path.join(DIRETORIO_BLAST, "tardigrada"), 6),
-        "rotifera": (os.path.join(DIRETORIO_BLAST, "rotifera"), 20),
-        "acari": (os.path.join(DIRETORIO_BLAST, "acari"), 145),
-        "collembola": (os.path.join(DIRETORIO_BLAST, "collembola"), 139),
-        "minhocas": (os.path.join(DIRETORIO_BLAST, "oligochaeta"), 25),
-        "formigas": (os.path.join(DIRETORIO_BLAST, "formicidae"), 213),
-        "isopodes": (os.path.join(DIRETORIO_BLAST, "isopoda"), 14),
-        "miriapodes": (os.path.join(DIRETORIO_BLAST, "myriapoda"), 68),
-        "enchytraeidae": (os.path.join(DIRETORIO_BLAST, "enchytraeidae"), 8),
-        "isoptera": (os.path.join(DIRETORIO_BLAST, "isoptera"), 50),
-        "platelmintos": (os.path.join(DIRETORIO_BLAST, "platyhelminthes"), 103),
-        "amoebozoa": (os.path.join(DIRETORIO_BLAST, "amoebozoa"), 51),
-        "sar": (os.path.join(DIRETORIO_BLAST, "sar"), 599),
-        "discoba": (os.path.join(DIRETORIO_BLAST, "discoba"), 111),
-        "metamonada": (os.path.join(DIRETORIO_BLAST, "metamonada"), 23),
-        "refseqsoil": (string_banco_completo, 46190)
+        "fungi": ("fungi_all.fasta", 500000),  # legado: fora do NCBI Datasets, sem manifesto pra contar de verdade
+        "protozoa": (string_protozoa_completo, total_protozoa),
+        "bacteria": (os.path.join(DIRETORIO_BLAST, "bacteria"), _contagem_real("bacteria")),
+        "archaea": (os.path.join(DIRETORIO_BLAST, "archaea"), _contagem_real("archaea")),
+        "nematoda": (os.path.join(DIRETORIO_BLAST, "nematoda"), _contagem_real("nematoda")),
+        "tardigrada": (os.path.join(DIRETORIO_BLAST, "tardigrada"), _contagem_real("tardigrada")),
+        "rotifera": (os.path.join(DIRETORIO_BLAST, "rotifera"), _contagem_real("rotifera")),
+        "acari": (os.path.join(DIRETORIO_BLAST, "acari"), _contagem_real("acari")),
+        "collembola": (os.path.join(DIRETORIO_BLAST, "collembola"), _contagem_real("collembola")),
+        "minhocas": (os.path.join(DIRETORIO_BLAST, "oligochaeta"), _contagem_real("oligochaeta")),
+        "formigas": (os.path.join(DIRETORIO_BLAST, "formicidae"), _contagem_real("formicidae")),
+        "isopodes": (os.path.join(DIRETORIO_BLAST, "isopoda"), _contagem_real("isopoda")),
+        "miriapodes": (os.path.join(DIRETORIO_BLAST, "myriapoda"), _contagem_real("myriapoda")),
+        "enchytraeidae": (os.path.join(DIRETORIO_BLAST, "enchytraeidae"), _contagem_real("enchytraeidae")),
+        "isoptera": (os.path.join(DIRETORIO_BLAST, "isoptera"), _contagem_real("isoptera")),
+        "platelmintos": (os.path.join(DIRETORIO_BLAST, "platyhelminthes"), _contagem_real("platyhelminthes")),
+        "amoebozoa": (os.path.join(DIRETORIO_BLAST, "amoebozoa"), _contagem_real("amoebozoa")),
+        "sar": (os.path.join(DIRETORIO_BLAST, "sar"), _contagem_real("sar")),
+        "discoba": (os.path.join(DIRETORIO_BLAST, "discoba"), _contagem_real("discoba")),
+        "metamonada": (os.path.join(DIRETORIO_BLAST, "metamonada"), _contagem_real("metamonada")),
+        "refseqsoil": (string_banco_completo, total_refseqsoil)
     }
 
     # 1. Busca no dicionário
@@ -552,7 +575,12 @@ def run_pipeline(req, req_id):
     arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
 
     avisos = []
-    cobertura_global = (len(lista_bacterias) / total_sequencias_banco) if total_sequencias_banco > 0 else 0
+    # Cobertura = organismos ÚNICOS batidos (len(meta_dict), 1 por espécie)
+    # sobre o total de organismos do grupo -- NÃO len(lista_bacterias), que
+    # conta SEQUÊNCIAS (scaffolds/contigs individuais, várias por organismo
+    # em genomas fragmentados). Ver comentário equivalente em main.py.
+    total_organismos_unicos = len(meta_dict)
+    cobertura_global = (total_organismos_unicos / total_sequencias_banco) if total_sequencias_banco > 0 else 0
     if cobertura_global < 0.60: avisos.append("Cobertura geral baixa. Verifique os filos relevantes.")
     if mismatches > 2: avisos.append("Potenciais off-targets (Tolerância a mismatch alta).")
 
@@ -583,6 +611,7 @@ def run_pipeline(req, req_id):
         "summary": {
             "total_sequences_checked": total_sequencias_banco,
             "total_matches": len(lista_bacterias),
+            "unique_organisms": total_organismos_unicos,
             "estimated_coverage": round(cobertura_global, 5),
             "off_target_matches": 0,
             "mean_amplicon_size": round(media_amplicon, 1)

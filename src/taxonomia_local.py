@@ -26,6 +26,7 @@ organismos unicos. Este modulo substitui isso por duas fontes 100% locais:
 main.py so cai de volta pro Entrez.efetch quando uma sequencia nao esta
 mapeada no manifesto local (ex: banco novo, ainda sem manifesto gerado).
 """
+import json
 import os
 import sqlite3
 import tarfile
@@ -35,11 +36,13 @@ DIRETORIO_DADOS = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", 
 DIRETORIO_TAXDUMP = os.path.join(DIRETORIO_DADOS, "taxdump")
 DIRETORIO_MANIFESTOS = os.path.join(DIRETORIO_DADOS, "manifestos")
 CAMINHO_DB_MANIFESTO = os.path.join(DIRETORIO_MANIFESTOS, "taxid.sqlite")
+CAMINHO_CONTAGEM_ORGANISMOS = os.path.join(DIRETORIO_MANIFESTOS, "contagem_organismos.json")
 URL_TAXDUMP = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
 
 _taxid_para_pai = None
 _taxid_para_nome = None
 _conexao_manifesto = None
+_contagem_organismos = None
 
 
 def _baixar_taxdump_se_necessario():
@@ -124,3 +127,23 @@ def taxid_por_accession(acc):
         return None
     linha = conexao.execute("SELECT taxid FROM sequencias WHERE accession = ?", (acc,)).fetchone()
     return linha[0] if linha else None
+
+
+def _carregar_contagem_organismos():
+    global _contagem_organismos
+    if _contagem_organismos is not None:
+        return
+    _contagem_organismos = {}
+    if not os.path.exists(CAMINHO_CONTAGEM_ORGANISMOS):
+        return
+    with open(CAMINHO_CONTAGEM_ORGANISMOS, "r", encoding="utf-8") as f:
+        _contagem_organismos = json.load(f)
+
+
+def contagem_organismos_grupo(grupo):
+    """Quantidade real de genomas/organismos baixados pra um grupo (ex:
+    "isopoda"), contada a partir do assembly_data_report.jsonl real (não um
+    número digitado à mão). Retorna None se o grupo não tiver manifesto
+    gerado ainda (main.py cai pro valor antigo, hardcoded, nesse caso)."""
+    _carregar_contagem_organismos()
+    return _contagem_organismos.get(grupo)
