@@ -1,10 +1,17 @@
 *.csv
 *.out
+*.stderr.log
 data/refseq/*
 !data/refseq/.gitkeep
 
 data/blast_dbs/*
 !data/blast_dbs/.gitkeep
+
+data/manifestos/*
+!data/manifestos/.gitkeep
+
+data/taxdump/*
+!data/taxdump/.gitkeep
 
 __pycache__/
 src/credentials.json
