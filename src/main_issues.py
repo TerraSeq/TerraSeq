@@ -169,14 +169,16 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
             # NCBI pela rede, é instantâneo. Só cai pro Entrez (mais lento,
             # com limite de taxa) se a sequência não estiver mapeada
             # localmente (ex: banco novo, ainda sem manifesto gerado).
-            taxid, nome_local, desc_local = taxonomia_local.info_por_accession(acc)
+            taxid = taxonomia_local.taxid_por_accession(acc)
             if taxid:
                 linhagem = taxonomia_local.linhagem_por_taxid(taxid)
-                especie = nome_local or (linhagem[-1] if linhagem else "Desconhecido")
-                if linhagem and linhagem[0].lower() == "cellular organisms":
+                if not linhagem:
+                    raise ValueError("taxId sem linhagem na base de taxonomia local")
+                if linhagem[0].lower() == "cellular organisms":
                     linhagem.pop(0)
+                especie = linhagem[-1]
                 acc_final = acc
-                desc_final = desc_local or "Descrição indisponível"
+                desc_final = "Descrição indisponível"
                 length_final = "N/A"
             else:
                 handle = Entrez.efetch(db="nucleotide", id=acc, retmode="xml")

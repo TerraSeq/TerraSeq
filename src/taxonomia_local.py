@@ -7,29 +7,39 @@ por organismo (+ sleep de 0.4s pra respeitar o limite de taxa do NCBI), o que
 tornava essa etapa o maior gargalo de tempo do pipeline pra buscas com muitos
 organismos unicos. Este modulo substitui isso por duas fontes 100% locais:
 
-1. Um manifesto accession -> taxId (gerado uma vez por
+1. Um manifesto accession -> taxId em SQLite (gerado uma vez por
    scripts_auxiliares/gerar_manifesto_taxid.py, cruzando os
    assembly_data_report.jsonl do NCBI Datasets com os cabecalhos dos .fna
-   ja baixados).
+   ja baixados). Usamos SQLite (indice em disco) em vez de um dicionario
+   Python carregado inteiro na memoria porque os bancos combinados de vocês
+   passam de 90 milhoes de sequencias -- um dict desse tamanho facilmente
+   estoura dezenas de GB de RAM sozinho (o mesmo tipo de problema que
+   causou os OOM kills corrigidos em run_parse_blastn.py). Com SQLite, a
+   busca por accession usa o indice da PRIMARY KEY e fica praticamente
+   instantanea, com uso de memoria desprezivel.
 2. A base de taxonomia oficial do NCBI (taxdump: nodes.dmp + names.dmp),
    baixada uma unica vez e usada pra montar a linhagem completa de qualquer
-   taxId apenas subindo a arvore de pais em memoria -- sem rede.
+   taxId apenas subindo a arvore de pais em memoria -- sem rede. Essa parte
+   SIM cabe tranquilamente em memoria: a taxonomia inteira do NCBI tem só
+   ~2-3 milhoes de taxons, não centenas de milhões de sequências.
 
 main.py so cai de volta pro Entrez.efetch quando uma sequencia nao esta
 mapeada no manifesto local (ex: banco novo, ainda sem manifesto gerado).
 """
 import os
+import sqlite3
 import tarfile
 import urllib.request
 
 DIRETORIO_DADOS = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
 DIRETORIO_TAXDUMP = os.path.join(DIRETORIO_DADOS, "taxdump")
 DIRETORIO_MANIFESTOS = os.path.join(DIRETORIO_DADOS, "manifestos")
+CAMINHO_DB_MANIFESTO = os.path.join(DIRETORIO_MANIFESTOS, "taxid.sqlite")
 URL_TAXDUMP = "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz"
 
 _taxid_para_pai = None
 _taxid_para_nome = None
-_acc_para_info = None
+_conexao_manifesto = None
 
 
 def _baixar_taxdump_se_necessario():
@@ -92,29 +102,25 @@ def linhagem_por_taxid(taxid):
     return linhagem
 
 
-def _carregar_manifestos_taxid():
-    global _acc_para_info
-    if _acc_para_info is not None:
-        return
-    _acc_para_info = {}
-    if not os.path.isdir(DIRETORIO_MANIFESTOS):
-        return
-    for nome_arquivo in os.listdir(DIRETORIO_MANIFESTOS):
-        if not nome_arquivo.endswith("_taxid.tsv"):
-            continue
-        with open(os.path.join(DIRETORIO_MANIFESTOS, nome_arquivo), "r", encoding="utf-8", errors="ignore") as f:
-            for linha in f:
-                partes = linha.rstrip("\n").split("\t")
-                if len(partes) < 3:
-                    continue
-                acc, taxid, organismo = partes[0], partes[1], partes[2]
-                descricao = partes[3] if len(partes) > 3 else ""
-                _acc_para_info[acc] = (taxid, organismo, descricao)
+def _conectar_manifesto():
+    global _conexao_manifesto
+    if _conexao_manifesto is not None:
+        return _conexao_manifesto
+    if not os.path.exists(CAMINHO_DB_MANIFESTO):
+        return None
+    # uri=True + mode=ro: abre só leitura, várias submissões podem consultar
+    # ao mesmo tempo sem disputar lock de escrita com o script de geração.
+    _conexao_manifesto = sqlite3.connect(f"file:{CAMINHO_DB_MANIFESTO}?mode=ro", uri=True)
+    return _conexao_manifesto
 
 
-def info_por_accession(acc):
-    """Busca (taxId, nome_organismo, descricao) de uma sequencia no manifesto
-    local. Retorna (None, None, None) se a sequencia nao estiver mapeada
-    (ex: banco baixado depois do ultimo gerar_manifesto_taxid.py)."""
-    _carregar_manifestos_taxid()
-    return _acc_para_info.get(acc, (None, None, None))
+def taxid_por_accession(acc):
+    """Busca o taxId de uma sequência no manifesto local (SQLite, busca
+    indexada, sem carregar nada em memória). Retorna None se a sequência
+    não estiver mapeada (ex: banco baixado depois do último
+    gerar_manifesto_taxid.py)."""
+    conexao = _conectar_manifesto()
+    if conexao is None:
+        return None
+    linha = conexao.execute("SELECT taxid FROM sequencias WHERE accession = ?", (acc,)).fetchone()
+    return linha[0] if linha else None
