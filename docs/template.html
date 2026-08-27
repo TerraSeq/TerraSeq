@@ -898,8 +898,9 @@
             globalPrimers = `${data.primers.forward} / ${data.primers.reverse}`; 
             globalType = data.metadata.organism;
                     
+            const organismosUnicos = data.summary.unique_organisms || Object.keys(leafMetadata).length;
             document.getElementById('tot-match').textContent = csvTotalMatches;
-            document.getElementById('uni-org').textContent = data.summary.unique_organisms || Object.keys(leafMetadata).length;
+            document.getElementById('uni-org').textContent = organismosUnicos;
             document.getElementById('req-id').textContent = data.request_id;
             document.getElementById('sub-date').textContent = data.metadata.submitted_at;
             document.getElementById('sub-by').textContent = data.metadata.submitted_by;
@@ -917,7 +918,7 @@
             document.getElementById('total-genomes').textContent = totalGenomasBanco.toLocaleString('pt-BR');
             document.getElementById('total-genomes-sub').textContent = `Total catalogado para "${nomeGrupoBanco}"`;
             document.getElementById('est-cov-sub').textContent =
-                `${csvTotalMatches.toLocaleString('pt-BR')} de ${totalGenomasBanco.toLocaleString('pt-BR')} genomas de "${nomeGrupoBanco}" captados`;
+                `${organismosUnicos.toLocaleString('pt-BR')} de ${totalGenomasBanco.toLocaleString('pt-BR')} genomas de "${nomeGrupoBanco}" captados`;
 
             if(data.metadata) {
                 document.getElementById('param-banco').textContent = data.metadata.database || "Protozoa";
