@@ -12,20 +12,17 @@ DIRETORIO_MANIFESTOS = "/home/othin/Documents/tiago/Projeto_completo/pipeline_ge
 # O preparar_blast.py descarta o nome do organismo ao indexar (fica só o ID),
 # por isso este script gera um manifesto accession -> organismo ANTES de
 # tocar em qualquer arquivo, preservando essa informação para auditorias futuras.
-ACCESSIONS_EXCLUIDAS = {
-    "isopoda": {
-        "OZ209255.1": "Anilocra frontalis (isópode parasita marinho de peixes)",
-        "OZ209256.1": "Anilocra frontalis (isópode parasita marinho de peixes)",
-        "OZ209257.1": "Anilocra frontalis (isópode parasita marinho de peixes)",
-    },
-    "platyhelminthes": {
-        "CM097882.1": "Pseudobiceros splendidus (platelminto marinho)",
-        "OZ249426.1": "Schmidtea nova (planária de água doce, não terrestre)",
-    },
-    "nematoda": {
-        "CM075173.1": "Parascaris univalens (nematódeo parasita de equinos)",
-    },
-}
+#
+# HISTÓRICO: essas 4 exclusões originais foram feitas por ACCESSION (não por
+# taxId) porque, na época, só tínhamos os 1-3 maiores outliers de cada
+# espécie (identificados via "maior sequência do banco"), não a lista
+# completa de sequências. Descobrimos depois (blastdbcmd -entry all no
+# isopoda, pós-curadoria) que a Anilocra frontalis tinha MAIS cromossomos
+# grandes além dos 3 capturados manualmente (OZ209258.1-OZ209262.1 e
+# possivelmente outros seguiam sem ser removidos) -- por isso foram
+# migradas pra TAXIDS_EXCLUIDOS abaixo, que resolve automaticamente
+# TODAS as sequências do genoma, não só as que a auditoria manual pegou.
+ACCESSIONS_EXCLUIDAS = {}
 
 # Segunda rodada de curadoria (levantamento completo de organismos por
 # grupo + revisão manual, setembro/2026): organismos com CHANCE ZERO de
@@ -50,6 +47,7 @@ TAXIDS_EXCLUIDOS = {
         "38248": "Trypanosoma boissoni (parasita de sangue de tubarão/raia)",
     },
     "isopoda": {
+        "2925007": "Anilocra frontalis (isópode parasita marinho de peixes)",
         "1955234": "Bathynomus jamesi (isópode gigante de fossa abissal)",
         "2922061": "Ceratothoa steindachneri (parasita de brânquia de peixe marinho)",
         "2067965": "Jaera ischiosetosa (isópode de costão rochoso marinho)",
@@ -57,6 +55,7 @@ TAXIDS_EXCLUIDOS = {
         "96851": "Jaera albifrons (isópode de costão rochoso marinho)",
     },
     "nematoda": {
+        "6257": "Parascaris univalens (nematódeo parasita de equinos)",
         "320140": "Sabatieria punctata (nematódeo de sedimento marinho)",
         "3040841": "Trissonchulus latispiculum (nematódeo de sedimento marinho)",
         "2505740": "Enoplolaimus lenunculus (nematódeo de sedimento marinho)",
@@ -70,6 +69,8 @@ TAXIDS_EXCLUIDOS = {
         "944443": "Echinomermella matsi (parasita de ouriço-do-mar)",
     },
     "platyhelminthes": {
+        "983666": "Pseudobiceros splendidus (platelminto marinho)",
+        "163373": "Schmidtea nova (planária de água doce, não terrestre)",
         "2991682": "Nematoplana nigrocapitula (turbelário intersticial marinho)",
         "2991685": "Vannuccia rotundouncinata (turbelário intersticial marinho)",
         "2991684": "Coelogynopora nodosa (turbelário intersticial marinho)",
