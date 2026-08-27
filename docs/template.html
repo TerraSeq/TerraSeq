@@ -197,10 +197,6 @@
                 <div class="kpi-value" id="uni-org">0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Matches Validados</div>
-                <div class="kpi-value" id="tot-match">0</div>
-            </div>
-            <div class="kpi-card">
                 <div class="kpi-title">Genomas no Banco (Grupo)</div>
                 <div class="kpi-value" id="total-genomes">0</div>
                 <div class="kpi-sub" id="total-genomes-sub"></div>
@@ -899,7 +895,6 @@
             globalType = data.metadata.organism;
                     
             const organismosUnicos = data.summary.unique_organisms || Object.keys(leafMetadata).length;
-            document.getElementById('tot-match').textContent = csvTotalMatches;
             document.getElementById('uni-org').textContent = organismosUnicos;
             document.getElementById('req-id').textContent = data.request_id;
             document.getElementById('sub-date').textContent = data.metadata.submitted_at;
