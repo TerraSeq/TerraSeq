@@ -1,5 +1,6 @@
 import os
 import glob
+import json
 import subprocess
 
 DIRETORIO_ORIGEM = "/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/refseq"
@@ -26,7 +27,159 @@ ACCESSIONS_EXCLUIDAS = {
     },
 }
 
-GRUPOS_AFETADOS = list(ACCESSIONS_EXCLUIDAS.keys())
+# Segunda rodada de curadoria (levantamento completo de organismos por
+# grupo + revisão manual, setembro/2026): organismos com CHANCE ZERO de
+# ocorrer em solo (marinhos obrigatórios -- algas marrons, parasitas de
+# hospedeiro exclusivamente marinho, meiofauna intersticial marinha, etc.),
+# identificados pelo taxId (nível de organismo/genoma) em vez de accession
+# de sequência -- são resolvidos automaticamente pra todas as sequências
+# daquele genoma em _resolver_taxids_para_accessions().
+TAXIDS_EXCLUIDOS = {
+    "amoebozoa": {
+        "1077153": "Paramoeba atlantica (ameba marinha, associada a ouriço-do-mar)",
+        "1321612": "Paramoeba invadens (ameba marinha, associada a ouriço-do-mar)",
+        "180228": "Paramoeba pemaquidensis (ameba marinha)",
+        "1621016": "Entamoeba marina (ameba marinha)",
+    },
+    "discoba": {
+        "140242": "Cruzella marina (cinetoplastídeo marinho)",
+        "91374": "Diplonema papillatum (diplonemídeo planctônico marinho)",
+        "2508216": "Diplonema japonicum (diplonemídeo planctônico marinho)",
+        "630703": "Rhynchopus euleeides (diplonemídeo planctônico marinho)",
+        "2016123": "Rhynchopus humris (diplonemídeo planctônico marinho)",
+        "38248": "Trypanosoma boissoni (parasita de sangue de tubarão/raia)",
+    },
+    "isopoda": {
+        "1955234": "Bathynomus jamesi (isópode gigante de fossa abissal)",
+        "2922061": "Ceratothoa steindachneri (parasita de brânquia de peixe marinho)",
+        "2067965": "Jaera ischiosetosa (isópode de costão rochoso marinho)",
+        "2613951": "Jaera praehirsuta (isópode de costão rochoso marinho)",
+        "96851": "Jaera albifrons (isópode de costão rochoso marinho)",
+    },
+    "nematoda": {
+        "320140": "Sabatieria punctata (nematódeo de sedimento marinho)",
+        "3040841": "Trissonchulus latispiculum (nematódeo de sedimento marinho)",
+        "2505740": "Enoplolaimus lenunculus (nematódeo de sedimento marinho)",
+        "3040840": "Trileptium ribeirensis (nematódeo de sedimento marinho)",
+        "320139": "Daptonema setosum (nematódeo de sedimento marinho)",
+        "1654675": "Litoditis marina (nematódeo marinho)",
+        "319955": "Sphaerolaimus hirsutus (nematódeo de sedimento marinho)",
+        "303229": "Anisakis pegreffii (parasita de peixe/mamífero marinho)",
+        "6269": "Anisakis simplex (parasita de peixe/mamífero marinho)",
+        "6271": "Pseudoterranova decipiens (parasita de peixe/mamífero marinho)",
+        "944443": "Echinomermella matsi (parasita de ouriço-do-mar)",
+    },
+    "platyhelminthes": {
+        "2991682": "Nematoplana nigrocapitula (turbelário intersticial marinho)",
+        "2991685": "Vannuccia rotundouncinata (turbelário intersticial marinho)",
+        "2991684": "Coelogynopora nodosa (turbelário intersticial marinho)",
+        "2991686": "Parotoplana pacifica (turbelário intersticial marinho)",
+        "2991687": "Invenusta paracnida (turbelário intersticial marinho)",
+        "2991690": "Americanaplana fernaldi (turbelário intersticial marinho)",
+        "2991683": "Monocelis spectator (turbelário intersticial marinho)",
+        "2991688": "Minona dolichovesicula (turbelário intersticial marinho)",
+        "2291463": "Prostheceraeus crozeri (polyclad marinho)",
+        "2730667": "Benedenia humboldti (parasita de peixe marinho)",
+        "335511": "Cardicola forsteri (parasita de sangue de atum de cultivo marinho)",
+        "282301": "Macrostomum lignano (organismo-modelo marinho/salobro)",
+    },
+    "rotifera": {
+        "104778": "Seison nebaliae (epizoico de crustáceo marinho)",
+    },
+    "sar": {
+        "117523": "Nereocystis luetkeana (alga marrom/kelp marinha)",
+        "169782": "Pterygophora californica (alga marrom/kelp marinha)",
+        "105409": "Egregia menziesii (alga marrom/kelp marinha)",
+        "309354": "Cymathaere triplicata (alga marrom/kelp marinha)",
+        "169770": "Laminaria sinclairii (alga marrom/kelp marinha)",
+        "2872": "Costaria costata (alga marrom/kelp marinha)",
+        "309364": "Laminaria ephemera (alga marrom/kelp marinha)",
+        "572309": "Neoagarum fimbriatum (alga marrom/kelp marinha)",
+        "98221": "Alaria marginata (alga marrom/kelp marinha)",
+        "105414": "Postelsia palmaeformis (alga marrom/kelp marinha)",
+        "169769": "Laminaria setchellii (alga marrom/kelp marinha)",
+        "98222": "Alaria nana (alga marrom/kelp marinha)",
+        "2724434": "Hedophyllum nigripes (alga marrom/kelp marinha)",
+        "243268": "Phaeostrophion irregulare (alga marrom/kelp marinha)",
+        "381692": "Padina boergesenii (alga marrom marinha)",
+        "531973": "Dictyopteris delicatula (alga marrom marinha)",
+        "2880": "Ectocarpus siliculosus (alga marrom marinha)",
+        "690460": "Ectocarpus crouaniorum (alga marrom marinha)",
+        "116065": "Choristocarpus tenellus (alga marrom marinha)",
+        "376270": "Discosporangium mesarthrocarpum (alga marrom marinha)",
+        "3012": "Fucus distichus (alga marrom marinha)",
+        "43935": "Ectocarpus fasciculatus (alga marrom marinha)",
+        "2885": "Pylaiella littoralis (alga marrom marinha)",
+        "74478": "Himanthalia elongata (alga marrom marinha)",
+        "52969": "Ascophyllum nodosum (alga marrom marinha)",
+        "74467": "Pelvetia canaliculata (alga marrom marinha)",
+        "588760": "Halopteris paniculata (alga marrom marinha)",
+        "99931": "Desmarestia dudresnayi (alga marrom marinha)",
+        "64930": "Myriotrichia clavaeformis (alga marrom marinha)",
+        "1964287": "Feldmannia mitchelliae (alga marrom marinha)",
+        "2876": "Dictyota dichotoma (alga marrom marinha)",
+        "2567908": "Hapterophycus canaliculatus (alga marrom/kelp marinha)",
+        "87148": "Fucus serratus (alga marrom marinha)",
+        "1205903": "Desmarestia herbacea (alga marrom marinha)",
+        "80365": "Laminaria digitata (alga marrom/kelp marinha)",
+        "64904": "Chordaria linearis (alga marrom marinha)",
+        "590117": "Ericaria zosteroides (alga marrom marinha)",
+        "74381": "Undaria pinnatifida (alga marrom/kelp marinha)",
+        "416828": "Saccharina sessilis (alga marrom/kelp marinha)",
+        "143165": "Sargassum natans (alga marrom marinha)",
+        "115959": "Sargassum obtusifolium (alga marrom marinha)",
+        "143163": "Sargassum fluitans (alga marrom marinha)",
+        "143166": "Sargassum platycarpum (alga marrom marinha)",
+        "27967": "Scytosiphon lomentaria (alga marrom marinha)",
+        "88149": "Saccharina japonica (alga marrom/kelp marinha)",
+        "416830": "Saccharina sculpera (alga marrom/kelp marinha)",
+        "2841634": "Sphaerotrichia firma (alga marrom marinha)",
+        "117516": "Sphacelaria rigidula (alga marrom marinha)",
+        "309358": "Saccharina latissima (alga marrom/kelp marinha)",
+        "66620": "Saccorhiza dermatodea (alga marrom/kelp marinha)",
+        "1403536": "Scytosiphon promiscuus (alga marrom marinha)",
+        "45365": "Saccorhiza polyschides (alga marrom/kelp marinha)",
+        "1442163": "Sargassum wightii (alga marrom marinha)",
+    },
+}
+
+GRUPOS_AFETADOS = sorted(set(ACCESSIONS_EXCLUIDAS.keys()) | set(TAXIDS_EXCLUIDOS.keys()))
+
+
+def _resolver_taxids_para_accessions(taxon):
+    """Resolve os taxIds banidos de um grupo (nível organismo/genoma) pras
+    accessions de sequência específicas dentro de cada genoma, lendo o
+    assembly_data_report.jsonl (taxId de cada genoma) e os cabeçalhos dos
+    .fna daquele genoma (accession de cada sequência dentro dele)."""
+    taxids_banidos = TAXIDS_EXCLUIDOS.get(taxon)
+    if not taxids_banidos:
+        return {}
+
+    pasta_taxon = os.path.join(DIRETORIO_ORIGEM, taxon)
+    caminho_relatorio = os.path.join(pasta_taxon, "ncbi_dataset", "data", "assembly_data_report.jsonl")
+    genomas_banidos = {}  # accession_genoma -> motivo
+    if os.path.exists(caminho_relatorio):
+        with open(caminho_relatorio, "r", encoding="utf-8", errors="ignore") as f:
+            for linha in f:
+                linha = linha.strip()
+                if not linha:
+                    continue
+                dados = json.loads(linha)
+                taxid = str(dados.get("organism", {}).get("taxId", ""))
+                if taxid in taxids_banidos:
+                    genomas_banidos[dados.get("accession", "")] = taxids_banidos[taxid]
+
+    accessions_resolvidas = {}
+    pasta_dados = os.path.join(pasta_taxon, "ncbi_dataset", "data")
+    for acc_genoma, motivo in genomas_banidos.items():
+        pasta_genoma = os.path.join(pasta_dados, acc_genoma)
+        for fna in glob.glob(os.path.join(pasta_genoma, "*.fna")):
+            with open(fna, "r", errors="ignore") as f:
+                for linha in f:
+                    if linha.startswith(">"):
+                        acc_seq = linha[1:].split(" ")[0].strip()
+                        accessions_resolvidas[acc_seq] = motivo
+    return accessions_resolvidas
 
 
 def gerar_manifesto(taxon):
@@ -45,8 +198,7 @@ def gerar_manifesto(taxon):
     print(f"  -> Manifesto salvo em {caminho_manifesto}")
 
 
-def filtrar_e_reindexar(taxon):
-    banidos = set(ACCESSIONS_EXCLUIDAS[taxon].keys())
+def filtrar_e_reindexar(taxon, banidos):
     pasta_alvo = os.path.join(DIRETORIO_ORIGEM, taxon)
     arquivos_fna = glob.glob(os.path.join(pasta_alvo, "**", "*.fna"), recursive=True)
     base_out = os.path.join(DIRETORIO_BLAST, taxon)
@@ -100,9 +252,19 @@ if __name__ == "__main__":
     for taxon in GRUPOS_AFETADOS:
         print("-" * 50)
         print(f"🧹 Curando {taxon.upper()}...")
-        for acc, motivo in ACCESSIONS_EXCLUIDAS[taxon].items():
+
+        banidos = dict(ACCESSIONS_EXCLUIDAS.get(taxon, {}))
+        for acc, motivo in banidos.items():
             print(f"   - removendo {acc}: {motivo}")
-        filtrar_e_reindexar(taxon)
+
+        if taxon in TAXIDS_EXCLUIDOS:
+            resolvidos = _resolver_taxids_para_accessions(taxon)
+            especies_unicas = sorted(set(resolvidos.values()))
+            for especie in especies_unicas:
+                print(f"   - removendo (via taxId): {especie}")
+            banidos.update(resolvidos)
+
+        filtrar_e_reindexar(taxon, banidos)
 
     print("\n" + "=" * 60)
     print("🎉 CURADORIA CONCLUÍDA.")
