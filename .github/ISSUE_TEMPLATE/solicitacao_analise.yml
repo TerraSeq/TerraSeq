@@ -82,13 +82,14 @@ body:
     id: banco_dados
     attributes:
       label: Banco de Dados
-      description: "Selecione contra qual banco genômico o BLAST será rodado (Sar = Stramenopila/Alveolata/Rhizaria)"
+      description: "Selecione contra qual banco genômico o BLAST será rodado (Sar = Stramenopila/Alveolata/Rhizaria; Eucariotos = Refseqsoil sem Bacteria/Archaea, útil pra marcadores como 18S/ITS/28S que não existem em procariontes)"
       options:
         - "Amoebozoa"
         - "Sar"
         - "Discoba"
         - "Metamonada"
         - "Refseqsoil"
+        - "Eucariotos"
         - "Protozoa"
         - "Fungi"
         - "Bacteria"

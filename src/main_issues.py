@@ -418,6 +418,12 @@ def run_pipeline(req, req_id):
     bancos_protozoa = [os.path.join(DIRETORIO_BLAST, b) for b in tags_protozoarios]
     string_protozoa_completo = " ".join(bancos_protozoa)
 
+    # Banco "eucariotos": igual ao refseqsoil completo, mas sem bacteria/
+    # archaea. Ver comentário equivalente em main.py.
+    tags_nao_eucariotos = {"bacteria", "archaea"}
+    bancos_eucariotos = [b for b in bancos_locais_unicos if b not in tags_nao_eucariotos]
+    string_eucariotos_completo = " ".join(os.path.join(DIRETORIO_BLAST, b) for b in bancos_eucariotos)
+
     # Contagem REAL de genomas/organismos por grupo, lida do manifesto gerado
     # por scripts_auxiliares/gerar_manifesto_taxid.py (a partir dos
     # assembly_data_report.jsonl reais). Substitui os números fixos que
@@ -439,11 +445,13 @@ def run_pipeline(req, req_id):
 
     total_protozoa = sum(_contagem_real(g) for g in tags_protozoarios)
     total_refseqsoil = sum(_contagem_real(g) for g in bancos_locais_unicos)
+    total_eucariotos = sum(_contagem_real(g) for g in bancos_eucariotos)
 
     # Dicionário: "nome_no_forms/issue": ("arquivo_fasta", "total_real_de_organismos")
     BANCOS_DISPONIVEIS = {
         "fungi": ("fungi_all.fasta", 500000),  # legado: fora do NCBI Datasets, sem manifesto pra contar de verdade
         "protozoa": (string_protozoa_completo, total_protozoa),
+        "eucariotos": (string_eucariotos_completo, total_eucariotos),
         "bacteria": (os.path.join(DIRETORIO_BLAST, "bacteria"), _contagem_real("bacteria")),
         "archaea": (os.path.join(DIRETORIO_BLAST, "archaea"), _contagem_real("archaea")),
         "nematoda": (os.path.join(DIRETORIO_BLAST, "nematoda"), _contagem_real("nematoda")),
