@@ -32,6 +32,9 @@ ACCESSIONS_EXCLUIDAS = {}
 # de sequência -- são resolvidos automaticamente pra todas as sequências
 # daquele genoma em _resolver_taxids_para_accessions().
 TAXIDS_EXCLUIDOS = {
+    "ascomycota": {
+        "161743": "Ramulispora sorghi f. maydis (taxId mal-atribuido -- biosample da NCBI descreve como 'Uncultivated OLB16 bacterium', MAG remontado de metagenoma de agua do mar do Oceano Artico/Canada Basin, nao e nem fungo cultivado)",
+    },
     "amoebozoa": {
         "1077153": "Paramoeba atlantica (ameba marinha, associada a ouriço-do-mar)",
         "1321612": "Paramoeba invadens (ameba marinha, associada a ouriço-do-mar)",
