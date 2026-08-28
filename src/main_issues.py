@@ -418,6 +418,25 @@ def run_pipeline(req, req_id):
     bancos_protozoa = [os.path.join(DIRETORIO_BLAST, b) for b in tags_protozoarios]
     string_protozoa_completo = " ".join(bancos_protozoa)
 
+    # Mapeamento dinâmico EXCLUSIVO para agrupar os Fungos: os 6 filos que o
+    # motor de classificação ecológica (classificar_ecologia) já reconhece
+    # como "Fungos" -- quando o usuário escolhe "Fungi" no formulário, roda
+    # contra os 6 juntos, igual ao grupo "protozoa" acima.
+    tags_fungos = [
+        "basidiomycota", "ascomycota", "mucoromycota",
+        "chytridiomycota", "zoopagomycota", "glomeromycota",
+    ]
+    bancos_fungos = [os.path.join(DIRETORIO_BLAST, b) for b in tags_fungos]
+    string_fungos_completo = " ".join(bancos_fungos)
+
+    # Mapeamento dinâmico EXCLUSIVO para agrupar as Minhocas: oligochaeta
+    # (minhocas propriamente ditas) + enchytraeidae (minhocas-brancas,
+    # parentes menores da mesma classe Clitellata) -- não existe opção
+    # separada de "Enchytraeidae" no formulário, então "Minhocas" cobre as duas.
+    tags_minhocas = ["oligochaeta", "enchytraeidae"]
+    bancos_minhocas = [os.path.join(DIRETORIO_BLAST, b) for b in tags_minhocas]
+    string_minhocas_completo = " ".join(bancos_minhocas)
+
     # Banco "eucariotos": igual ao refseqsoil completo, mas sem bacteria/
     # archaea. Ver comentário equivalente em main.py.
     tags_nao_eucariotos = {"bacteria", "archaea"}
@@ -444,12 +463,14 @@ def run_pipeline(req, req_id):
         return real if real is not None else VALORES_ANTIGOS_FALLBACK.get(grupo_taxid, 0)
 
     total_protozoa = sum(_contagem_real(g) for g in tags_protozoarios)
+    total_fungos = sum(_contagem_real(g) for g in tags_fungos)
+    total_minhocas = sum(_contagem_real(g) for g in tags_minhocas)
     total_refseqsoil = sum(_contagem_real(g) for g in bancos_locais_unicos)
     total_eucariotos = sum(_contagem_real(g) for g in bancos_eucariotos)
 
     # Dicionário: "nome_no_forms/issue": ("arquivo_fasta", "total_real_de_organismos")
     BANCOS_DISPONIVEIS = {
-        "fungi": ("fungi_all.fasta", 500000),  # legado: fora do NCBI Datasets, sem manifesto pra contar de verdade
+        "fungi": (string_fungos_completo, total_fungos),
         "protozoa": (string_protozoa_completo, total_protozoa),
         "eucariotos": (string_eucariotos_completo, total_eucariotos),
         "bacteria": (os.path.join(DIRETORIO_BLAST, "bacteria"), _contagem_real("bacteria")),
@@ -459,17 +480,24 @@ def run_pipeline(req, req_id):
         "rotifera": (os.path.join(DIRETORIO_BLAST, "rotifera"), _contagem_real("rotifera")),
         "acari": (os.path.join(DIRETORIO_BLAST, "acari"), _contagem_real("acari")),
         "collembola": (os.path.join(DIRETORIO_BLAST, "collembola"), _contagem_real("collembola")),
-        "minhocas": (os.path.join(DIRETORIO_BLAST, "oligochaeta"), _contagem_real("oligochaeta")),
+        "minhocas": (string_minhocas_completo, total_minhocas),
         "formigas": (os.path.join(DIRETORIO_BLAST, "formicidae"), _contagem_real("formicidae")),
         "isopodes": (os.path.join(DIRETORIO_BLAST, "isopoda"), _contagem_real("isopoda")),
         "miriapodes": (os.path.join(DIRETORIO_BLAST, "myriapoda"), _contagem_real("myriapoda")),
         "enchytraeidae": (os.path.join(DIRETORIO_BLAST, "enchytraeidae"), _contagem_real("enchytraeidae")),
         "isoptera": (os.path.join(DIRETORIO_BLAST, "isoptera"), _contagem_real("isoptera")),
+        "cupins": (os.path.join(DIRETORIO_BLAST, "isoptera"), _contagem_real("isoptera")),  # alias -- dropdown do Issue usa "Cupins", não "Isoptera"
         "platelmintos": (os.path.join(DIRETORIO_BLAST, "platyhelminthes"), _contagem_real("platyhelminthes")),
         "amoebozoa": (os.path.join(DIRETORIO_BLAST, "amoebozoa"), _contagem_real("amoebozoa")),
         "sar": (os.path.join(DIRETORIO_BLAST, "sar"), _contagem_real("sar")),
         "discoba": (os.path.join(DIRETORIO_BLAST, "discoba"), _contagem_real("discoba")),
         "metamonada": (os.path.join(DIRETORIO_BLAST, "metamonada"), _contagem_real("metamonada")),
+        "basidiomycota": (os.path.join(DIRETORIO_BLAST, "basidiomycota"), _contagem_real("basidiomycota")),
+        "ascomycota": (os.path.join(DIRETORIO_BLAST, "ascomycota"), _contagem_real("ascomycota")),
+        "mucoromycota": (os.path.join(DIRETORIO_BLAST, "mucoromycota"), _contagem_real("mucoromycota")),
+        "chytridiomycota": (os.path.join(DIRETORIO_BLAST, "chytridiomycota"), _contagem_real("chytridiomycota")),
+        "zoopagomycota": (os.path.join(DIRETORIO_BLAST, "zoopagomycota"), _contagem_real("zoopagomycota")),
+        "glomeromycota": (os.path.join(DIRETORIO_BLAST, "glomeromycota"), _contagem_real("glomeromycota")),
         "refseqsoil": (string_banco_completo, total_refseqsoil)
     }
 

@@ -104,6 +104,7 @@ body:
         - "Cupins"
         - "Isopodes"
         - "Miriapodes"
+        - "Platelmintos"
     validations:
       required: true
 
