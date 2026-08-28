@@ -17,8 +17,14 @@ for taxon in pastas_taxons:
     pasta_alvo = os.path.join(DIRETORIO_ORIGEM, taxon)
     base_out = os.path.join(DIRETORIO_BLAST, taxon)
     
-    # Verifica se o banco já foi criado
-    if os.path.exists(f"{base_out}.nsq"):
+    # Verifica se o banco já foi criado. Bancos grandes o suficiente viram
+    # MULTI-VOLUME (base_out.00.nsq, base_out.01.nsq, ...) em vez de um
+    # único base_out.nsq -- checar só ".nsq" não detecta esses, e o script
+    # tentaria reconstruir do zero a partir do data/refseq BRUTO (sem a
+    # curadoria de organismos fora de escopo já aplicada pelo
+    # curar_bancos.py), apagando essa curadoria sem aviso nenhum.
+    ja_existe = os.path.exists(f"{base_out}.nsq") or os.path.exists(f"{base_out}.00.nsq")
+    if ja_existe:
         print(f"✅ Banco de {taxon} já existe. Pulando...")
         continue
 
