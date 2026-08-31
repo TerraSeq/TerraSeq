@@ -150,8 +150,14 @@
         .search-box:focus { border-color: var(--secondary); outline: none; }
 
         /* Overlay do Relatório Completo */
-        #full-report-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 76, 117, 0.9); z-index: 9999; overflow-y: auto; padding: 40px 20px; }
-        .report-content { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; padding: 40px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.3);}
+        #full-report-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 76, 117, 0.9); z-index: 9999; overflow: hidden; padding: 40px 20px; }
+        /* O card tem altura limitada e vira um flex-column -- só a lista de
+           amplicons (a parte que cresce com o número de resultados) rola por
+           dentro dela mesma (ver #amplicons-list). Cabeçalho, botão de
+           fechar e resumo do organismo ficam sempre visíveis, sem precisar
+           rolar a página toda pra baixo a cada produto. */
+        .report-content { max-width: 900px; max-height: calc(100vh - 80px); margin: 0 auto; background: white; border-radius: 8px; padding: 40px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        #amplicons-list { overflow-y: auto; padding-right: 10px; flex: 1 1 auto; min-height: 0; }
         .close-report { position: absolute; top: 15px; right: 25px; font-size: 35px; cursor: pointer; color: #94a3b8; font-weight: bold; line-height: 1;}
         .close-report:hover { color: #ef4444; }
         
@@ -510,19 +516,19 @@
             if (!speciesData.amplicons || speciesData.amplicons.length === 0) {
                 list.innerHTML = "<p>Nenhum detalhe de amplicon encontrado no log do BLAST.</p>";
             } else {
+                // Accession de cada PRODUTO/amplicon é ${amp.acc} (a sequência
+                // específica onde aquele hit ocorreu) -- NÃO speciesData.info.acc
+                // (só a accession "representante" da espécie, sempre a mesma pra
+                // todos os produtos). Uma espécie pode ter matches em vários
+                // scaffolds/assemblies diferentes; mostrar sempre o mesmo
+                // accession escondia isso.
+                const especieAtual = currentSpecies;
                 speciesData.amplicons.forEach((amp, index) => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
-                    // Sequência fora do orçamento de tamanho do relatório: não existe
-                    // localmente pra baixar (só texto de aviso), então o botão fica
-                    // desabilitado em vez de baixar esse aviso como se fosse a sequência.
-                    const botaoDownload = amp.omitido
-                        ? `<button class="btn-download-fasta" disabled title="Sequência não incluída neste relatório (limite de tamanho do arquivo). Dados brutos preservados no servidor de processamento.">📥 Indisponível</button>`
-                        : `<button class="btn-download-fasta" onclick="downloadProductFasta('${speciesData.info.acc}', ${index+1}, '${amp.size}', '${amp.tm}', '${amp.seq}')">📥 Baixar FASTA</button>`;
                     card.innerHTML = `
                         <div class="product-header">
-                            <span>Produto #${index + 1} - ${speciesData.info.acc}</span>
-                            ${botaoDownload}
+                            <span>Produto #${index + 1} - ${amp.acc}</span>
                         </div>
                         <div class="product-body">
                             <div class="badge-row">
@@ -533,12 +539,25 @@
                             <div class="seq-box">${amp.seq}</div>
                         </div>
                     `;
+
+                    // Sequência fora do orçamento embutido no result.json: baixa sob
+                    // demanda de sequencias_completas.json (arquivo separado, só
+                    // buscado quando o botão é clicado -- não pesa o carregamento
+                    // inicial da página, e a página continua 100% estática).
+                    const btnDownload = document.createElement('button');
+                    btnDownload.className = 'btn-download-fasta';
+                    btnDownload.textContent = '📥 Baixar FASTA';
+                    btnDownload.onclick = amp.omitido
+                        ? () => downloadProductFastaOmitido(especieAtual, index, amp, btnDownload)
+                        : () => downloadProductFasta(amp.acc, index + 1, amp.size, amp.tm, amp.seq);
+                    card.querySelector('.product-header').appendChild(btnDownload);
+
                     list.appendChild(card);
                 });
             }
 
             document.getElementById('full-report-overlay').style.display = 'block';
-            document.body.style.overflow = 'hidden'; 
+            document.body.style.overflow = 'hidden';
         }
 
         function downloadProductFasta(acc, prodNum, size, tm, seq) {
@@ -549,6 +568,40 @@
             }
             let text = `>${acc}_amplicon_${prodNum} [organism=${currentSpecies}] [size=${size}bp] [tm=${tm}°C]\n${formattedSeq}`;
             triggerDownloadFasta(`${acc}_amp_${prodNum}.fasta`, text);
+        }
+
+        // sequencias_completas.json só existe se algum amplicon deste relatório
+        // ficou de fora do orçamento embutido no result.json -- carregado (e
+        // guardado em cache) só na primeira vez que um botão precisar dele.
+        let sequenciasCompletasCache = null;
+        async function carregarSequenciasCompletas() {
+            if (sequenciasCompletasCache !== null) return sequenciasCompletasCache;
+            try {
+                const resp = await fetch('sequencias_completas.json');
+                sequenciasCompletasCache = resp.ok ? await resp.json() : {};
+            } catch (err) {
+                console.error(err);
+                sequenciasCompletasCache = {};
+            }
+            return sequenciasCompletasCache;
+        }
+
+        async function downloadProductFastaOmitido(especie, index, amp, btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Buscando...';
+            btn.disabled = true;
+            try {
+                const dados = await carregarSequenciasCompletas();
+                const seq = dados[especie] ? dados[especie][index] : null;
+                if (!seq) {
+                    alert('Essa sequência não está disponível para download -- ficou fora até do orçamento do arquivo de sequências completas (caso raro, com um número extremo de resultados). Os dados brutos continuam preservados no servidor de processamento.');
+                    return;
+                }
+                downloadProductFasta(amp.acc, index + 1, amp.size, amp.tm, seq);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         function closeFullReport() {

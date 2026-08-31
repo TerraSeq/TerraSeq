@@ -581,15 +581,14 @@ def run_pipeline(req, req_id):
     soma_amplicon = 0
     bacterias_encontradas = set()
 
-    # Limite global (não por espécie) de caracteres de sequência de amplicon
-    # guardados no result.json. Sem isso, buscas com muitos hits geram um
-    # JSON gigante -- já aconteceu de passar dos 145MB, estourando o limite
-    # de 100MB por arquivo do GitHub e travando o push do relatório. O corte
-    # é só na sequência (o resto do hit -- acc/size/tm/start/end -- continua
-    # sendo salvo pra TODOS os hits, então nenhuma estatística é perdida, só
-    # deixa de ter a sequência completa pros hits além do orçamento).
+    # Ver comentário equivalente em main.py: sequências além do orçamento
+    # embutido no result.json vão pra um arquivo separado (sequencias_
+    # completas.json), com orçamento próprio maior, buscado sob demanda pelo
+    # botão "Baixar FASTA" -- em vez de simplesmente descartadas.
     ORCAMENTO_MAX_CARACTERES_SEQ = 15_000_000
+    ORCAMENTO_MAX_CARACTERES_SEQ_COMPLETA = 80_000_000
     caracteres_seq_acumulados = 0
+    caracteres_completa_acumulados = 0
 
     if os.path.exists(arquivo_pass):
         with open(arquivo_pass, mode='r', encoding='utf-8') as f:
@@ -616,13 +615,20 @@ def run_pipeline(req, req_id):
                         tm_real = valor
                         break
 
-                seq_amplicon = linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível'))
+                seq_original = linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível'))
                 seq_omitida = False
+                seq_completa_disponivel = False
+                seq_amplicon = seq_original
                 if caracteres_seq_acumulados < ORCAMENTO_MAX_CARACTERES_SEQ:
-                    caracteres_seq_acumulados += len(seq_amplicon)
+                    caracteres_seq_acumulados += len(seq_original)
                 else:
                     seq_omitida = True
-                    seq_amplicon = "Sequência não incluída neste relatório (limite de tamanho do arquivo atingido) — dados brutos preservados no servidor de processamento."
+                    if caracteres_completa_acumulados < ORCAMENTO_MAX_CARACTERES_SEQ_COMPLETA:
+                        caracteres_completa_acumulados += len(seq_original)
+                        seq_completa_disponivel = True
+                        seq_amplicon = "Sequência não exibida neste relatório (limite de tamanho do arquivo) — clique em \"Baixar FASTA\" para obtê-la."
+                    else:
+                        seq_amplicon = "Sequência não incluída neste relatório (limite de tamanho do arquivo atingido) — dados brutos preservados no servidor de processamento."
 
                 hits_data_map[sid].append({
                     "acc": acc_limpo,
@@ -631,7 +637,8 @@ def run_pipeline(req, req_id):
                     "start": extrair_campo_flexivel(linha, "start", "N/A"),
                     "end": extrair_campo_flexivel(linha, "end", "N/A"),
                     "seq": seq_amplicon,
-                    "omitido": seq_omitida
+                    "omitido": seq_omitida,
+                    "_seq_completa": seq_original if seq_completa_disponivel else None
                 })
 
     media_amplicon = (soma_amplicon / total_matches) if total_matches > 0 else 0
@@ -639,6 +646,13 @@ def run_pipeline(req, req_id):
     
     print("⚙️ Preparando montagem taxonômica...")
     arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
+
+    # Ver comentário equivalente em main.py.
+    sequencias_completas = {}
+    for especie, dados in meta_dict.items():
+        lista_seqs = [amp.pop("_seq_completa", None) for amp in dados["amplicons"]]
+        if any(s is not None for s in lista_seqs):
+            sequencias_completas[especie] = lista_seqs
 
     avisos = []
     # Cobertura = organismos ÚNICOS batidos (len(meta_dict), 1 por espécie)
@@ -692,6 +706,10 @@ def run_pipeline(req, req_id):
     with open(os.path.join(pasta_resultado, "result.json"), 'w', encoding='utf-8') as f:
         # Sem indent: ver comentário equivalente em main.py.
         json.dump(resultado_json, f, ensure_ascii=False, separators=(',', ':'))
+
+    if sequencias_completas:
+        with open(os.path.join(pasta_resultado, "sequencias_completas.json"), 'w', encoding='utf-8') as f:
+            json.dump(sequencias_completas, f, ensure_ascii=False, separators=(',', ':'))
 
     shutil.copy(os.path.join(raiz_projeto, "docs/template.html"), os.path.join(pasta_resultado, "index.html"))
     return f"docs/reports/{req_id}", resultado_json

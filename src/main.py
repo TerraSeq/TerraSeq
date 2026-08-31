@@ -624,14 +624,25 @@ def run_pipeline(req, req_id):
     bacterias_encontradas = set()
 
     # Limite global (não por espécie) de caracteres de sequência de amplicon
-    # guardados no result.json. Sem isso, buscas com muitos hits geram um
-    # JSON gigante -- já aconteceu de passar dos 145MB, estourando o limite
-    # de 100MB por arquivo do GitHub e travando o push do relatório. O corte
-    # é só na sequência (o resto do hit -- acc/size/tm/start/end -- continua
-    # sendo salvo pra TODOS os hits, então nenhuma estatística é perdida, só
-    # deixa de ter a sequência completa pros hits além do orçamento).
+    # guardados DIRETO no result.json. Sem isso, buscas com muitos hits geram
+    # um JSON gigante -- já aconteceu de passar dos 145MB, estourando o
+    # limite de 100MB por arquivo do GitHub e travando o push do relatório.
+    # O corte é só na sequência (o resto do hit -- acc/size/tm/start/end --
+    # continua sendo salvo pra TODOS os hits, então nenhuma estatística é
+    # perdida, só deixa de ter a sequência completa embutida na página).
+    #
+    # As sequências que ficam de fora do result.json NÃO são descartadas --
+    # vão pra um arquivo separado (sequencias_completas.json, ver mais
+    # abaixo) que o botão "Baixar FASTA" busca sob demanda só quando
+    # clicado, sem pesar o carregamento inicial da página. Esse arquivo tem
+    # orçamento próprio, bem maior (ainda seguro dentro do limite de 100MB
+    # do GitHub) -- cobre a esmagadora maioria dos casos reais. No raríssimo
+    # caso de estourar os DOIS orçamentos, a sequência realmente não fica
+    # disponível pra download (só no servidor de processamento).
     ORCAMENTO_MAX_CARACTERES_SEQ = 15_000_000
+    ORCAMENTO_MAX_CARACTERES_SEQ_COMPLETA = 80_000_000
     caracteres_seq_acumulados = 0
+    caracteres_completa_acumulados = 0
 
     if os.path.exists(arquivo_pass):
         with open(arquivo_pass, mode='r', encoding='utf-8') as f:
@@ -658,13 +669,20 @@ def run_pipeline(req, req_id):
                         tm_real = valor
                         break
 
-                seq_amplicon = linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível'))
+                seq_original = linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível'))
                 seq_omitida = False
+                seq_completa_disponivel = False
+                seq_amplicon = seq_original
                 if caracteres_seq_acumulados < ORCAMENTO_MAX_CARACTERES_SEQ:
-                    caracteres_seq_acumulados += len(seq_amplicon)
+                    caracteres_seq_acumulados += len(seq_original)
                 else:
                     seq_omitida = True
-                    seq_amplicon = "Sequência não incluída neste relatório (limite de tamanho do arquivo atingido) — dados brutos preservados no servidor de processamento."
+                    if caracteres_completa_acumulados < ORCAMENTO_MAX_CARACTERES_SEQ_COMPLETA:
+                        caracteres_completa_acumulados += len(seq_original)
+                        seq_completa_disponivel = True
+                        seq_amplicon = "Sequência não exibida neste relatório (limite de tamanho do arquivo) — clique em \"Baixar FASTA\" para obtê-la."
+                    else:
+                        seq_amplicon = "Sequência não incluída neste relatório (limite de tamanho do arquivo atingido) — dados brutos preservados no servidor de processamento."
 
                 hits_data_map[sid].append({
                     "acc": acc_limpo,
@@ -677,7 +695,11 @@ def run_pipeline(req, req_id):
                     # Flag explícita pro template.html decidir se oferece o
                     # botão de download -- sem isso, ele baixava esse texto
                     # de aviso formatado como se fosse a sequência real.
-                    "omitido": seq_omitida
+                    "omitido": seq_omitida,
+                    # Guardada só em memória -- extraída pro arquivo separado
+                    # sequencias_completas.json (e removida daqui) antes de
+                    # salvar o result.json, ver mais abaixo.
+                    "_seq_completa": seq_original if seq_completa_disponivel else None
                 })
 
     media_amplicon = (soma_amplicon / total_matches) if total_matches > 0 else 0
@@ -685,6 +707,19 @@ def run_pipeline(req, req_id):
     
     print("⚙️ Preparando montagem taxonômica...")
     arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map, total_sequencias_banco)
+
+    # Extrai as sequências completas (guardadas em "_seq_completa") pra um
+    # arquivo separado -- sequencias_completas.json -- que o botão "Baixar
+    # FASTA" do relatório busca sob demanda quando a sequência não coube no
+    # orçamento embutido no result.json. Isso permite baixar a sequência
+    # real (não um aviso) mesmo com a página sendo 100% estática, sem
+    # precisar de nenhum backend: o arquivo fica publicado no GitHub Pages
+    # igual ao result.json, só não é carregado até o usuário clicar.
+    sequencias_completas = {}
+    for especie, dados in meta_dict.items():
+        lista_seqs = [amp.pop("_seq_completa", None) for amp in dados["amplicons"]]
+        if any(s is not None for s in lista_seqs):
+            sequencias_completas[especie] = lista_seqs
 
     avisos = []
     # Cobertura = organismos ÚNICOS batidos (len(meta_dict), 1 por espécie)
@@ -746,6 +781,10 @@ def run_pipeline(req, req_id):
         # arquivo do GitHub (ver ORCAMENTO_MAX_CARACTERES_SEQ acima, que já
         # limita a maior parte do peso -- as sequências de amplicon).
         json.dump(resultado_json, f, ensure_ascii=False, separators=(',', ':'))
+
+    if sequencias_completas:
+        with open(os.path.join(pasta_resultado, "sequencias_completas.json"), 'w', encoding='utf-8') as f:
+            json.dump(sequencias_completas, f, ensure_ascii=False, separators=(',', ':'))
 
     shutil.copy(os.path.join(raiz_projeto, "docs/template.html"), os.path.join(pasta_resultado, "index.html"))
     return f"docs/reports/{req_id}", resultado_json
