@@ -225,7 +225,18 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map, total_seq
                 length_final = rec.get("GBSeq_length", "N/A")
                 time.sleep(0.4)  # só precisa respeitar o limite de taxa do NCBI no fallback
 
-            paths.append(linhagem)
+            # Peso = quantidade REAL de hits desse accession (pode ser >1 --
+            # ex: gene ribossomal multi-cópia com várias cópias no mesmo
+            # scaffold, cada uma gerando um hit/produto separado). "paths"
+            # tem 1 entrada por accession ÚNICA (pra não reclassificar a
+            # mesma sequência várias vezes, caro), mas a árvore precisa
+            # contar cada hit -- daí o peso, aplicado só na hora de montar
+            # a árvore mais abaixo. Sem isso, "Qtd. Matches" da árvore
+            # taxonômica ficava menor que a quantidade real de produtos
+            # (visível clicando na espécie), porque contava só 1 por
+            # accession visitada, não por hit.
+            peso = len(hits_data_map.get(subject_id, [])) or 1
+            paths.append((linhagem, peso))
 
             if especie not in meta_dict:
                 meta_dict[especie] = {
@@ -263,7 +274,8 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map, total_seq
             acc_desconhecido = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
             acc_desconhecido = acc_desconhecido.split('.')[0]
 
-            paths.append(["Unclassified", acc_desconhecido])
+            peso_desconhecido = len(hits_data_map.get(subject_id, [])) or 1
+            paths.append((["Unclassified", acc_desconhecido], peso_desconhecido))
 
             if acc_desconhecido not in meta_dict:
                 meta_dict[acc_desconhecido] = {
@@ -288,7 +300,7 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map, total_seq
     print(f"\n   ✅ Árvore construída com sucesso para {total_organismos} organismos!")
 
     root = {"name": "Root", "rank": "root", "matches": total_matches, "coverage": 1.0, "children": []}
-    for path in paths:
+    for path, peso in paths:
         current_node = root
         tamanho_path = len(path)
         for depth, taxa in enumerate(path):
@@ -297,10 +309,10 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map, total_seq
             for child in current_node["children"]:
                 if child["name"] == taxa: found_child = child; break
             if found_child:
-                found_child["matches"] += 1
+                found_child["matches"] += peso
                 current_node = found_child
             else:
-                new_node = {"name": taxa, "rank": rank_correto, "matches": 1, "coverage": 0.0, "children": []}
+                new_node = {"name": taxa, "rank": rank_correto, "matches": peso, "coverage": 0.0, "children": []}
                 current_node["children"].append(new_node)
                 current_node = new_node
 
@@ -759,7 +771,10 @@ def run_pipeline(req, req_id):
         },
         "summary": {
             "total_sequences_checked": total_sequencias_banco,
-            "total_matches": len(lista_bacterias),
+            # total_matches (contador de linhas do CSV) e não len(lista_bacterias)
+            # (accessions ÚNICAS) -- ver comentário em construir_arvore_aninhada
+            # sobre o mesmo tipo de subcontagem na árvore taxonômica.
+            "total_matches": total_matches,
             "unique_organisms": total_organismos_unicos,
             "estimated_coverage": round(cobertura_global, 5),
             "off_target_matches": 0,
