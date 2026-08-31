@@ -129,6 +129,23 @@ def taxid_por_accession(acc):
     return linha[0] if linha else None
 
 
+def descricao_e_tamanho_por_accession(acc):
+    """Busca (descricao, tamanho_genoma) de uma sequência no manifesto
+    local. Retorna (None, None) se não mapeada ou se o manifesto ainda é de
+    uma versão anterior (sem essas colunas) -- main.py cai pro texto padrão
+    "Descrição indisponível"/"N/A" nesse caso, igual antes."""
+    conexao = _conectar_manifesto()
+    if conexao is None:
+        return None, None
+    try:
+        linha = conexao.execute(
+            "SELECT descricao, genoma_tamanho FROM sequencias WHERE accession = ?", (acc,)
+        ).fetchone()
+    except sqlite3.OperationalError:
+        return None, None
+    return (linha[0], linha[1]) if linha else (None, None)
+
+
 def _carregar_contagem_organismos():
     global _contagem_organismos
     if _contagem_organismos is not None:

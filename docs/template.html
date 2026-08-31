@@ -111,6 +111,14 @@
 
         /* Card de Metadados da Espécie (Dentro da árvore) */
         .meta-card { display: none; background: #fffcf2; border: 1px solid #fde68a; border-radius: 6px; margin-top: 15px; padding: 20px; border-left: 4px solid var(--warning);}
+
+        /* Ilustração do grupo biológico (Atlas Global da Biodiversidade do
+           Solo) -- aparece ao clicar num Grande Grupo (ex: Minhocas) na
+           Classificação Funcional. Usa placeholder gerado localmente até as
+           imagens reais (com direitos de uso confirmados) serem adicionadas. */
+        .illustration-card { display: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; margin-top: 15px; padding: 15px; text-align: center; }
+        .illustration-card img { max-width: 100%; max-height: 220px; border-radius: 4px; display: block; margin: 0 auto; }
+        .illustration-caption { margin-top: 10px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
         .meta-header { display: flex; align-items: center; gap: 10px; color: var(--warning); font-weight: 700; font-size: 1.1em; border-bottom: 1px solid #fde68a; padding-bottom: 10px; margin-bottom: 12px;}
         .meta-row { display: grid; grid-template-columns: 100px 1fr; margin-bottom: 8px; font-size: 0.9rem; }
         .meta-label { color: var(--text-light); font-weight: 600; }
@@ -282,7 +290,12 @@
                         <div id="meta-content"></div>
                         <button class="btn-full" onclick="openFullReport()">Ver Relatório de Alinhamento</button>
                     </div>
-                    
+
+                    <div id="group-illustration-box" class="illustration-card">
+                        <img id="group-illustration-img" src="" alt="Ilustração do grupo">
+                        <div class="illustration-caption" id="group-illustration-caption"></div>
+                    </div>
+
                     <div class="chart-container">
                         <h3 id="chart-title" style="color: var(--primary); font-weight: 600; font-size: 1rem; text-align: center; margin-top: 0;">Composição</h3>
                         <div class="chart-canvas-wrap"><canvas id="dynamicChart"></canvas></div>
@@ -291,7 +304,7 @@
 
                 <div class="panel">
                     <h2 class="panel-title">Inventário de Cobertura</h2>
-                    <input type="text" id="search-taxa" class="search-box" placeholder="Filtrar organismo na tabela...">
+                    <input type="text" id="search-taxa" class="search-box" placeholder="Buscar genomas encontrados nesta análise...">
                     
                     <div class="table-container">
                         <table id="table-all-taxa">
@@ -349,7 +362,7 @@
         <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Universidade de Coimbra" class="footer-logo-item" title="Faculty of Sciences and Technology of the University of Coimbra">
         <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="CNPq" class="footer-logo-item" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="FAPES" class="footer-logo-item" title="Fundação de Amparo à Pesquisa e Inovação do Espírito Santo">
-        <img src="../../imagens/footer.png" alt="Logo 2" class="footer-logo-item" title="Logo 2">
+        <img src="../../imagens/footer.png" alt="TerraSeq" class="footer-logo-item" title="In silico primer optimization for Earth biodiversity assessment">
     </div>
 
     <footer>
@@ -389,11 +402,11 @@
             "Miriápodes": "🐍",
             "Insetos (Adultos e Larvas)": "🐞",
             "Aracnídeos (Aranhas e Escorpiões)": "🕷️",
-            "Platelmintos": "🪱",
+            "Platelmintos": "🎗️",
             "Protistas": "🔬",
             "Nematoides": "🪱",
             "Tardígrados": "🐻",
-            "Rotíferos": "🔬",
+            "Rotíferos": "🌀",
             "Fungos": "🍄",
             "Archaea": "🧫",
             "Bactérias": "🦠",
@@ -418,6 +431,29 @@
         function functionIcon(nome) { return FUNCTION_ICONS[nome] || "♻️"; }
         function groupIcon(nome) { return GROUP_ICONS[nome] || "📂"; }
         function sizeIcon(nome) { return SIZE_ICONS[nome] || "📏"; }
+
+        // Ilustrações reais dos grupos, extraídas do Atlas Global da
+        // Biodiversidade do Solo (direitos de uso em confirmação). Preencher
+        // aqui, ex: "Minhocas": "../../imagens/ilustracoes/minhocas.png" --
+        // enquanto uma chave estiver vazia/ausente, o placeholder abaixo
+        // (ícone + nome) é usado no lugar, sem quebrar o layout.
+        const GROUP_ILLUSTRATIONS = {};
+
+        function placeholderIllustration(nome, icone) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">
+                <rect width="100%" height="100%" fill="#eaf3fb"/>
+                <text x="50%" y="42%" font-size="64" text-anchor="middle" dominant-baseline="middle">${icone}</text>
+                <text x="50%" y="80%" font-size="15" fill="#0f4c75" text-anchor="middle" font-family="sans-serif">Ilustração em breve</text>
+            </svg>`;
+            return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+        }
+
+        function showGroupIllustration(nome) {
+            document.getElementById('species-card').style.display = 'none';
+            document.getElementById('group-illustration-img').src = GROUP_ILLUSTRATIONS[nome] || placeholderIllustration(nome, groupIcon(nome));
+            document.getElementById('group-illustration-caption').textContent = nome;
+            document.getElementById('group-illustration-box').style.display = 'block';
+        }
 
         function formatPercent(value) {
             let p = value * 100;
@@ -477,10 +513,16 @@
                 speciesData.amplicons.forEach((amp, index) => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
+                    // Sequência fora do orçamento de tamanho do relatório: não existe
+                    // localmente pra baixar (só texto de aviso), então o botão fica
+                    // desabilitado em vez de baixar esse aviso como se fosse a sequência.
+                    const botaoDownload = amp.omitido
+                        ? `<button class="btn-download-fasta" disabled title="Sequência não incluída neste relatório (limite de tamanho do arquivo). Dados brutos preservados no servidor de processamento.">📥 Indisponível</button>`
+                        : `<button class="btn-download-fasta" onclick="downloadProductFasta('${speciesData.info.acc}', ${index+1}, '${amp.size}', '${amp.tm}', '${amp.seq}')">📥 Baixar FASTA</button>`;
                     card.innerHTML = `
                         <div class="product-header">
                             <span>Produto #${index + 1} - ${speciesData.info.acc}</span>
-                            <button class="btn-download-fasta" onclick="downloadProductFasta('${speciesData.info.acc}', ${index+1}, '${amp.size}', '${amp.tm}', '${amp.seq}')">📥 Baixar FASTA</button>
+                            ${botaoDownload}
                         </div>
                         <div class="product-body">
                             <div class="badge-row">
@@ -522,6 +564,7 @@
             document.getElementById(val === 'via1' ? 'btn-via1' : 'btn-via2').classList.add('active');
 
             document.getElementById('species-card').style.display = 'none';
+            document.getElementById('group-illustration-box').style.display = 'none';
             document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Papéis Ecológicos` : `Grupos Biológicos`;
             renderFunctionalBrowser();
         }
@@ -533,8 +576,9 @@
             const browserTaxa = document.getElementById('silva-browser');
             const browserFunc = document.getElementById('functional-browser');
             const viewToggles = document.getElementById('func-view-toggles');
-            
+
             document.getElementById('species-card').style.display = 'none';
+            document.getElementById('group-illustration-box').style.display = 'none';
             
             if(type === 'taxa') {
                 btnTaxa.classList.add('active');
@@ -742,6 +786,7 @@
                      Array.from(ul2.children).forEach(c => c.classList.remove('active'));
                      li.classList.add('active');
                      document.getElementById('species-card').style.display = 'none';
+                     showGroupIllustration(grupo);
                 };
                 ul2.appendChild(li);
             });
@@ -769,6 +814,7 @@
                      Array.from(ul2.children).forEach(c => c.classList.remove('active'));
                      li.classList.add('active');
                      document.getElementById('species-card').style.display = 'none';
+                     showGroupIllustration(item.grupo);
                 };
                 ul2.appendChild(li);
             });
@@ -812,6 +858,7 @@
         }
 
         function showSpeciesCard(name) {
+            document.getElementById('group-illustration-box').style.display = 'none';
             currentSpecies = name;
             document.getElementById('meta-title').textContent = name;
             const info = leafMetadata[name].info;
@@ -932,15 +979,27 @@
             allTaxaList.forEach(taxon => {
                 let icon = taxon.isLeaf ? '<span style="color:var(--warning); margin-right:5px;">🦠</span>' : '';
                 let isBold = taxon.depth <= 2 ? 'font-weight: 700; color: var(--primary);' : 'font-weight: 500;';
-                        
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="${isBold}">${icon}${taxon.name}</td>
-                        <td style="color: var(--text-light); font-size: 0.85em;">Nível ${taxon.depth}</td>
-                        <td style="font-weight: 600;">${taxon.matches}</td>
-                        <td style="font-weight: 600;"><span style="color:var(--success); background: #d1fae5; padding: 2px 8px; border-radius: 4px;">${formatPercent(taxon.matches / globalTotal)}</span></td>
-                    </tr>
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="${isBold}">${icon}${taxon.name}</td>
+                    <td style="color: var(--text-light); font-size: 0.85em;">Nível ${taxon.depth}</td>
+                    <td style="font-weight: 600;">${taxon.matches}</td>
+                    <td style="font-weight: 600;"><span style="color:var(--success); background: #d1fae5; padding: 2px 8px; border-radius: 4px;">${formatPercent(taxon.matches / globalTotal)}</span></td>
                 `;
+                // Só espécies (folhas da árvore) têm metadados (accession, descrição,
+                // amplicons) pra abrir o card -- níveis taxonômicos mais altos
+                // (filo, classe, etc.) não têm um genoma único associado.
+                if (taxon.isLeaf && leafMetadata[taxon.name]) {
+                    tr.style.cursor = 'pointer';
+                    tr.title = 'Clique para ver os detalhes deste genoma';
+                    tr.onclick = () => {
+                        switchTree('taxa');
+                        showSpeciesCard(taxon.name);
+                        document.getElementById('species-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    };
+                }
+                tbody.appendChild(tr);
             });
 
             renderBrowser(); 

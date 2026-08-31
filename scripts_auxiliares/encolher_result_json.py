@@ -11,7 +11,7 @@ import os
 # Uso: python3 scripts_auxiliares/encolher_result_json.py <caminho_result.json>
 
 ORCAMENTO_MAX_CARACTERES_SEQ = 15_000_000
-MENSAGEM_OMITIDA = "Sequência omitida (limite de tamanho do relatório atingido) — dados brutos disponíveis no servidor."
+MENSAGEM_OMITIDA = "Sequência não incluída neste relatório (limite de tamanho do arquivo atingido) — dados brutos preservados no servidor de processamento."
 
 
 def encolher(caminho):
@@ -29,8 +29,9 @@ def encolher(caminho):
             total_sequencias += 1
             if caracteres_acumulados < ORCAMENTO_MAX_CARACTERES_SEQ:
                 caracteres_acumulados += len(seq)
-            elif seq != MENSAGEM_OMITIDA:
+            elif not amplicon.get("omitido"):
                 amplicon["seq"] = MENSAGEM_OMITIDA
+                amplicon["omitido"] = True
                 total_omitidas += 1
 
     with open(caminho, "w", encoding="utf-8") as f:

@@ -178,8 +178,9 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
                     linhagem.pop(0)
                 especie = linhagem[-1]
                 acc_final = acc
-                desc_final = "Descrição indisponível"
-                length_final = "N/A"
+                desc_local, tamanho_local = taxonomia_local.descricao_e_tamanho_por_accession(acc)
+                desc_final = desc_local or "Descrição indisponível"
+                length_final = tamanho_local if tamanho_local is not None else "N/A"
             else:
                 handle = Entrez.efetch(db="nucleotide", id=acc, retmode="xml")
                 records = Entrez.read(handle)
@@ -224,7 +225,33 @@ def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map):
                 meta_dict[especie]["amplicons"].extend(hits_data_map[subject_id])
 
         except Exception:
-            paths.append(["Unclassified"])
+            # Ver comentário equivalente em main.py: agora vira um ramo
+            # "Unclassified" > accession clicável, em vez de um nó sem filhos.
+            partes = subject_id.split('|')
+            acc_desconhecido = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
+            acc_desconhecido = acc_desconhecido.split('.')[0]
+
+            paths.append(["Unclassified", acc_desconhecido])
+
+            if acc_desconhecido not in meta_dict:
+                meta_dict[acc_desconhecido] = {
+                    "info": {
+                        "acc": acc_desconhecido,
+                        "desc": "Organismo não classificado — falha na resolução taxonômica (local e via NCBI).",
+                        "length": "N/A"
+                    },
+                    "amplicons": []
+                }
+            if subject_id in hits_data_map:
+                meta_dict[acc_desconhecido]["amplicons"].extend(hits_data_map[subject_id])
+
+            if "Não Classificado" not in functional_roles["Função Indefinida"]:
+                functional_roles["Função Indefinida"]["Não Classificado"] = {"tamanho": "Indefinido", "especies": []}
+            functional_roles["Função Indefinida"]["Não Classificado"]["especies"].append({
+                "especie": acc_desconhecido,
+                "id": acc_desconhecido,
+                "matches": len(hits_data_map.get(subject_id, []))
+            })
 
     print(f"\n   ✅ Árvore construída com sucesso para {total_organismos} organismos!")
 
@@ -590,10 +617,12 @@ def run_pipeline(req, req_id):
                         break
 
                 seq_amplicon = linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível'))
+                seq_omitida = False
                 if caracteres_seq_acumulados < ORCAMENTO_MAX_CARACTERES_SEQ:
                     caracteres_seq_acumulados += len(seq_amplicon)
                 else:
-                    seq_amplicon = "Sequência omitida (limite de tamanho do relatório atingido) — dados brutos disponíveis no servidor."
+                    seq_omitida = True
+                    seq_amplicon = "Sequência não incluída neste relatório (limite de tamanho do arquivo atingido) — dados brutos preservados no servidor de processamento."
 
                 hits_data_map[sid].append({
                     "acc": acc_limpo,
@@ -601,7 +630,8 @@ def run_pipeline(req, req_id):
                     "tm": tm_real,
                     "start": extrair_campo_flexivel(linha, "start", "N/A"),
                     "end": extrair_campo_flexivel(linha, "end", "N/A"),
-                    "seq": seq_amplicon
+                    "seq": seq_amplicon,
+                    "omitido": seq_omitida
                 })
 
     media_amplicon = (soma_amplicon / total_matches) if total_matches > 0 else 0

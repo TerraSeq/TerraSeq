@@ -8,8 +8,8 @@ DIRETORIO_MANIFESTOS = "/home/othin/Documents/tiago/Projeto_completo/pipeline_ge
 CAMINHO_DB = os.path.join(DIRETORIO_MANIFESTOS, "taxid.sqlite")
 CAMINHO_CONTAGEM = os.path.join(DIRETORIO_MANIFESTOS, "contagem_organismos.json")
 
-# Gera um manifesto SQLite (accession_sequencia -> taxId) 100% local, sem
-# consultar o NCBI pela rede.
+# Gera um manifesto SQLite (accession_sequencia -> taxId, descricao, tamanho
+# do genoma) 100% local, sem consultar o NCBI pela rede.
 #
 # Por que SQLite e nao um TSV lido pra um dict Python (como na primeira
 # versao deste script): os bancos combinados de solo passam de 90 milhoes
@@ -20,24 +20,32 @@ CAMINHO_CONTAGEM = os.path.join(DIRETORIO_MANIFESTOS, "contagem_organismos.json"
 # memoria desprezivel e busca praticamente instantanea mesmo com dezenas de
 # milhoes de linhas.
 #
-# Tambem NAO guardamos o nome do organismo/descricao aqui (so o taxId) --
-# isso e redundante: taxonomia_local.linhagem_por_taxid() ja devolve o nome
-# do organismo (ultimo elemento da linhagem) a partir do taxId, usando a
-# base de taxonomia do NCBI que fica carregada em memoria (essa sim cabe
-# tranquilamente, sao so uns 2-3 milhoes de taxons no total, nao centenas
-# de milhoes de sequencias).
+# O nome do organismo continua vindo de taxonomia_local.linhagem_por_taxid()
+# (ultimo elemento da linhagem), nao daqui -- isso seria redundante.
+#
+# JA a DESCRICAO (texto do cabecalho FASTA apos o accession) e o TAMANHO DO
+# GENOMA (soma de todas as sequencias do assembly, "assemblyStats.
+# totalSequenceLength" do assembly_data_report.jsonl) SAO guardados aqui --
+# antes, so vinham do Entrez.efetch (rede), entao qualquer sequencia
+# resolvida pelo caminho local (a maioria, hoje) ficava com "Descricao
+# indisponivel" / "N/A bp" na pagina do relatorio, mesmo a informacao
+# existindo localmente. "Tamanho Genoma" aqui e o tamanho do ASSEMBLY
+# inteiro (mais correto cientificamente do que o tamanho de só uma
+# sequencia/scaffold, que e o que o Entrez.GBSeq_length retornava antes).
 #
 # O NCBI Datasets ja salva, junto de cada genoma baixado, um
-# assembly_data_report.jsonl com o taxId do organismo (nivel GENOMA). Cada
-# genoma tem varias sequencias/scaffolds dentro dele (nivel SEQUENCIA, que e
-# o que aparece como "sseqid" nos hits do BLAST) -- entao cruzamos os dois:
-# lemos o taxId de cada genoma (pasta ncbi_dataset/data/<accession_genoma>/)
-# e aplicamos esse mesmo taxId a todas as sequencias dentro da pasta dele.
+# assembly_data_report.jsonl com o taxId do organismo e o tamanho total do
+# assembly (nivel GENOMA). Cada genoma tem varias sequencias/scaffolds
+# dentro dele (nivel SEQUENCIA, que e o que aparece como "sseqid" nos hits
+# do BLAST) -- entao cruzamos os dois: lemos o taxId e tamanho de cada
+# genoma (pasta ncbi_dataset/data/<accession_genoma>/) e aplicamos aos
+# cabecalhos das sequencias dentro da pasta dele.
 
 TAMANHO_LOTE = 20_000
 
 
-def _carregar_taxid_por_genoma(pasta_taxon):
+def _carregar_info_por_genoma(pasta_taxon):
+    """Retorna {accession_genoma: (taxid, tamanho_genoma)}."""
     caminho_relatorio = os.path.join(pasta_taxon, "ncbi_dataset", "data", "assembly_data_report.jsonl")
     mapa = {}
     if not os.path.exists(caminho_relatorio):
@@ -50,15 +58,16 @@ def _carregar_taxid_por_genoma(pasta_taxon):
             dados = json.loads(linha)
             acc_genoma = dados.get("accession", "")
             taxid = dados.get("organism", {}).get("taxId")
+            tamanho = dados.get("assemblyStats", {}).get("totalSequenceLength")
             if acc_genoma and taxid:
-                mapa[acc_genoma] = str(taxid)
+                mapa[acc_genoma] = (str(taxid), tamanho)
     return mapa
 
 
 def gerar_manifesto_taxid(taxon, conexao):
     pasta_taxon = os.path.join(DIRETORIO_ORIGEM, taxon)
-    taxid_por_genoma = _carregar_taxid_por_genoma(pasta_taxon)
-    if not taxid_por_genoma:
+    info_por_genoma = _carregar_info_por_genoma(pasta_taxon)
+    if not info_por_genoma:
         print(f"  ⚠️ Nenhum assembly_data_report.jsonl encontrado/válido para {taxon}, pulando.")
         return 0
 
@@ -66,7 +75,7 @@ def gerar_manifesto_taxid(taxon, conexao):
     total_sequencias = 0
     lote = []
 
-    for acc_genoma, taxid in taxid_por_genoma.items():
+    for acc_genoma, (taxid, tamanho_genoma) in info_por_genoma.items():
         pasta_genoma = os.path.join(pasta_dados, acc_genoma)
         arquivos_fna = glob.glob(os.path.join(pasta_genoma, "*.fna"))
         for fna in arquivos_fna:
@@ -74,32 +83,42 @@ def gerar_manifesto_taxid(taxon, conexao):
                 for linha in f:
                     if linha.startswith(">"):
                         resto = linha[1:].strip()
+                        partes = resto.split(" ", 1)
                         # Mesma normalizacao que main.py usa antes de
                         # consultar (remove a versao ".1" do accession),
                         # pra bater exatamente com a chave de busca.
-                        acc_sequencia = resto.split(" ")[0].split(".")[0]
-                        lote.append((acc_sequencia, taxid))
+                        acc_sequencia = partes[0].split(".")[0]
+                        descricao = partes[1] if len(partes) > 1 else ""
+                        lote.append((acc_sequencia, taxid, descricao, tamanho_genoma))
                         total_sequencias += 1
                         if len(lote) >= TAMANHO_LOTE:
-                            conexao.executemany("INSERT OR REPLACE INTO sequencias VALUES (?, ?)", lote)
+                            conexao.executemany(
+                                "INSERT OR REPLACE INTO sequencias VALUES (?, ?, ?, ?)", lote
+                            )
                             lote = []
 
     if lote:
-        conexao.executemany("INSERT OR REPLACE INTO sequencias VALUES (?, ?)", lote)
+        conexao.executemany("INSERT OR REPLACE INTO sequencias VALUES (?, ?, ?, ?)", lote)
     conexao.commit()
 
-    print(f"  -> {taxon}: {total_sequencias} sequência(s) mapeada(s) de {len(taxid_por_genoma)} genoma(s)")
-    return len(taxid_por_genoma)
+    print(f"  -> {taxon}: {total_sequencias} sequência(s) mapeada(s) de {len(info_por_genoma)} genoma(s)")
+    return len(info_por_genoma)
 
 
 if __name__ == "__main__":
-    print("Gerando manifesto de taxId (accession -> taxId), 100% local, em SQLite.\n")
+    print("Gerando manifesto (accession -> taxId, descrição, tamanho do genoma), 100% local, em SQLite.\n")
     os.makedirs(DIRETORIO_MANIFESTOS, exist_ok=True)
 
     # Manifestos antigos em TSV (de uma versão anterior deste script) não são
     # mais usados -- o manifesto agora é só o banco SQLite abaixo.
     for tsv_antigo in glob.glob(os.path.join(DIRETORIO_MANIFESTOS, "*_taxid.tsv")):
         os.remove(tsv_antigo)
+
+    # Banco 100% derivado/regenerável -- recriar do zero a cada rodada evita
+    # ficar com schema antigo (versão anterior deste script só tinha as
+    # colunas accession/taxid) misturado com o novo.
+    if os.path.exists(CAMINHO_DB):
+        os.remove(CAMINHO_DB)
 
     conexao = sqlite3.connect(CAMINHO_DB)
     # synchronous=OFF e journal_mode=MEMORY aceleram MUITO a carga em lote
@@ -108,7 +127,11 @@ if __name__ == "__main__":
     # da geração, basta rodar o script de novo.
     conexao.execute("PRAGMA synchronous = OFF")
     conexao.execute("PRAGMA journal_mode = MEMORY")
-    conexao.execute("CREATE TABLE IF NOT EXISTS sequencias (accession TEXT PRIMARY KEY, taxid TEXT NOT NULL)")
+    conexao.execute(
+        "CREATE TABLE IF NOT EXISTS sequencias ("
+        "accession TEXT PRIMARY KEY, taxid TEXT NOT NULL, "
+        "descricao TEXT, genoma_tamanho INTEGER)"
+    )
 
     grupos = [f.name for f in os.scandir(DIRETORIO_ORIGEM) if f.is_dir()]
     contagem_por_grupo = {}
