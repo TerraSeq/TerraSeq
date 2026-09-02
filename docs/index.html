@@ -552,7 +552,7 @@
 
     <nav>
         <a href="#inicio" style="display:flex; align-items:center; text-decoration:none;">
-            <img src="imagens/Logo2.png" alt="TerraSeq" style="max-height: 100px; width:auto; display:block; filter: brightness(1.05);">
+            <img src="imagens/Logo2.png" alt="TerraSeq" title="In silico primer optimization for Earth biodiversity assessment" style="max-height: 100px; width:auto; display:block; filter: brightness(1.05);">
         </a>
         <ul>
             <li><a href="#inicio">Início</a></li>
@@ -2426,6 +2426,50 @@
                 setupPagination();
             }
 
+            // --- Ajusta cada coluna pra largura que cabe o texto numa linha só ---
+            // Força "não quebrar linha" temporariamente em cabeçalho e células
+            // (só assim dá pra medir a largura "sem quebra" de verdade -- só
+            // trocar pra table-layout:auto não é suficiente, o navegador ainda
+            // prefere quebrar linha em vez de esticar a tabela), mede a largura
+            // que cada coluna precisaria, trava esses valores em px no colgroup
+            // e volta pro table-layout:fixed -- assim já nasce "esticada" e o
+            // usuário ainda pode encolher arrastando (resize já existente).
+            function autoAjustarLargurasColunas() {
+                const table = document.querySelector(".results-table");
+                if (!table) return;
+                const cols = table.querySelectorAll("colgroup col");
+                const ths = table.querySelectorAll("thead th");
+                const celulas = table.querySelectorAll("tbody td");
+
+                const layoutOriginalTabela = table.style.tableLayout;
+                const minLarguraOriginal = table.style.minWidth;
+
+                table.style.tableLayout = "auto";
+                table.style.width = "auto";
+                table.style.minWidth = "0";
+                cols.forEach(c => { c.style.width = ""; });
+                ths.forEach(th => { th.style.whiteSpace = "nowrap"; });
+                celulas.forEach(td => { td.style.whiteSpace = "nowrap"; });
+
+                void table.offsetWidth; // força recálculo de layout
+
+                ths.forEach((th, i) => {
+                    if (!cols[i]) return;
+                    const largura = Math.ceil(th.getBoundingClientRect().width) + 6;
+                    cols[i].style.width = largura + "px";
+                });
+
+                ths.forEach(th => { th.style.whiteSpace = ""; });
+                celulas.forEach(td => { td.style.whiteSpace = ""; });
+
+                let total = 0;
+                cols.forEach(c => total += parseFloat(c.style.width) || 0);
+
+                table.style.tableLayout = layoutOriginalTabela || "fixed";
+                table.style.width = total + "px";
+                table.style.minWidth = minLarguraOriginal || "";
+            }
+
             // --- Ordenação por clique no cabeçalho ---
             document.querySelectorAll(".results-table th.sortable").forEach(th => {
                 th.addEventListener("click", function(e) {
@@ -2456,6 +2500,7 @@
                 // Rankeia inicialmente pelos maiores amplicons
                 sortRows(sortKey, "number");
                 updateSortHeadersUI();
+                autoAjustarLargurasColunas();
                 aplicarFiltro();
             }
 
