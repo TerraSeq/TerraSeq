@@ -36,10 +36,28 @@
         .btn-primary:hover { background-color: var(--primary-color); }
         .btn-outline { border: 2px solid var(--secondary-color); color: var(--secondary-color); }
         .btn-outline:hover { background-color: var(--secondary-color); color: white; }
-        .results-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 20px; }
-        .results-table th, .results-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        .results-table th { background-color: var(--primary-color); color: white; font-weight: 600; }
+        .results-table { width: 100%; min-width: 1220px; table-layout: fixed; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 20px; }
+        .results-table th, .results-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; overflow-wrap: break-word; }
+        .results-table th { background-color: var(--primary-color); color: white; font-weight: 600; position: relative; }
         .results-table tr:hover { background-color: #f1f7fa; }
+
+        /* Alça de redimensionar coluna (arrasta a borda direita do th) */
+        .col-resizer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 100%;
+            cursor: col-resize;
+            user-select: none;
+            touch-action: none;
+        }
+        .col-resizer:hover, .col-resizer.resizing {
+            background: rgba(255,255,255,0.35);
+        }
+        .results-table th.resizing-active {
+            cursor: col-resize;
+        }
         .status-badge { background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
         footer { background: #222; color: #aaa; text-align: center; padding: 30px 20px; margin-top: 40px; font-size: 0.9em; }
         
@@ -290,6 +308,51 @@
             font-weight: 500;
         }
 
+        /* Barra de filtros da tabela de resultados */
+        .filter-toolbar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .filter-search {
+            flex: 1 1 260px;
+            padding: 9px 14px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 0.95rem;
+        }
+        .filter-select {
+            padding: 9px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background: white;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .filter-clear-btn {
+            padding: 9px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--accent-color);
+            background: white;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .filter-clear-btn:hover {
+            background: #f1f7fa;
+        }
+        .filter-result-count {
+            width: 100%;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
         /* Barra de ferramentas da tabela (Resultados por página) */
         .table-toolbar {
             display: flex;
@@ -318,7 +381,6 @@
         .results-table th.sortable {
             cursor: pointer;
             user-select: none;
-            white-space: nowrap;
         }
         .results-table th.sortable:hover {
             background-color: var(--secondary-color);
@@ -495,6 +557,7 @@
         <ul>
             <li><a href="#inicio">Início</a></li>
             <li><a href="#submeter">Testar Primer</a></li>
+            <li><a href="#acervo-genomas">Acervo de Genomas</a></li>
             <li><a href="#resultados">Resultados</a></li>
             <li><a href="#sobre">Equipe & Sobre</a></li>
         </ul>
@@ -557,6 +620,18 @@
             <p>Histórico de análises já processadas e validadas pelo pipeline contra nossos bancos de genomas de referência.</p>
         </div>
 
+        <div class="filter-toolbar">
+            <input type="text" id="filter-search" class="filter-search" placeholder="Buscar por ID, nome do primer, alvo ou sequência...">
+            <select id="filter-banco" class="filter-select">
+                <option value="">Todos os bancos</option>
+            </select>
+            <select id="filter-alvo" class="filter-select">
+                <option value="">Todos os alvos</option>
+            </select>
+            <button type="button" id="filter-clear-btn" class="filter-clear-btn">Limpar filtros</button>
+            <span class="filter-result-count" id="filter-result-count"></span>
+        </div>
+
         <div class="table-toolbar">
             <label for="page-size-select" class="page-size-label">Resultados por página:</label>
             <select id="page-size-select" class="page-size-select">
@@ -570,16 +645,27 @@
 
         <div style="overflow-x: auto;">
             <table class="results-table">
+                <colgroup>
+                    <col style="width:150px">
+                    <col style="width:190px">
+                    <col style="width:110px">
+                    <col style="width:110px">
+                    <col style="width:260px">
+                    <col style="width:110px">
+                    <col style="width:80px">
+                    <col style="width:80px">
+                    <col style="width:130px">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th class="sortable" data-sort-key="id" data-sort-type="text">ID da Requisição<span class="sort-arrow"></span></th>
-                        <th class="sortable" data-sort-key="primername" data-sort-type="text">Nome do Par de Primers<span class="sort-arrow"></span></th>
-                        <th class="sortable" data-sort-key="alvo" data-sort-type="text">Alvo<span class="sort-arrow"></span></th>
-                        <th class="sortable" data-sort-key="banco" data-sort-type="text">Banco<span class="sort-arrow"></span></th>
-                        <th>Primers (5'→3')</th>
-                        <th class="sortable" data-sort-key="amplicon" data-sort-type="number">Tamanho do Amplicon<span class="sort-arrow"></span></th>
-                        <th class="sortable" data-sort-key="date" data-sort-type="text">Data<span class="sort-arrow"></span></th>
-                        <th>Status</th>
+                        <th class="sortable" data-sort-key="id" data-sort-type="text">ID da Requisição<span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="primername" data-sort-type="text">Nome do Par de Primers<span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="alvo" data-sort-type="text">Alvo<span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="banco" data-sort-type="text">Banco<span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th>Primers (5'→3')<span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="amplicon" data-sort-type="number">Tamanho do Amplicon<span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="date" data-sort-type="text">Data<span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th>Status<span class="col-resizer"></span></th>
                         <th>Ação</th>
                     </tr>
                 </thead>
@@ -2151,8 +2237,15 @@
             if (!tableBody) return;
 
             let rows = Array.from(tableBody.querySelectorAll("tr"));
+            let filteredRows = rows.slice();
 
             const pageSizeSelect = document.getElementById("page-size-select");
+            const searchInput = document.getElementById("filter-search");
+            const bancoSelect = document.getElementById("filter-banco");
+            const alvoSelect = document.getElementById("filter-alvo");
+            const clearBtn = document.getElementById("filter-clear-btn");
+            const resultCount = document.getElementById("filter-result-count");
+
             let rowsPerPage = 10;
             let currentPage = 1;
             let sortKey = "amplicon";
@@ -2194,13 +2287,69 @@
                 });
             }
 
+            // --- Popula os selects de filtro (Banco / Alvo) com os valores presentes na tabela ---
+            function popularSelect(select, colIndex) {
+                const valores = new Set();
+                rows.forEach(row => {
+                    const cell = row.children[colIndex];
+                    const texto = cell ? cell.textContent.trim() : "";
+                    if (texto) valores.add(texto);
+                });
+                Array.from(valores).sort((a, b) => a.localeCompare(b, 'pt-BR')).forEach(valor => {
+                    const opt = document.createElement("option");
+                    opt.value = valor;
+                    opt.textContent = valor;
+                    select.appendChild(opt);
+                });
+            }
+            if (bancoSelect) popularSelect(bancoSelect, COLUMN_INDEX.banco);
+            if (alvoSelect) popularSelect(alvoSelect, COLUMN_INDEX.alvo);
+
+            // --- Filtro: busca livre (ID, nome, alvo, banco, sequência) + banco + alvo ---
+            function aplicarFiltro() {
+                const termo = ((searchInput && searchInput.value) || "").trim().toLowerCase();
+                const banco = bancoSelect ? bancoSelect.value : "";
+                const alvo = alvoSelect ? alvoSelect.value : "";
+
+                filteredRows = rows.filter(row => {
+                    if (banco && row.children[COLUMN_INDEX.banco].textContent.trim() !== banco) return false;
+                    if (alvo && row.children[COLUMN_INDEX.alvo].textContent.trim() !== alvo) return false;
+                    if (termo && !row.textContent.toLowerCase().includes(termo)) return false;
+                    return true;
+                });
+
+                rows.forEach(row => {
+                    if (!filteredRows.includes(row)) row.style.display = "none";
+                });
+
+                if (resultCount) {
+                    resultCount.textContent = filteredRows.length === rows.length
+                        ? `${rows.length} resultado(s)`
+                        : `${filteredRows.length} de ${rows.length} resultado(s)`;
+                }
+
+                currentPage = 1;
+                displayRows(currentPage);
+                setupPagination();
+            }
+
+            if (searchInput) searchInput.addEventListener("input", aplicarFiltro);
+            if (bancoSelect) bancoSelect.addEventListener("change", aplicarFiltro);
+            if (alvoSelect) alvoSelect.addEventListener("change", aplicarFiltro);
+            if (clearBtn) clearBtn.addEventListener("click", function() {
+                if (searchInput) searchInput.value = "";
+                if (bancoSelect) bancoSelect.value = "";
+                if (alvoSelect) alvoSelect.value = "";
+                aplicarFiltro();
+            });
+
             function displayRows(page) {
-                const total = rows.length;
+                const total = filteredRows.length;
                 const perPage = rowsPerPage === "all" ? total : rowsPerPage;
                 const start = (page - 1) * perPage;
                 const end = start + perPage;
 
-                rows.forEach((row, index) => {
+                filteredRows.forEach((row, index) => {
                     row.style.display = index >= start && index < end ? "" : "none";
                 });
             }
@@ -2209,7 +2358,7 @@
                 const infoText = document.getElementById("page-info-text");
                 if (!infoText) return;
 
-                const total = rows.length;
+                const total = filteredRows.length;
                 const perPage = rowsPerPage === "all" ? total : rowsPerPage;
                 const start = total === 0 ? 0 : (currentPage - 1) * perPage + 1;
                 const end = Math.min(currentPage * perPage, total);
@@ -2225,8 +2374,8 @@
             }
 
             function getTotalPages() {
-                const perPage = rowsPerPage === "all" ? rows.length : rowsPerPage;
-                return Math.max(1, Math.ceil(rows.length / perPage));
+                const perPage = rowsPerPage === "all" ? filteredRows.length : rowsPerPage;
+                return Math.max(1, Math.ceil(filteredRows.length / perPage));
             }
 
             function setupPagination() {
@@ -2279,7 +2428,8 @@
 
             // --- Ordenação por clique no cabeçalho ---
             document.querySelectorAll(".results-table th.sortable").forEach(th => {
-                th.addEventListener("click", function() {
+                th.addEventListener("click", function(e) {
+                    if (e.target.classList.contains("col-resizer")) return;
                     const key = th.dataset.sortKey;
                     const type = th.dataset.sortType;
                     if (sortKey === key) {
@@ -2290,7 +2440,7 @@
                     }
                     sortRows(sortKey, type);
                     updateSortHeadersUI();
-                    refreshTable();
+                    aplicarFiltro();
                 });
             });
 
@@ -2306,9 +2456,58 @@
                 // Rankeia inicialmente pelos maiores amplicons
                 sortRows(sortKey, "number");
                 updateSortHeadersUI();
-                displayRows(currentPage);
-                setupPagination();
+                aplicarFiltro();
             }
+
+            // --- Redimensionar colunas por arraste (a largura muda e o texto reflui/quebra junto) ---
+            (function setupColumnResize() {
+                const table = document.querySelector(".results-table");
+                if (!table) return;
+                const cols = table.querySelectorAll("colgroup col");
+                const ths = table.querySelectorAll("thead th");
+                let resizing = null;
+
+                function travarLargurasEmPixel() {
+                    let total = 0;
+                    ths.forEach((th, i) => {
+                        const w = th.getBoundingClientRect().width;
+                        total += w;
+                        if (cols[i]) cols[i].style.width = w + "px";
+                    });
+                    table.style.width = total + "px";
+                }
+
+                ths.forEach((th, i) => {
+                    const resizer = th.querySelector(".col-resizer");
+                    if (!resizer || !cols[i]) return;
+                    resizer.addEventListener("mousedown", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        travarLargurasEmPixel();
+                        resizing = { col: cols[i], startX: e.clientX, startWidth: parseFloat(cols[i].style.width) };
+                        resizer.classList.add("resizing");
+                        document.body.style.cursor = "col-resize";
+                    });
+                });
+
+                document.addEventListener("mousemove", function(e) {
+                    if (!resizing) return;
+                    const delta = e.clientX - resizing.startX;
+                    const newWidth = Math.max(50, resizing.startWidth + delta);
+                    resizing.col.style.width = newWidth + "px";
+                    let total = 0;
+                    cols.forEach(c => total += parseFloat(c.style.width) || 0);
+                    table.style.width = total + "px";
+                });
+
+                document.addEventListener("mouseup", function() {
+                    if (resizing) {
+                        document.querySelectorAll(".col-resizer.resizing").forEach(r => r.classList.remove("resizing"));
+                        resizing = null;
+                        document.body.style.cursor = "";
+                    }
+                });
+            })();
         });
 
         // ---- Acervo de Genomas: carrossel de bancos + busca de organismos ----
