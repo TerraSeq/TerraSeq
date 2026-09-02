@@ -355,6 +355,26 @@ def publicar_no_github(req_id):
         print("   ⚠️ O relatório está salvo localmente (commitado), mas precisa de um 'git pull'/merge manual para ir ao ar.")
         
         
+# Normaliza a capitalização do nome do banco exibido na tabela de resultados
+# do site -- o requerente digita esse campo livremente (Google Forms/GitHub
+# Issues), então "RefSeq"/"refseq" ou "Mistura_teste"/"mistura_teste" viravam
+# entradas diferentes no filtro por banco da tabela. Bancos ainda não
+# mapeados aqui continuam exibidos exatamente como o requerente digitou.
+MAPA_BANCO_CANONICO = {
+    "acari": "Acari",
+    "banco_solo_unificado": "Banco_Solo_Unificado",
+    "eucariotos": "eucariotos",
+    "formigas": "Formigas",
+    "fungi": "Fungi",
+    "isoptera": "Isoptera",
+    "minhocas": "Minhocas",
+    "mistura_teste": "Mistura_teste",
+    "protozoa": "Protozoa",
+    "refseq": "RefSeq",
+    "refseqsoil": "RefSeqSoil",
+}
+
+
 def atualizar_vitrine_html(req, req_id, resultado_json=None):
     print("🖥️ Atualizando painel de resultados na página inicial...")
 
@@ -371,7 +391,8 @@ def atualizar_vitrine_html(req, req_id, resultado_json=None):
     fwd = str(req.get('Primer forward', '')).strip().upper()
     rev = str(req.get('Primer reverse', '')).strip().upper()
     alvo = str(req.get('Região alvo', 'Não informada')).strip()
-    banco = str(req.get('Banco de Dados', 'Protozoa')).strip()
+    banco_bruto = str(req.get('Banco de Dados', 'Protozoa')).strip()
+    banco = MAPA_BANCO_CANONICO.get(banco_bruto.lower(), banco_bruto)
     data_hoje = datetime.now()
     data_hoje_br = data_hoje.strftime("%d/%m/%Y")
     data_hoje_iso = data_hoje.strftime("%Y-%m-%d")
