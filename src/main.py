@@ -499,7 +499,20 @@ def run_pipeline(req, req_id):
     mismatches = int(req.get('Máximo de Mismatches na extremidade 3', 0) or 0)
     e_value = str(req.get('E-value máximo', 10.0) or 10.0)
     cobertura = str(req.get('Cobertura mínima', 0) or 0)
-    max_hits = str(req.get('Limite de hits', 30000) or 30000)
+    # Teto de segurança do servidor: em 03/09/2026 uma submissão com
+    # "Limite de hits"=30000 + --amp_seq (busca sequência completa do
+    # amplicon, 2-8kb "long read", por hit) chegou a consumir ~123GB de RAM
+    # numa máquina de 125GB e foi morta pelo OOM killer do Linux -- sem esse
+    # teto, qualquer pesquisador digitando um número alto no formulário
+    # consegue derrubar o servidor sem querer. 5000 hits já é generoso pra
+    # medir cobertura (o banco "eucariotos" tem ~8.300 genomas no total) e
+    # fica bem longe do ponto que travou a máquina.
+    LIMITE_MAXIMO_HITS = 5000
+    max_hits_solicitado = int(req.get('Limite de hits', LIMITE_MAXIMO_HITS) or LIMITE_MAXIMO_HITS)
+    if max_hits_solicitado > LIMITE_MAXIMO_HITS:
+        print(f"⚠️ 'Limite de hits' pedido ({max_hits_solicitado}) acima do teto de segurança "
+              f"({LIMITE_MAXIMO_HITS}) -- usando o teto pra evitar estourar a memória do servidor.")
+    max_hits = str(min(max_hits_solicitado, LIMITE_MAXIMO_HITS))
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
     # ==========================================
