@@ -873,5 +873,10 @@ while True:
     except Exception as e:
         print(f"\n🔥 ERRO FATAL DETECTADO NA EXECUÇÃO PRINCIPAL:")
         traceback.print_exc()
+        if isinstance(e, subprocess.CalledProcessError):
+            print("\n📋 SAÍDA DO COMANDO QUE FALHOU (stderr):")
+            print(e.stderr or "(vazio)")
+            print("\n📋 SAÍDA DO COMANDO QUE FALHOU (stdout):")
+            print(e.stdout or "(vazio)")
         print("Reiniciando a varredura em 10 segundos...")
         time.sleep(10)
