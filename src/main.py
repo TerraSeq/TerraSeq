@@ -15,9 +15,28 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import traceback
+import resource
 from dotenv import load_dotenv
 
 # --- CONFIGURAÇÕES INICIAIS ---
+
+# Eleva o limite de arquivos abertos do processo (ulimit -n). O banco
+# "eucariotos" combina dezenas de bancos BLAST numa busca só, e os maiores
+# (bacteria, ascomycota, sar...) são divididos em vários volumes -- a soma
+# de arquivos que o blastn precisa abrir ao mesmo tempo passou do padrão do
+# Linux (1024) depois que os grupos novos foram indexados, causando
+# "BLAST Database error: Cannot memory map ... Number of files opened: 1020".
+# Isso sobe o limite do processo (não precisa de sudo nem mexer no shell),
+# até o teto que o sistema permitir.
+try:
+    limite_atual, limite_maximo = resource.getrlimit(resource.RLIMIT_NOFILE)
+    novo_limite = 65536 if limite_maximo == resource.RLIM_INFINITY else min(65536, limite_maximo)
+    if limite_atual < novo_limite:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (novo_limite, limite_maximo))
+        print(f"🔧 Limite de arquivos abertos elevado de {limite_atual} para {novo_limite}.")
+except (ValueError, OSError) as e:
+    print(f"⚠️ Não foi possível elevar o limite de arquivos abertos automaticamente ({e}).")
+    print("   Se o erro 'Cannot memory map ... .nhr' persistir, rode antes: ulimit -n 65536")
 # Carrega variáveis do arquivo .env (que NÃO é versionado no Git).
 # Veja .env.example para o modelo com as chaves esperadas.
 load_dotenv()
