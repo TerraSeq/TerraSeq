@@ -639,7 +639,16 @@ def run_pipeline(req, req_id):
         "-e", e_value, "--min_size", min_size, "--max_size", max_size,
         "-m", tm_min, "--max_3prime_mismatches", str(mismatches),
         "--qcov_hsp_perc", cobertura, "--max_target_seqs", max_hits,
-        "-t", "8",
+        # -num_threads=1 é proposital: com >1 thread e um banco combinado com
+        # bancos "split" em múltiplos volumes (bacteria, ascomycota, sar,
+        # platyhelminthes...), o blastn trava com um NULL pointer dentro de
+        # BlastFormatter_PreFetchSequenceData/x_RunMTBySplitDB ao buscar as
+        # sequências do amplicon (qseq/sseq no outfmt) -- é um bug conhecido
+        # do próprio NCBI BLAST+ nessa combinação (multithread + split DB +
+        # outfmt pedindo sequência), não um problema dos nossos dados. Rodar
+        # com 1 thread evita esse caminho de código. Fica mais lento, mas
+        # não trava.
+        "-t", "1",
         "--amp_seq"
     ]
     
