@@ -13,11 +13,15 @@
             --text-color: #2b2b2b;
         }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
-        nav { background-color: var(--primary-color); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        nav { background-color: var(--primary-color); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 12px; }
         nav h2 { margin: 0; font-weight: 600; font-size: 1.5rem; letter-spacing: 1px; }
-        nav ul { list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; }
+        nav ul { list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; flex-wrap: wrap; align-items: center; }
         nav a { color: var(--accent-color); text-decoration: none; font-weight: 500; transition: 0.3s; }
         nav a:hover { color: white; }
+        .lang-toggle { display: inline-flex; border: 1px solid rgba(255,255,255,0.35); border-radius: 20px; padding: 3px; background: rgba(255,255,255,0.08); }
+        .lang-toggle button { border: none; background: transparent; color: var(--accent-color); font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.4px; padding: 5px 13px; border-radius: 16px; cursor: pointer; transition: 0.2s; }
+        .lang-toggle button.active { background: white; color: var(--primary-color); }
+        .lang-toggle button:hover:not(.active) { color: white; }
         .brand-logo { display: flex; align-items: center; height: 44px; overflow: hidden; }
         .brand-logo img { height: 44px; width: auto; max-width: 220px; object-fit: contain; display: block; filter: brightness(1.05); transform: scale(1.2); transform-origin: left center; }
         .hero { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; text-align: center; padding: 60px 20px; }
@@ -555,91 +559,97 @@
             <img src="imagens/Logo2.png" alt="TerraSeq" style="max-height: 100px; width:auto; display:block; filter: brightness(1.05);">
         </a>
         <ul>
-            <li><a href="#inicio">Início</a></li>
-            <li><a href="#submeter">Testar Primer</a></li>
-            <li><a href="#acervo-genomas">Acervo de Genomas</a></li>
-            <li><a href="#resultados">Resultados</a></li>
-            <li><a href="#sobre">Equipe & Sobre</a></li>
+            <li><a href="#inicio" data-i18n="nav.inicio">Início</a></li>
+            <li><a href="#submeter" data-i18n="nav.submeter">Testar Primer</a></li>
+            <li><a href="#acervo-genomas" data-i18n="nav.acervo">Acervo de Genomas</a></li>
+            <li><a href="#resultados" data-i18n="nav.resultados">Resultados</a></li>
+            <li><a href="#sobre" data-i18n="nav.sobre">Equipe & Sobre</a></li>
+            <li>
+                <div class="lang-toggle" role="group" aria-label="Idioma / Language">
+                    <button type="button" data-lang-btn="pt" class="active">PT</button>
+                    <button type="button" data-lang-btn="en">EN</button>
+                </div>
+            </li>
         </ul>
     </nav>
 
     <header class="hero" id="inicio">
-        <h1>Validação in silico de Primers</h1>
-        <p>Uma plataforma automatizada para avaliação de cobertura taxonômica e simulação de PCR contra genomas completos.</p>
+        <h1 data-i18n="hero.titulo">Validação in silico de Primers</h1>
+        <p data-i18n="hero.sub">Uma plataforma automatizada para avaliação de cobertura taxonômica e simulação de PCR contra genomas completos.</p>
     </header>
 
     <section class="container" id="submeter">
         <div class="center-text">
-            <h2 class="section-title">Escolha sua via de Submissão</h2>
-            <p>O nosso pipeline suporta duas arquiteturas diferentes para recebimento e processamento de ensaios.</p>
+            <h2 class="section-title" data-i18n="submeter.titulo">Escolha sua via de Submissão</h2>
+            <p data-i18n="submeter.intro">O nosso pipeline suporta duas arquiteturas diferentes para recebimento e processamento de ensaios.</p>
         </div>
-        
+
         <div class="submission-grid">
             <div class="card">
                 <h3>📊 Google Forms</h3>
-                <p>Preencha um formulário web simples e receba os resultados diretamente no seu e-mail.</p>
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSd061rHejG0NuOxotzHSfdCpYhioZG284lNUP0x_P54UUymNg/viewform?usp=dialog" target="_blank" class="btn btn-primary">Formulário de Análise</a>
+                <p data-i18n="submeter.forms.texto">Preencha um formulário web simples e receba os resultados diretamente no seu e-mail.</p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSd061rHejG0NuOxotzHSfdCpYhioZG284lNUP0x_P54UUymNg/viewform?usp=dialog" target="_blank" class="btn btn-primary" data-i18n="submeter.forms.btn">Formulário de Análise</a>
             </div>
 
             <div class="card">
                 <h3>💻 GitHub Issues</h3>
-                <p>Submeta seus parâmetros via Issues e acompanhe o log de execução público.</p>
-                <a href="https://github.com/tiagogabrielsi/pipeline_genoma/issues/new/choose" target="_blank" class="btn btn-outline">Abrir Nova Issue</a>
+                <p data-i18n="submeter.issues.texto">Submeta seus parâmetros via Issues e acompanhe o log de execução público.</p>
+                <a href="https://github.com/tiagogabrielsi/pipeline_genoma/issues/new/choose" target="_blank" class="btn btn-outline" data-i18n="submeter.issues.btn">Abrir Nova Issue</a>
             </div>
         </div>
     </section>
 
     <section class="container" id="acervo-genomas">
         <div class="center-text">
-            <h2 class="section-title">Acervo de Genomas</h2>
-            <p>Os bancos de referência curados que sustentam cada busca in silico da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.</p>
+            <h2 class="section-title" data-i18n="acervo.titulo">Acervo de Genomas</h2>
+            <p data-i18n="acervo.intro">Os bancos de referência curados que sustentam cada busca in silico da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.</p>
         </div>
-        <p class="stat-line" id="acervo-stat-line">Carregando acervo...</p>
+        <p class="stat-line" id="acervo-stat-line" data-i18n="acervo.carregando">Carregando acervo...</p>
 
         <div class="carousel-wrap">
             <div class="carousel-track" id="acervo-carousel-track"></div>
         </div>
-        <p class="carousel-hint">Passe o mouse pra pausar · clique num banco pra ver os organismos catalogados</p>
+        <p class="carousel-hint" data-i18n="acervo.hint">Passe o mouse pra pausar · clique num banco pra ver os organismos catalogados</p>
 
         <div id="painel-banco">
             <div class="painel-header">
                 <div><h3 id="painel-nome">—</h3></div>
                 <div style="display:flex; align-items:center; gap:14px;">
                     <span class="contagem-total" id="painel-contagem"></span>
-                    <button class="painel-fechar" id="painel-fechar-btn">Fechar ✕</button>
+                    <button class="painel-fechar" id="painel-fechar-btn" data-i18n="acervo.fechar">Fechar ✕</button>
                 </div>
             </div>
-            <input type="text" class="busca-organismo" id="busca-organismo" placeholder="Buscar organismo neste banco...">
+            <input type="text" class="busca-organismo" id="busca-organismo" data-i18n-placeholder="acervo.buscarPlaceholder" placeholder="Buscar organismo neste banco...">
             <div class="lista-organismos" id="lista-organismos"></div>
         </div>
     </section>
 
     <section class="container" id="resultados">
         <div class="center-text">
-            <h2 class="section-title">Acervo de Primers Avaliados</h2>
-            <p>Histórico de análises já processadas e validadas pelo pipeline contra nossos bancos de genomas de referência.</p>
+            <h2 class="section-title" data-i18n="resultados.titulo">Acervo de Primers Avaliados</h2>
+            <p data-i18n="resultados.intro">Histórico de análises já processadas e validadas pelo pipeline contra nossos bancos de genomas de referência.</p>
         </div>
 
         <div class="filter-toolbar">
-            <input type="text" id="filter-search" class="filter-search" placeholder="Buscar por ID, nome do primer, alvo ou sequência...">
+            <input type="text" id="filter-search" class="filter-search" data-i18n-placeholder="resultados.buscarPlaceholder" placeholder="Buscar por ID, nome do primer, alvo ou sequência...">
             <select id="filter-banco" class="filter-select">
-                <option value="">Todos os bancos</option>
+                <option value="" data-i18n="resultados.todosBancos">Todos os bancos</option>
             </select>
             <select id="filter-alvo" class="filter-select">
-                <option value="">Todos os alvos</option>
+                <option value="" data-i18n="resultados.todosAlvos">Todos os alvos</option>
             </select>
-            <button type="button" id="filter-clear-btn" class="filter-clear-btn">Limpar filtros</button>
+            <button type="button" id="filter-clear-btn" class="filter-clear-btn" data-i18n="resultados.limparFiltros">Limpar filtros</button>
             <span class="filter-result-count" id="filter-result-count"></span>
         </div>
 
         <div class="table-toolbar">
-            <label for="page-size-select" class="page-size-label">Resultados por página:</label>
+            <label for="page-size-select" class="page-size-label" data-i18n="resultados.porPagina">Resultados por página:</label>
             <select id="page-size-select" class="page-size-select">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-                <option value="all">Todos</option>
+                <option value="all" data-i18n="resultados.todos">Todos</option>
             </select>
         </div>
 
@@ -658,15 +668,15 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th class="sortable" data-sort-key="id" data-sort-type="text">ID da Requisição<span class="sort-arrow"></span><span class="col-resizer"></span></th>
-                        <th class="sortable" data-sort-key="primername" data-sort-type="text">Nome do Par de Primers<span class="sort-arrow"></span><span class="col-resizer"></span></th>
-                        <th class="sortable" data-sort-key="alvo" data-sort-type="text">Alvo<span class="sort-arrow"></span><span class="col-resizer"></span></th>
-                        <th class="sortable" data-sort-key="banco" data-sort-type="text">Banco<span class="sort-arrow"></span><span class="col-resizer"></span></th>
-                        <th>Primers (5'→3')<span class="col-resizer"></span></th>
-                        <th class="sortable" data-sort-key="amplicon" data-sort-type="number">Tamanho do Amplicon<span class="sort-arrow"></span><span class="col-resizer"></span></th>
-                        <th class="sortable" data-sort-key="date" data-sort-type="text">Data<span class="sort-arrow"></span><span class="col-resizer"></span></th>
-                        <th>Status<span class="col-resizer"></span></th>
-                        <th>Ação</th>
+                        <th class="sortable" data-sort-key="id" data-sort-type="text"><span data-i18n="tabela.id">ID da Requisição</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="primername" data-sort-type="text"><span data-i18n="tabela.nome">Nome do Par de Primers</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="alvo" data-sort-type="text"><span data-i18n="tabela.alvo">Alvo</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="banco" data-sort-type="text"><span data-i18n="tabela.banco">Banco</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th><span data-i18n="tabela.primers">Primers (5'→3')</span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="amplicon" data-sort-type="number"><span data-i18n="tabela.amplicon">Tamanho do Amplicon</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="date" data-sort-type="text"><span data-i18n="tabela.data">Data</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
+                        <th><span data-i18n="tabela.status">Status</span><span class="col-resizer"></span></th>
+                        <th data-i18n="tabela.acao">Ação</th>
                     </tr>
                 </thead>
                 <tbody id="results-body">
@@ -2098,23 +2108,23 @@
     <!-- Nova Seção: Equipe & Sobre -->
     <section class="container" id="sobre" style="margin-top: 40px;">
         <div class="center-text">
-            <h2 class="section-title">Sobre o Projeto</h2>
-            <p>Conheça a equipe de pesquisa e as instituições que apoiam a plataforma.</p>
+            <h2 class="section-title" data-i18n="sobre.titulo">Sobre o Projeto</h2>
+            <p data-i18n="sobre.intro">Conheça a equipe de pesquisa e as instituições que apoiam a plataforma.</p>
         </div>
 
-        <h3 style="color: var(--primary-color); text-align: center; margin-top: 20px;">Nossa Equipe</h3>
+        <h3 style="color: var(--primary-color); text-align: center; margin-top: 20px;" data-i18n="sobre.nossaEquipe">Nossa Equipe</h3>
         <div class="sobre-grid">
             
             <div class="equipe-card">
                 <div class="equipe-info">
                     <h4>Tiago Marques Gabriel</h4>
-                    <p class="cargo">Desenvolvedor / Pesquisador</p>
-                    <a href="" target="_blank" class="perfil-link">Sobre ↗</a>
+                    <p class="cargo" data-i18n="sobre.cargo.tiago">Desenvolvedor / Pesquisador</p>
+                    <a href="" target="_blank" class="perfil-link" data-i18n="sobre.perfilLink">Sobre ↗</a>
                 </div>
                 <div class="equipe-foto-container">
                     <div class="no-photo">
                         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        NO PHOTO
+                        <span data-i18n="sobre.semFoto">NO PHOTO</span>
                     </div>
                 </div>
             </div>
@@ -2122,13 +2132,13 @@
             <div class="equipe-card">
                 <div class="equipe-info">
                     <h4>Prof. Dr. Leandro Fonseca de Souza</h4>
-                    <p class="cargo">Pesquisador / Orientador</p>
-                    <a href="" target="_blank" class="perfil-link">Sobre ↗</a>
+                    <p class="cargo" data-i18n="sobre.cargo.leandro">Pesquisador / Orientador</p>
+                    <a href="" target="_blank" class="perfil-link" data-i18n="sobre.perfilLink">Sobre ↗</a>
                 </div>
                 <div class="equipe-foto-container">
                     <div class="no-photo">
                         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        NO PHOTO
+                        <span data-i18n="sobre.semFoto">NO PHOTO</span>
                     </div>
                 </div>
             </div>
@@ -2136,13 +2146,13 @@
             <div class="equipe-card">
                 <div class="equipe-info">
                     <h4>Profa. Dra. Liana Hilda Golin Mengarda</h4>
-                    <p class="cargo">Pesquisadora / Coordenadora</p>
-                    <a href="#" target="_blank" class="perfil-link">Sobre ↗</a>
+                    <p class="cargo" data-i18n="sobre.cargo.liana">Pesquisadora / Coordenadora</p>
+                    <a href="#" target="_blank" class="perfil-link" data-i18n="sobre.perfilLink">Sobre ↗</a>
                 </div>
                 <div class="equipe-foto-container">
                     <div class="no-photo">
                         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        NO PHOTO
+                        <span data-i18n="sobre.semFoto">NO PHOTO</span>
                     </div>
                 </div>
             </div>
@@ -2150,29 +2160,29 @@
             <div class="equipe-card">
                 <div class="equipe-info">
                     <h4>Prof. Dr. Eliezer de Souza da Silva</h4>
-                    <p class="cargo">Pesquisador Colaborador</p>
-                    <a href="#" target="_blank" class="perfil-link">Sobre ↗</a>
+                    <p class="cargo" data-i18n="sobre.cargo.eliezer">Pesquisador Colaborador</p>
+                    <a href="#" target="_blank" class="perfil-link" data-i18n="sobre.perfilLink">Sobre ↗</a>
                 </div>
                 <div class="equipe-foto-container">
                     <div class="no-photo">
                         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        NO PHOTO
+                        <span data-i18n="sobre.semFoto">NO PHOTO</span>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;">Instituições Envolvidas</h3>
+        <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;" data-i18n="sobre.institEnvolvidas">Instituições Envolvidas</h3>
         <div class="sobre-grid">
             <div class="inst-box">
-                <h4>Instituição Executora</h4>
+                <h4 data-i18n="sobre.institExecutora">Instituição Executora</h4>
                 <p style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">Universidade Federal do Espírito Santo - UFES</p>
                 <img src="https://www.ufes.br/themes/custom/ufes_Varbase/images/marca_ufes.png" alt="Logo UFES" class="inst-logo">
             </div>
 
             <div class="inst-box">
-                <h4>Instituições Colaboradoras</h4>
+                <h4 data-i18n="sobre.institColaboradoras">Instituições Colaboradoras</h4>
                 <div class="colab-container">
                     
                     <div class="colab-item">
@@ -2189,13 +2199,13 @@
             </div>
         </div>
 
-        <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;">Agências de Fomento (Apoio)</h3>
+        <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;" data-i18n="sobre.agenciasFomento">Agências de Fomento (Apoio)</h3>
         <div>
             <div class="fomento-card">
                 <div class="fomento-text">
                     <h4>CNPq</h4>
-                    <p><strong>Projeto:</strong> Sistemas Agroflorestais na cafeicultura e seu potencial em conservar a diversidade biológica edáfica da mata atlântica: combinando short reads Ilumina e long reads Nanopore no estudo do microbioma do solo.</p>
-                    <p><strong>Coordenador:</strong> Leandro Fonseca de Souza</p>
+                    <p><strong data-i18n="sobre.projeto">Projeto:</strong> Sistemas Agroflorestais na cafeicultura e seu potencial em conservar a diversidade biológica edáfica da mata atlântica: combinando short reads Ilumina e long reads Nanopore no estudo do microbioma do solo.</p>
+                    <p><strong data-i18n="sobre.coordenador">Coordenador:</strong> Leandro Fonseca de Souza</p>
                     <p><em>Edital CNPq Universal 2024</em></p>
                 </div>
                 <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="Logo CNPq" class="fomento-logo">
@@ -2204,8 +2214,8 @@
             <div class="fomento-card">
                 <div class="fomento-text">
                     <h4>FAPES</h4>
-                    <p><strong>Projeto:</strong> Qualidade biológica do solo na Cafeicultura em Sistemas de produção agroflorestal e convencional: eDNA como ferramenta de estudo e bioindicadora de micro, meso e macro organismos.</p>
-                    <p><strong>Coordenadora:</strong> Liana Hilda Golin Mengarda</p>
+                    <p><strong data-i18n="sobre.projeto">Projeto:</strong> Qualidade biológica do solo na Cafeicultura em Sistemas de produção agroflorestal e convencional: eDNA como ferramenta de estudo e bioindicadora de micro, meso e macro organismos.</p>
+                    <p><strong data-i18n="sobre.coordenadora">Coordenadora:</strong> Liana Hilda Golin Mengarda</p>
                     <p><em>Edital FAPES Inovagro 2024</em></p>
                 </div>
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="Logo FAPES" class="fomento-logo">
@@ -2232,6 +2242,197 @@
     </footer>
 
     <script>
+        // ---- Seletor de idioma (PT/EN) ----
+        // Traduz apenas a interface (menus, títulos, botões, placeholders).
+        // Os dados de cada requisição (nome do primer, banco, sequências) vêm
+        // prontos do pipeline em português/nomenclatura científica e não são
+        // traduzidos -- só valores fixos e controlados (status "Concluído",
+        // botão "Ver Relatório") entram no mapa de termos fixos abaixo.
+        let idiomaAtual = "pt";
+
+        const DICIONARIO = {
+            pt: {
+                "nav.inicio": "Início",
+                "nav.submeter": "Testar Primer",
+                "nav.acervo": "Acervo de Genomas",
+                "nav.resultados": "Resultados",
+                "nav.sobre": "Equipe & Sobre",
+                "hero.titulo": "Validação in silico de Primers",
+                "hero.sub": "Uma plataforma automatizada para avaliação de cobertura taxonômica e simulação de PCR contra genomas completos.",
+                "submeter.titulo": "Escolha sua via de Submissão",
+                "submeter.intro": "O nosso pipeline suporta duas arquiteturas diferentes para recebimento e processamento de ensaios.",
+                "submeter.forms.texto": "Preencha um formulário web simples e receba os resultados diretamente no seu e-mail.",
+                "submeter.forms.btn": "Formulário de Análise",
+                "submeter.issues.texto": "Submeta seus parâmetros via Issues e acompanhe o log de execução público.",
+                "submeter.issues.btn": "Abrir Nova Issue",
+                "acervo.titulo": "Acervo de Genomas",
+                "acervo.intro": "Os bancos de referência curados que sustentam cada busca in silico da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.",
+                "acervo.carregando": "Carregando acervo...",
+                "acervo.indisponivel": "Acervo em atualização — volte em breve.",
+                "acervo.hint": "Passe o mouse pra pausar · clique num banco pra ver os organismos catalogados",
+                "acervo.fechar": "Fechar ✕",
+                "acervo.buscarPlaceholder": "Buscar organismo neste banco...",
+                "acervo.semOrganismo": "Nenhum organismo encontrado.",
+                "acervo.statBancos": "bancos curados",
+                "acervo.statGenomas": "genomas catalogados",
+                "acervo.genomasLabel": "genomas",
+                "resultados.titulo": "Acervo de Primers Avaliados",
+                "resultados.intro": "Histórico de análises já processadas e validadas pelo pipeline contra nossos bancos de genomas de referência.",
+                "resultados.buscarPlaceholder": "Buscar por ID, nome do primer, alvo ou sequência...",
+                "resultados.todosBancos": "Todos os bancos",
+                "resultados.todosAlvos": "Todos os alvos",
+                "resultados.limparFiltros": "Limpar filtros",
+                "resultados.porPagina": "Resultados por página:",
+                "resultados.todos": "Todos",
+                "resultados.de": "de",
+                "resultados.resultadosSufixo": "resultado(s)",
+                "tabela.id": "ID da Requisição",
+                "tabela.nome": "Nome do Par de Primers",
+                "tabela.alvo": "Alvo",
+                "tabela.banco": "Banco",
+                "tabela.primers": "Primers (5'→3')",
+                "tabela.amplicon": "Tamanho do Amplicon",
+                "tabela.data": "Data",
+                "tabela.status": "Status",
+                "tabela.acao": "Ação",
+                "sobre.titulo": "Sobre o Projeto",
+                "sobre.intro": "Conheça a equipe de pesquisa e as instituições que apoiam a plataforma.",
+                "sobre.nossaEquipe": "Nossa Equipe",
+                "sobre.perfilLink": "Sobre ↗",
+                "sobre.semFoto": "NO PHOTO",
+                "sobre.cargo.tiago": "Desenvolvedor / Pesquisador",
+                "sobre.cargo.leandro": "Pesquisador / Orientador",
+                "sobre.cargo.liana": "Pesquisadora / Coordenadora",
+                "sobre.cargo.eliezer": "Pesquisador Colaborador",
+                "sobre.institEnvolvidas": "Instituições Envolvidas",
+                "sobre.institExecutora": "Instituição Executora",
+                "sobre.institColaboradoras": "Instituições Colaboradoras",
+                "sobre.agenciasFomento": "Agências de Fomento (Apoio)",
+                "sobre.projeto": "Projeto:",
+                "sobre.coordenador": "Coordenador:",
+                "sobre.coordenadora": "Coordenadora:"
+            },
+            en: {
+                "nav.inicio": "Home",
+                "nav.submeter": "Test a Primer",
+                "nav.acervo": "Genome Archive",
+                "nav.resultados": "Results",
+                "nav.sobre": "Team & About",
+                "hero.titulo": "In Silico Primer Validation",
+                "hero.sub": "An automated platform for taxonomic coverage assessment and PCR simulation against complete genomes.",
+                "submeter.titulo": "Choose Your Submission Method",
+                "submeter.intro": "Our pipeline supports two different architectures for receiving and processing assays.",
+                "submeter.forms.texto": "Fill out a simple web form and get your results straight to your inbox.",
+                "submeter.forms.btn": "Analysis Form",
+                "submeter.issues.texto": "Submit your parameters via Issues and follow the public execution log.",
+                "submeter.issues.btn": "Open New Issue",
+                "acervo.titulo": "Genome Archive",
+                "acervo.intro": "The curated reference databases behind every in silico search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.",
+                "acervo.carregando": "Loading archive...",
+                "acervo.indisponivel": "Archive being updated — check back soon.",
+                "acervo.hint": "Hover to pause · click a database to see its catalogued organisms",
+                "acervo.fechar": "Close ✕",
+                "acervo.buscarPlaceholder": "Search organisms in this database...",
+                "acervo.semOrganismo": "No organisms found.",
+                "acervo.statBancos": "curated databases",
+                "acervo.statGenomas": "catalogued genomes",
+                "acervo.genomasLabel": "genomes",
+                "resultados.titulo": "Evaluated Primer Archive",
+                "resultados.intro": "History of analyses already processed and validated by the pipeline against our reference genome databases.",
+                "resultados.buscarPlaceholder": "Search by ID, primer name, target or sequence...",
+                "resultados.todosBancos": "All databases",
+                "resultados.todosAlvos": "All targets",
+                "resultados.limparFiltros": "Clear filters",
+                "resultados.porPagina": "Results per page:",
+                "resultados.todos": "All",
+                "resultados.de": "of",
+                "resultados.resultadosSufixo": "result(s)",
+                "tabela.id": "Request ID",
+                "tabela.nome": "Primer Pair Name",
+                "tabela.alvo": "Target",
+                "tabela.banco": "Database",
+                "tabela.primers": "Primers (5'→3')",
+                "tabela.amplicon": "Amplicon Size",
+                "tabela.data": "Date",
+                "tabela.status": "Status",
+                "tabela.acao": "Action",
+                "sobre.titulo": "About the Project",
+                "sobre.intro": "Meet the research team and the institutions that support the platform.",
+                "sobre.nossaEquipe": "Our Team",
+                "sobre.perfilLink": "About ↗",
+                "sobre.semFoto": "NO PHOTO",
+                "sobre.cargo.tiago": "Developer / Researcher",
+                "sobre.cargo.leandro": "Researcher / Advisor",
+                "sobre.cargo.liana": "Researcher / Coordinator",
+                "sobre.cargo.eliezer": "Collaborating Researcher",
+                "sobre.institEnvolvidas": "Institutions Involved",
+                "sobre.institExecutora": "Lead Institution",
+                "sobre.institColaboradoras": "Collaborating Institutions",
+                "sobre.agenciasFomento": "Funding Agencies (Support)",
+                "sobre.projeto": "Project:",
+                "sobre.coordenador": "Coordinator:",
+                "sobre.coordenadora": "Coordinator:"
+            }
+        };
+
+        // Termos de vocabulário fixo (não são "texto livre") que aparecem
+        // repetidos em cada linha da tabela de resultados -- traduzidos por
+        // correspondência de valor em vez de um data-i18n por linha, assim
+        // cobre tanto as linhas existentes quanto as que main.py for
+        // adicionando no futuro sem precisar mexer no pipeline.
+        const TERMOS_FIXOS_PT_EN = {
+            "Concluído": "Completed",
+            "Ver Relatório": "View Report"
+        };
+        const TERMOS_FIXOS_EN_PT = Object.fromEntries(
+            Object.entries(TERMOS_FIXOS_PT_EN).map(([pt, en]) => [en, pt])
+        );
+
+        function t(chave) {
+            return (DICIONARIO[idiomaAtual] && DICIONARIO[idiomaAtual][chave]) || chave;
+        }
+
+        function aplicarIdioma(lang) {
+            idiomaAtual = lang;
+
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const texto = DICIONARIO[lang][el.getAttribute("data-i18n")];
+                if (texto !== undefined) el.innerHTML = texto;
+            });
+            document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+                const texto = DICIONARIO[lang][el.getAttribute("data-i18n-placeholder")];
+                if (texto !== undefined) el.placeholder = texto;
+            });
+
+            const mapaFixo = lang === "en" ? TERMOS_FIXOS_PT_EN : TERMOS_FIXOS_EN_PT;
+            document.querySelectorAll("#results-body .status-badge, #results-body .btn-primary").forEach(el => {
+                const atual = el.textContent.trim();
+                if (mapaFixo[atual]) el.textContent = mapaFixo[atual];
+            });
+
+            document.querySelectorAll("[data-lang-btn]").forEach(btn => {
+                btn.classList.toggle("active", btn.dataset.langBtn === lang);
+            });
+            document.documentElement.setAttribute("lang", lang);
+            try { localStorage.setItem("terraseq-lang", lang); } catch (e) {}
+
+            // Reaplica as partes que são montadas dinamicamente via JS
+            // (dependem dos dados já terem carregado -- os hooks só existem
+            // depois que cada seção terminou sua própria inicialização).
+            if (typeof window._atualizarTextosAcervo === "function") window._atualizarTextosAcervo();
+            if (typeof window._refrescarTabelaResultados === "function") window._refrescarTabelaResultados();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll("[data-lang-btn]").forEach(btn => {
+                btn.addEventListener("click", () => aplicarIdioma(btn.dataset.langBtn));
+            });
+
+            let idiomaInicial = "pt";
+            try { idiomaInicial = localStorage.getItem("terraseq-lang") || "pt"; } catch (e) {}
+            aplicarIdioma(idiomaInicial);
+        });
+
         document.addEventListener("DOMContentLoaded", function() {
             const tableBody = document.getElementById("results-body");
             if (!tableBody) return;
@@ -2324,8 +2525,8 @@
 
                 if (resultCount) {
                     resultCount.textContent = filteredRows.length === rows.length
-                        ? `${rows.length} resultado(s)`
-                        : `${filteredRows.length} de ${rows.length} resultado(s)`;
+                        ? `${rows.length} ${t('resultados.resultadosSufixo')}`
+                        : `${filteredRows.length} ${t('resultados.de')} ${rows.length} ${t('resultados.resultadosSufixo')}`;
                 }
 
                 currentPage = 1;
@@ -2362,7 +2563,7 @@
                 const perPage = rowsPerPage === "all" ? total : rowsPerPage;
                 const start = total === 0 ? 0 : (currentPage - 1) * perPage + 1;
                 const end = Math.min(currentPage * perPage, total);
-                infoText.innerText = `${start} - ${end} de ${total}`;
+                infoText.innerText = `${start} - ${end} ${t('resultados.de')} ${total}`;
             }
 
             function updatePaginationUI() {
@@ -2496,6 +2697,11 @@
                 });
             }
 
+            // Permite que o seletor de idioma reaplique a contagem de
+            // resultados e o texto da paginação (que são montados via JS)
+            // quando o idioma muda, sem precisar duplicar essa lógica.
+            window._refrescarTabelaResultados = aplicarFiltro;
+
             if (rows.length > 0) {
                 // Rankeia inicialmente pelos maiores amplicons
                 sortRows(sortKey, "number");
@@ -2564,25 +2770,60 @@
             const statLine = document.getElementById("acervo-stat-line");
             if (!track) return;
 
+            function localeAtual() { return idiomaAtual === "en" ? "en-US" : "pt-BR"; }
+
+            let dadosAcervo = null;
+            let bancoAberto = null;
+
             fetch("dados/acervo_genomas.json")
                 .then(r => { if (!r.ok) throw new Error("acervo indisponível"); return r.json(); })
                 .then(dados => montarAcervo(dados))
                 .catch(() => {
-                    statLine.textContent = "Acervo em atualização — volte em breve.";
+                    statLine.textContent = t("acervo.indisponivel");
                 });
 
+            // Reaplica só os textos que dependem do idioma nas partes já
+            // montadas (contadores, rótulos "genomas", painel aberto) sem
+            // precisar reconstruir o carrossel inteiro.
+            function atualizarTextosAcervo() {
+                if (!dadosAcervo) return;
+                statLine.textContent = `${dadosAcervo.total_bancos} ${t('acervo.statBancos')} · ${dadosAcervo.total_genomas.toLocaleString(localeAtual())} ${t('acervo.statGenomas')}`;
+
+                document.querySelectorAll(".banco-chip").forEach(chip => {
+                    const genomas = parseInt(chip.dataset.genomas, 10) || 0;
+                    const contagemEl = chip.querySelector(".contagem");
+                    const labelEl = chip.querySelector(".genomas-label");
+                    if (contagemEl) contagemEl.textContent = genomas.toLocaleString(localeAtual());
+                    if (labelEl) labelEl.textContent = t("acervo.genomasLabel");
+                });
+
+                if (bancoAberto) {
+                    painelContagem.textContent = `${bancoAberto.genomas.toLocaleString(localeAtual())} ${t('acervo.genomasLabel')}`;
+                    renderLista(organismosAtuais.filter(n => n.toLowerCase().includes(buscaEl.value.toLowerCase().trim())));
+                }
+            }
+            window._atualizarTextosAcervo = atualizarTextosAcervo;
+
+            const painel = document.getElementById("painel-banco");
+            const painelNome = document.getElementById("painel-nome");
+            const painelContagem = document.getElementById("painel-contagem");
+            const listaEl = document.getElementById("lista-organismos");
+            const buscaEl = document.getElementById("busca-organismo");
+            let organismosAtuais = [];
+
             function montarAcervo(dados) {
+                dadosAcervo = dados;
                 const bancos = dados.bancos || [];
-                statLine.textContent = `${dados.total_bancos} bancos curados · ${dados.total_genomas.toLocaleString('pt-BR')} genomas catalogados`;
 
                 function montarChip(banco) {
                     const el = document.createElement("button");
                     el.className = "banco-chip";
                     el.type = "button";
                     el.dataset.id = banco.id;
+                    el.dataset.genomas = banco.genomas;
                     el.innerHTML = `
-                        <span class="contagem">${banco.genomas.toLocaleString('pt-BR')}</span>
-                        <span class="genomas-label">genomas</span>
+                        <span class="contagem">${banco.genomas.toLocaleString(localeAtual())}</span>
+                        <span class="genomas-label">${t("acervo.genomasLabel")}</span>
                         <span class="rotulo">${banco.nome}</span>
                     `;
                     el.addEventListener("click", () => abrirPainel(banco));
@@ -2592,48 +2833,45 @@
                 // Duplica a lista pra loop contínuo do carrossel
                 [...bancos, ...bancos].forEach(b => track.appendChild(montarChip(b)));
 
-                const painel = document.getElementById("painel-banco");
-                const painelNome = document.getElementById("painel-nome");
-                const painelContagem = document.getElementById("painel-contagem");
-                const listaEl = document.getElementById("lista-organismos");
-                const buscaEl = document.getElementById("busca-organismo");
-                let organismosAtuais = [];
+                atualizarTextosAcervo();
+            }
 
-                function abrirPainel(banco) {
-                    document.querySelectorAll(".banco-chip").forEach(c => c.classList.toggle("active", c.dataset.id === banco.id));
-                    painelNome.textContent = banco.nome;
-                    painelContagem.textContent = `${banco.genomas.toLocaleString('pt-BR')} genomas`;
-                    organismosAtuais = banco.organismos || [];
-                    buscaEl.value = "";
-                    renderLista(organismosAtuais);
-                    painel.classList.add("aberto");
-                    painel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            function abrirPainel(banco) {
+                document.querySelectorAll(".banco-chip").forEach(c => c.classList.toggle("active", c.dataset.id === banco.id));
+                bancoAberto = banco;
+                painelNome.textContent = banco.nome;
+                painelContagem.textContent = `${banco.genomas.toLocaleString(localeAtual())} ${t('acervo.genomasLabel')}`;
+                organismosAtuais = banco.organismos || [];
+                buscaEl.value = "";
+                renderLista(organismosAtuais);
+                painel.classList.add("aberto");
+                painel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+
+            function renderLista(itens) {
+                listaEl.innerHTML = "";
+                if (itens.length === 0) {
+                    listaEl.innerHTML = `<div class="sem-resultado">${t("acervo.semOrganismo")}</div>`;
+                    return;
                 }
-
-                function renderLista(itens) {
-                    listaEl.innerHTML = "";
-                    if (itens.length === 0) {
-                        listaEl.innerHTML = `<div class="sem-resultado">Nenhum organismo encontrado.</div>`;
-                        return;
-                    }
-                    itens.forEach(nome => {
-                        const item = document.createElement("div");
-                        item.className = "organismo-item";
-                        item.textContent = `🧬 ${nome}`;
-                        listaEl.appendChild(item);
-                    });
-                }
-
-                buscaEl.addEventListener("input", () => {
-                    const q = buscaEl.value.toLowerCase().trim();
-                    renderLista(organismosAtuais.filter(n => n.toLowerCase().includes(q)));
-                });
-
-                document.getElementById("painel-fechar-btn").addEventListener("click", () => {
-                    painel.classList.remove("aberto");
-                    document.querySelectorAll(".banco-chip").forEach(c => c.classList.remove("active"));
+                itens.forEach(nome => {
+                    const item = document.createElement("div");
+                    item.className = "organismo-item";
+                    item.textContent = `🧬 ${nome}`;
+                    listaEl.appendChild(item);
                 });
             }
+
+            buscaEl.addEventListener("input", () => {
+                const q = buscaEl.value.toLowerCase().trim();
+                renderLista(organismosAtuais.filter(n => n.toLowerCase().includes(q)));
+            });
+
+            document.getElementById("painel-fechar-btn").addEventListener("click", () => {
+                painel.classList.remove("aberto");
+                bancoAberto = null;
+                document.querySelectorAll(".banco-chip").forEach(c => c.classList.remove("active"));
+            });
         });
     </script>
 
