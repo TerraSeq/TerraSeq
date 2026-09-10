@@ -4,7 +4,7 @@ from Bio.Seq import Seq
 from Bio.Data.IUPACData import ambiguous_dna_values as _IUPAC_AMBIGUOUS
 from reformat import _decode_fasta_header
 import numpy as np
-import subprocess, os
+import subprocess, os, re
 
 def _other_dir(dir):
     if dir == "fwd":
@@ -203,16 +203,80 @@ def _blast_to_dict(file):
             line = ifile.readline()
     return hit_dict
 
+_WGS_CONTIG_RE = re.compile(r'^([A-Za-z]{4,6}\d{2})\d{6,9}$')
+
+def _genome_key(sseqid):
+    """
+    Agrupa contigs que pertencem ao mesmo genoma montado, sem precisar de
+    rede/NCBI: contigs de montagens WGS fragmentadas compartilham um prefixo
+    de projeto+versao antes do numero sequencial do contig (ex:
+    JBAMJC010000001.1 e JBAMJC010000002.1 sao dois contigs do MESMO genoma,
+    prefixo "JBAMJC01"). Genomas com accession unico (ex: NZ_CP012345.1,
+    cromossomo/plasmideo completo) nao batem no padrao WGS e usam o proprio
+    accession como chave.
+    """
+    partes = sseqid.split('|')
+    acc = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
+    acc = acc.split('.')[0]
+    m = _WGS_CONTIG_RE.match(acc)
+    return m.group(1) if m else acc
+
+
 def _evaluate_hit_loc(hit_dict, primer_dict, tm_thresh = 45., size_max=9999, size_min=20, max_3prime_mm=0, Na=50, K=0, Tris=0, Mg=0, dNTPs=0, saltcorr=5):
-    buffer_passing, buffer_all = "Assay_name_and_target,Forward_primer_seq,Reverse_primer_seq,Subject_ID,Tm_forward,Tm_reverse,Amplicon_size,Start,End\n", "Assay_name_and_target,Forward_primer_seq,Reverse_primer_seq,Tm_forward,Tm_reverse,amplicon_size\n"
+    buffer_passing = "Assay_name_and_target,Forward_primer_seq,Reverse_primer_seq,Subject_ID,Tm_forward,Tm_reverse,Amplicon_size,Start,End,Raw_hits_no_genoma\n"
+    buffer_all = "Assay_name_and_target,Forward_primer_seq,Reverse_primer_seq,Tm_forward,Tm_reverse,amplicon_size\n"
+
     for assay_num_target in hit_dict:
-        for x in hit_dict[assay_num_target]["fwd"]:
-            for y in hit_dict[assay_num_target]["rev"]:
-                fwd_seq, rev_seq = primer_dict[F"{assay_num_target}|fwd"], primer_dict[F"{assay_num_target}|rev"] # get primer sequences
-                passing, tm_fwd, tm_rev, amp_size, threep_f_mm, threep_r_mm, start, end = _check_primer_quals(x, y, fwd_seq, rev_seq, tm_thresh=tm_thresh, size_max=size_max, size_min=size_min, max_3prime_mm=max_3prime_mm, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
-                if passing:
-                    buffer_passing += F"{assay_num_target},{fwd_seq},{rev_seq},{x['sseqid']},{tm_fwd},{tm_rev},{amp_size},{start},{end}\n"
-                buffer_all += F"{assay_num_target},{fwd_seq},{rev_seq},{x['sseqid']},{tm_fwd},{tm_rev},{amp_size}\n"
+        fwd_seq, rev_seq = primer_dict[F"{assay_num_target}|fwd"], primer_dict[F"{assay_num_target}|rev"] # get primer sequences
+
+        # 1) Agrupa por CONTIG exato (sseqid): _check_primer_quals so aceita
+        #    um par se hit1.sseqid == hit2.sseqid (fwd e rev no mesmo contig,
+        #    fitas opostas), entao comparar hits de contigs diferentes e
+        #    sempre descarte garantido. Agrupar primeiro evita fazer o
+        #    cross-product cego O(N_fwd x N_rev) inteiro so pra descartar.
+        fwd_por_contig, rev_por_contig = {}, {}
+        for hit in hit_dict[assay_num_target]["fwd"]:
+            fwd_por_contig.setdefault(hit["sseqid"], []).append(hit)
+        for hit in hit_dict[assay_num_target]["rev"]:
+            rev_por_contig.setdefault(hit["sseqid"], []).append(hit)
+
+        # Contagem bruta de hits (fwd+rev, mesmo sem par) por GENOMA -- e
+        # barata (so len()) e da pra reportar "quantos matches reais esse
+        # genoma teve" mesmo parando a validacao cedo la embaixo.
+        genoma_de_contig = {}
+        raw_hits_por_genoma = {}
+        for sseqid in set(fwd_por_contig) | set(rev_por_contig):
+            genoma = _genome_key(sseqid)
+            genoma_de_contig[sseqid] = genoma
+            n_hits = len(fwd_por_contig.get(sseqid, [])) + len(rev_por_contig.get(sseqid, []))
+            raw_hits_por_genoma[genoma] = raw_hits_por_genoma.get(genoma, 0) + n_hits
+
+        # 2) So contigs com hit nos dois sentidos podem virar um amplicon.
+        #    Agrupa esses contigs por GENOMA pra que, assim que UM contig do
+        #    genoma confirmar cobertura (par valido), os demais contigs
+        #    desse MESMO genoma sejam pulados -- evita que um genoma
+        #    fragmentado/multi-copia consuma toda a validacao e "afogue" os
+        #    outros genomas do banco.
+        contigs_por_genoma = {}
+        for sseqid in set(fwd_por_contig) & set(rev_por_contig):
+            contigs_por_genoma.setdefault(genoma_de_contig[sseqid], []).append(sseqid)
+
+        for genoma, contigs in contigs_por_genoma.items():
+            raw_hits_genoma = raw_hits_por_genoma.get(genoma, 0)
+            achou_par_valido = False
+            for sseqid in contigs:
+                if achou_par_valido:
+                    break
+                for x in fwd_por_contig[sseqid]:
+                    if achou_par_valido:
+                        break
+                    for y in rev_por_contig[sseqid]:
+                        passing, tm_fwd, tm_rev, amp_size, threep_f_mm, threep_r_mm, start, end = _check_primer_quals(x, y, fwd_seq, rev_seq, tm_thresh=tm_thresh, size_max=size_max, size_min=size_min, max_3prime_mm=max_3prime_mm, Na=Na, K=K, Tris=Tris, Mg=Mg, dNTPs=dNTPs, saltcorr=saltcorr)
+                        buffer_all += F"{assay_num_target},{fwd_seq},{rev_seq},{x['sseqid']},{tm_fwd},{tm_rev},{amp_size}\n"
+                        if passing:
+                            buffer_passing += F"{assay_num_target},{fwd_seq},{rev_seq},{x['sseqid']},{tm_fwd},{tm_rev},{amp_size},{start},{end},{raw_hits_genoma}\n"
+                            achou_par_valido = True
+                            break
     return buffer_passing, buffer_all
 
 def _pull_amp_seqs(buffer_passing, fasta, log_file, Na=50, K=0, Tris=0, Mg=0, dNTPs=0, saltcorr=5):

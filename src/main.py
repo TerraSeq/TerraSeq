@@ -14,6 +14,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import traceback
+import resource
 from dotenv import load_dotenv
 
 # --- CONFIGURAÇÕES INICIAIS ---
@@ -50,6 +51,17 @@ client = gspread.authorize(credentials)
 
 NOME_DA_PLANILHA = os.environ.get("NOME_DA_PLANILHA", "Submissoes_Primers_Pipeline")
 planilha = client.open(NOME_DA_PLANILHA).sheet1
+
+# Buscas contra bancos combinados grandes (vários bancos split multi-volume)
+# podem abrir mais de 1024 arquivos simultâneos (limite padrão do processo),
+# derrubando o BLAST com "Too many open files". Eleva o teto pro máximo
+# permitido pelo sistema.
+try:
+    _soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    resource.setrlimit(resource.RLIMIT_NOFILE, (min(65536, _hard), _hard))
+    print(f"🔧 Limite de arquivos abertos elevado de {_soft} para {min(65536, _hard)}.")
+except Exception as _e:
+    print(f"⚠️ Não foi possível elevar o limite de arquivos abertos: {_e}")
 
 # ==========================================
 # MOTOR DE CLASSIFICAÇÃO ECOLÓGICA (Global Soil Biodiversity Atlas)
@@ -170,67 +182,98 @@ def extrair_campo_flexivel(dicionario_linha, palavra_chave, padrao="N/A"):
             return valor
     return padrao
 
+TAMANHO_LOTE_ENTREZ = 150  # nº de accessions por chamada -- efetch aceita lista
+
+def _consultar_ncbi_em_lote(accessions):
+    """
+    Consulta o NCBI (Entrez.efetch) em LOTES de accessions numa única
+    chamada, em vez de uma chamada por accession. O limite de 3 req/s sem
+    api_key é POR REQUISIÇÃO HTTP, não por ID dentro dela -- então isso
+    reduz o tempo de rede+espera de ~0,4s×N_contigs pra ~0,4s×(N_contigs/150),
+    sem violar a política do NCBI. Retorna um dict acc_limpo -> registro GBSeq.
+    """
+    registros_por_acc = {}
+    total_lotes = (len(accessions) + TAMANHO_LOTE_ENTREZ - 1) // TAMANHO_LOTE_ENTREZ
+    for i in range(0, len(accessions), TAMANHO_LOTE_ENTREZ):
+        lote = accessions[i:i + TAMANHO_LOTE_ENTREZ]
+        num_lote = i // TAMANHO_LOTE_ENTREZ + 1
+        print(f"   ⏳ Consultando NCBI em lote [{num_lote}/{total_lotes}] ({len(lote)} accessions)...", end="\r")
+        try:
+            handle = Entrez.efetch(db="nucleotide", id=",".join(lote), retmode="xml")
+            records = Entrez.read(handle)
+            handle.close()
+            for rec in records:
+                acc_retornado = rec.get("GBSeq_primary-accession", "").split('.')[0]
+                if acc_retornado:
+                    registros_por_acc[acc_retornado] = rec
+        except Exception as e:
+            print(f"\n   ⚠️ Falha ao consultar lote NCBI [{num_lote}/{total_lotes}]: {e}")
+        time.sleep(0.4)  # cortesia entre LOTES (não entre IDs individuais)
+    return registros_por_acc
+
+
 def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map, total_sequences_banco):
     total_organismos = len(lista_ids)
     print(f"🌳 Consultando NCBI para {total_organismos} organismos únicos...")
     paths = []
-    meta_dict = {} 
-    
+    meta_dict = {}
+
     # DICIONÁRIO PARA A CLASSIFICAÇÃO FUNCIONAL (Cap. 4, p.112)
     # Gerado a partir de FUNCOES_ECOLOGICAS, então cobre automaticamente os
     # 4 grupos do Atlas + "Fora do Escopo do Atlas (Cap.4)" + "Função Indefinida".
     functional_roles = {funcao: {} for funcao in FUNCOES_ECOLOGICAS}
-    
-    for index, subject_id in enumerate(lista_ids, 1):
-        print(f"   ⏳ Baixando dados [{index}/{total_organismos}]: {subject_id}...", end="\r")
-        try:
-            # CORREÇÃO: Pega o ID após o último | ou antes do primeiro | se não tiver prefixo.
-            # Se for gb|JBAMJC...| ele pega o item do meio.
-            partes = subject_id.split('|')
-            acc = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
-            acc = acc.split('.')[0]  # Remove a versão do Accession (.1)
-            handle = Entrez.efetch(db="nucleotide", id=acc, retmode="xml")
-            records = Entrez.read(handle)
-            handle.close()
-            if records:
-                rec = records[0]
-                linhagem = rec["GBSeq_taxonomy"].split("; ")
-                especie = rec["GBSeq_organism"]
-                linhagem.append(especie)
-                if linhagem[0].lower() == "cellular organisms":
-                    linhagem.pop(0)
-                paths.append(linhagem)
 
-                if especie not in meta_dict:
-                    meta_dict[especie] = {
-                        "info": {
-                            "acc": rec.get("GBSeq_primary-accession", acc),
-                            "desc": rec.get("GBSeq_definition", "Descrição indisponível"),
-                            "length": rec.get("GBSeq_length", "N/A")
-                        },
-                        "amplicons": []
-                    }
-                
-                # ---> INJETAR ESTA PARTE NOVA LOGO ABAIXO DO paths.append <---
-                grupo, tamanho, funcao = classificar_ecologia(linhagem)
-                
-                if grupo not in functional_roles[funcao]:
-                    # Agora criamos um dicionário que guarda o tamanho e a lista de espécies
-                    functional_roles[funcao][grupo] = {"tamanho": tamanho, "especies": []}
-                    
-                functional_roles[funcao][grupo]["especies"].append({
-                    "especie": especie,
-                    "id": acc,
-                    "matches": len(hits_data_map.get(subject_id, []))
-                })
-                
-                if subject_id in hits_data_map:
-                    meta_dict[especie]["amplicons"].extend(hits_data_map[subject_id])
-                    
+    # CORREÇÃO: Pega o ID após o último | ou antes do primeiro | se não tiver prefixo.
+    # Se for gb|JBAMJC...| ele pega o item do meio.
+    acc_por_subject_id = {}
+    for subject_id in lista_ids:
+        partes = subject_id.split('|')
+        acc = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
+        acc_por_subject_id[subject_id] = acc.split('.')[0]  # Remove a versão do Accession (.1)
+
+    registros_por_acc = _consultar_ncbi_em_lote(list(set(acc_por_subject_id.values())))
+
+    for index, subject_id in enumerate(lista_ids, 1):
+        acc = acc_por_subject_id[subject_id]
+        try:
+            rec = registros_por_acc.get(acc)
+            if rec is None:
+                raise KeyError(f"NCBI não retornou registro para {acc}")
+            linhagem = rec["GBSeq_taxonomy"].split("; ")
+            especie = rec["GBSeq_organism"]
+            linhagem.append(especie)
+            if linhagem[0].lower() == "cellular organisms":
+                linhagem.pop(0)
+            paths.append(linhagem)
+
+            if especie not in meta_dict:
+                meta_dict[especie] = {
+                    "info": {
+                        "acc": rec.get("GBSeq_primary-accession", acc),
+                        "desc": rec.get("GBSeq_definition", "Descrição indisponível"),
+                        "length": rec.get("GBSeq_length", "N/A")
+                    },
+                    "amplicons": []
+                }
+
+            # ---> INJETAR ESTA PARTE NOVA LOGO ABAIXO DO paths.append <---
+            grupo, tamanho, funcao = classificar_ecologia(linhagem)
+
+            if grupo not in functional_roles[funcao]:
+                # Agora criamos um dicionário que guarda o tamanho e a lista de espécies
+                functional_roles[funcao][grupo] = {"tamanho": tamanho, "especies": []}
+
+            functional_roles[funcao][grupo]["especies"].append({
+                "especie": especie,
+                "id": acc,
+                "matches": len(hits_data_map.get(subject_id, []))
+            })
+
+            if subject_id in hits_data_map:
+                meta_dict[especie]["amplicons"].extend(hits_data_map[subject_id])
+
         except Exception:
             paths.append(["Unclassified"])
-        
-        time.sleep(0.4) 
 
     print(f"\n   ✅ Árvore construída com sucesso para {total_organismos} organismos!")
 
@@ -394,7 +437,20 @@ def run_pipeline(req, req_id):
     mismatches = int(req.get('Máximo de Mismatches na extremidade 3', 0) or 0)
     e_value = str(req.get('E-value máximo', 10.0) or 10.0)
     cobertura = str(req.get('Cobertura mínima', 0) or 0)
-    max_hits = str(req.get('Limite de hits', 30000) or 30000)
+    # Teto de segurança pro "Limite de hits" (-max_target_seqs do BLAST): o
+    # usuário pode pedir um valor menor, mas nunca maior que isso -- valores
+    # muito altos aqui, combinados com --amp_seq (que puxa a sequência
+    # completa de cada amplicon, 2-8kb no caso de long reads), já derrubaram
+    # o servidor por OOM. Isso NÃO é o mesmo problema da cobertura por
+    # genoma -- esse é resolvido em _evaluate_hit_loc (run_parse_blastn.py),
+    # que agora para na 1ª validação por genoma em vez de esgotar a cota
+    # de hits do BLAST inteira num único genoma fragmentado/multi-cópia.
+    LIMITE_MAXIMO_HITS = 5000
+    max_hits_solicitado = int(req.get('Limite de hits', LIMITE_MAXIMO_HITS) or LIMITE_MAXIMO_HITS)
+    if max_hits_solicitado > LIMITE_MAXIMO_HITS:
+        print(f"⚠️ 'Limite de hits' pedido ({max_hits_solicitado}) acima do teto de segurança "
+              f"({LIMITE_MAXIMO_HITS}) -- usando o teto pra evitar estourar a memória do servidor.")
+    max_hits = str(min(max_hits_solicitado, LIMITE_MAXIMO_HITS))
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
     # ==========================================
@@ -537,7 +593,11 @@ def run_pipeline(req, req_id):
                     "start": extrair_campo_flexivel(linha, "start", "N/A"),
                     "end": extrair_campo_flexivel(linha, "end", "N/A"),
                     # Tenta pegar as colunas exatas do amplicon primeiro!
-                    "seq": linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível'))
+                    "seq": linha.get('Amplicon_sequence', linha.get('amplicon_sequence', 'Sequência indisponível')),
+                    # Quantos hits BRUTOS do BLAST (fwd+rev, antes de validar Tm/mismatch)
+                    # esse genoma teve no total -- calculado em _evaluate_hit_loc, mesmo
+                    # com a validação parando no 1º par válido por genoma.
+                    "raw_hits_genoma": extrair_campo_flexivel(linha, "Raw_hits_no_genoma", "N/A")
                 })
 
     media_amplicon = (soma_amplicon / total_matches) if total_matches > 0 else 0
@@ -644,5 +704,12 @@ while True:
     except Exception as e:
         print(f"\n🔥 ERRO FATAL DETECTADO NA EXECUÇÃO PRINCIPAL:")
         traceback.print_exc()
+        if isinstance(e, subprocess.CalledProcessError):
+            if e.stderr:
+                print("📋 STDERR DO COMANDO QUE FALHOU:")
+                print(e.stderr)
+            if e.stdout:
+                print("📋 STDOUT DO COMANDO QUE FALHOU:")
+                print(e.stdout)
         print("Reiniciando a varredura em 10 segundos...")
         time.sleep(10)
