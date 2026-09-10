@@ -7,7 +7,7 @@ from Bio.SeqUtils import MeltingTemp as mt
 
 from reformat import _determine_primerfile_type, _check_and_read_valid_FASTA, _idt_to_fasta
 # Retiramos o _pull_amp_seqs original da importação e mantemos os outros
-from run_parse_blastn import _call_makeblastdb, _call_blastn, _blast_to_dict, _evaluate_hit_loc
+from run_parse_blastn import _call_makeblastdb, _call_blastn, _blast_to_dict, _evaluate_hit_loc, CAMINHO_BLAST_BIN
 
 
 # ==========================================
@@ -77,7 +77,10 @@ def extrair_amplicons_via_blastdbcmd(csv_buffer, db_string, Na=50, K=0, Tris=0, 
             strand = "plus"
             
         # 4. O pulo do gato: ID limpo e protegido por aspas simples ('{acc}')
-        comando_shell = f"blastdbcmd -db \"{db_string}\" -entry '{acc}' -range {range_str} -strand {strand} -outfmt %s"
+        # Caminho fixo do binário (ver CAMINHO_BLAST_BIN em run_parse_blastn.py) --
+        # mesma razão do blastn: não depender de qual "blastdbcmd" o PATH resolver.
+        blastdbcmd_bin = os.path.join(CAMINHO_BLAST_BIN, "blastdbcmd")
+        comando_shell = f"{blastdbcmd_bin} -db \"{db_string}\" -entry '{acc}' -range {range_str} -strand {strand} -outfmt %s"
         
         try:
             res = subprocess.run(comando_shell, shell=True, capture_output=True, text=True, check=True)

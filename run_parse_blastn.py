@@ -117,10 +117,23 @@ def _check_primer_quals(hit1, hit2, fwd_seq, rev_seq, tm_thresh = 45., size_max=
     else:
         return False, 0., 0. , 0, 0, 0, 0, 0
 
+# Caminho fixo pros binários do BLAST+, em vez de confiar no "blastn"/
+# "makeblastdb" que o PATH da sessão resolver. O servidor tem DUAS versões
+# instaladas -- /usr/bin/blastn (2.12.0, com o bug conhecido de NULL pointer
+# em bancos split multi-volume + saída de sequência) e
+# /home/othin/blast-latest/bin/blastn (2.17.0, onde o bug foi corrigido) --
+# e qual delas o PATH resolve primeiro depende de COMO o processo foi
+# iniciado (terminal novo vs. antigo, systemd vs. shell manual, etc). Isso já
+# causou o bug voltar silenciosamente mesmo depois de "corrigido" com a
+# atualização de versão. Fixar o caminho absoluto elimina essa
+# ambiguidade -- ajustável via env var se o binário for movido no futuro.
+CAMINHO_BLAST_BIN = os.environ.get("CAMINHO_BLAST_BIN", "/home/othin/blast-latest/bin")
+
 def _call_makeblastdb(fasta, log_file):
+    makeblastdb_bin = os.path.join(CAMINHO_BLAST_BIN, "makeblastdb")
     with open(log_file, "a") as log:
         db_basename = os.path.splitext(fasta)[0]
-        subprocess.run(F" makeblastdb -in {fasta} -dbtype nucl -out {db_basename}__BLAST", check=True, shell=True, stderr=log)
+        subprocess.run(F" {makeblastdb_bin} -in {fasta} -dbtype nucl -out {db_basename}__BLAST", check=True, shell=True, stderr=log)
     return F"{db_basename}__BLAST"
 
 # Tamanho de banco de dados FIXO usado so para o calculo estatistico do
@@ -146,7 +159,8 @@ def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, ou
     # Definir so "-word_size 7" nao resolve, porque o algoritmo de
     # busca/extensao usado continua sendo o do megablast. A NCBI recomenda
     # blastn-short para qualquer query abaixo de 50 pb.
-    cmd = F"blastn -task blastn-short -query {query} -db {db} -num_threads {nt} -word_size 7 -evalue {ev} -dbsize {DBSIZE_REFERENCIA} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
+    blastn_bin = os.path.join(CAMINHO_BLAST_BIN, "blastn")
+    cmd = F"{blastn_bin} -task blastn-short -query {query} -db {db} -num_threads {nt} -word_size 7 -evalue {ev} -dbsize {DBSIZE_REFERENCIA} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
 
     if qcov_hsp_perc > 0:
         cmd += F" -qcov_hsp_perc {qcov_hsp_perc}"
