@@ -773,7 +773,13 @@ def run_pipeline(req, req_id):
                     # Guardada só em memória -- extraída pro arquivo separado
                     # sequencias_completas.json (e removida daqui) antes de
                     # salvar o result.json, ver mais abaixo.
-                    "_seq_completa": seq_original if seq_completa_disponivel else None
+                    "_seq_completa": seq_original if seq_completa_disponivel else None,
+                    # Quantos hits BRUTOS do BLAST (fwd+rev, antes de validar Tm/mismatch)
+                    # esse genoma teve no total -- calculado em _evaluate_hit_loc
+                    # (run_parse_blastn.py), que agora para no 1º par válido por genoma
+                    # em vez de esgotar a cota de --max_target_seqs num único genoma
+                    # fragmentado/multi-cópia.
+                    "raw_hits_genoma": extrair_campo_flexivel(linha, "Raw_hits_no_genoma", "N/A")
                 })
 
     media_amplicon = (soma_amplicon / total_matches) if total_matches > 0 else 0
