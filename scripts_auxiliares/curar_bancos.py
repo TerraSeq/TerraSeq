@@ -231,15 +231,15 @@ def filtrar_e_reindexar(taxon, banidos):
         os.remove(f)
 
     # -max_file_sz: ver comentário equivalente em preparar_blast.py -- sem
-    # isso, bancos grandes viram dezenas/centenas de volumes (~1GB cada por
+    # isso, bancos grandes viram dezenas/centenas de volumes (~1GiB cada por
     # padrão) e o blastn passa a falhar silenciosamente ao buscar a
     # sequência dos hits (>90 volumes, aprox.), devolvendo sseqid="Unknown"
-    # em vez de erro.
+    # em vez de erro. makeblastdb exige -max_file_sz < 4GiB.
     comando = [
         "makeblastdb", "-in", temp_fasta, "-dbtype", "nucl",
         "-out", base_out, "-title", f"Banco {taxon.capitalize()} (curado)",
         "-parse_seqids",
-        "-max_file_sz", "20GB",
+        "-max_file_sz", "3900MB",
     ]
     resultado = subprocess.run(comando, capture_output=True, text=True)
     os.remove(temp_fasta)

@@ -52,7 +52,7 @@ for taxon in pastas_taxons:
                     outfile.write(line)
     
     # 2. Comando profissional de indexação
-    # -max_file_sz: sem isso, o makeblastdb usa o padrão de ~1GB por volume,
+    # -max_file_sz: sem isso, o makeblastdb usa o padrão de ~1GiB por volume,
     # e bancos grandes (dezenas/centenas de GB) viram dezenas ou CENTENAS de
     # volumes (.00.nsq, .01.nsq, ...). O coleoptera (421GB) chegou a 107
     # volumes e isso quebrou o blastn: "Error pre-fetching sequence data"
@@ -60,8 +60,9 @@ for taxon in pastas_taxons:
     # zeradas pra 100% dos hits, sem nenhum erro fatal -- silencioso.
     # Testamos: araneae com 70 volumes e gastropoda com 89 funcionam bem,
     # coleoptera com 107 falha 100% -- o limite real do BLAST+ fica em
-    # algum ponto entre 90 e 106 volumes. 20GB por volume mantém qualquer
-    # banco atual (o maior é araneae, 271GB) bem abaixo de 20 volumes.
+    # algum ponto entre 90 e 106 volumes. O makeblastdb exige
+    # -max_file_sz < 4GiB (rejeita valores maiores), então usamos o maior
+    # valor permitido pra minimizar o número de volumes.
     comando = [
         "makeblastdb",
         "-in", temp_fasta,
@@ -69,7 +70,7 @@ for taxon in pastas_taxons:
         "-out", base_out,
         "-title", f"Banco {taxon.capitalize()}",
         "-parse_seqids",
-        "-max_file_sz", "20GB",
+        "-max_file_sz", "3900MB",
     ]
     
     print(f"  -> Executando makeblastdb...")
