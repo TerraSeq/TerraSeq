@@ -670,11 +670,10 @@ def run_pipeline(req, req_id):
             sequencias_completas[especie] = lista_seqs
 
     avisos = []
-    # Cobertura = organismos ÚNICOS batidos (len(meta_dict), 1 por espécie)
-    # sobre o total de organismos do grupo -- NÃO len(lista_bacterias), que
-    # conta SEQUÊNCIAS (scaffolds/contigs individuais, várias por organismo
-    # em genomas fragmentados). Ver comentário equivalente em main.py.
-    total_organismos_unicos = len(meta_dict)
+    # Cobertura = GENOMAS únicos batidos (len(lista_bacterias)) sobre o total
+    # de genomas do grupo -- mesma unidade dos dois lados. Ver comentário
+    # completo (com histórico) equivalente em main.py.
+    total_organismos_unicos = len(lista_bacterias)
     cobertura_global = (total_organismos_unicos / total_sequencias_banco) if total_sequencias_banco > 0 else 0
     if cobertura_global < 0.60: avisos.append("Cobertura geral baixa. Verifique os filos relevantes.")
     if mismatches > 2: avisos.append("Potenciais off-targets (Tolerância a mismatch alta).")

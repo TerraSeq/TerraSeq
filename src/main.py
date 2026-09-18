@@ -817,13 +817,28 @@ def run_pipeline(req, req_id):
             sequencias_completas[especie] = lista_seqs
 
     avisos = []
-    # Cobertura = organismos ÚNICOS batidos (len(meta_dict), 1 por espécie)
-    # sobre o total de organismos do grupo -- NÃO len(lista_bacterias), que
-    # conta SEQUÊNCIAS (scaffolds/contigs individuais, várias por organismo
-    # em genomas fragmentados). Misturar as duas unidades inflava a
-    # cobertura reportada (uma sequência com 8 scaffolds batendo já contava
-    # como "8" no numerador, mas o denominador conta esse organismo como 1).
-    total_organismos_unicos = len(meta_dict)
+    # Cobertura = GENOMAS únicos batidos (len(lista_bacterias)) sobre o total
+    # de genomas do grupo (total_sequencias_banco) -- mesma unidade dos dois
+    # lados. Duas montagens de genoma diferentes da MESMA espécie (ex: dois
+    # sequenciamentos distintos de um papagaio) contam como 2 aqui, porque o
+    # banco também as cataloga como 2 genomas distintos.
+    #
+    # Antes (até 10/09) usava len(meta_dict) -- 1 entrada por ESPÉCIE -- só
+    # porque na época results.pass.csv ainda tinha 1 linha por CONTIG bruto
+    # (várias por organismo em genomas fragmentados), então contar por
+    # espécie era o único jeito de aproximar "organismo" sem inflar o
+    # numerador. Isso mudou com o agrupamento por genoma em
+    # _evaluate_hit_loc (run_parse_blastn.py, ver README) -- desde então
+    # results.pass.csv já tem no máximo ~1 linha por GENOMA (não por
+    # contig), então len(lista_bacterias) passou a ser a contagem correta
+    # de genomas, e usar len(meta_dict) (espécie) voltava a misturar
+    # unidades no sentido oposto: dividia espécie por genoma, subestimando a
+    # cobertura real (caso observado: 4.231 espécies / 8.466 genomas = 50%
+    # exibido, mas o número por genoma, cientificamente o que "quantos
+    # genomas catalogados o primer detectou", é 6.735 / 8.466 = 79,5%).
+    # meta_dict continua agrupado por espécie só para a árvore taxonômica
+    # de navegação (leaf_metadata) -- não para esta estatística de cobertura.
+    total_organismos_unicos = len(lista_bacterias)
     cobertura_global = (total_organismos_unicos / total_sequencias_banco) if total_sequencias_banco > 0 else 0
     if cobertura_global < 0.60: avisos.append("Cobertura geral baixa. Verifique os filos relevantes.")
     if mismatches > 2: avisos.append("Potenciais off-targets (Tolerância a mismatch alta).")

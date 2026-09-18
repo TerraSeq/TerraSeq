@@ -552,8 +552,41 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   corretamente alinhado) em vez de arriscar associar a sequência errada
   à linha errada. Linhas com coordenadas inválidas (`start`/`end` <= 0)
   continuam sendo puladas do lote e marcadas `N/A` direto, como antes.
-  Estimativa (não confirmada em produção ainda): a etapa de extração deve
-  cair de ~5h pra poucos minutos.
+  Confirmado em produção (REQ-20260918-0069, reprocessado): blastn levou
+  13m13s e o processamento inteiro (extração + árvore taxonômica +
+  publicação + e-mail) terminou sem a espera de ~5h de antes.
+
+- **"Cobertura Estimada" e "Organismos Únicos" do relatório misturavam
+  unidades (espécie vs. genoma), subestimando a cobertura real.** O
+  numerador (`total_organismos_unicos`) vinha de `len(meta_dict)` --
+  agrupamento por NOME DE ESPÉCIE via linhagem taxonômica do NCBI -- mas o
+  denominador (`total_sequencias_banco`, de `BANCOS_DISPONIVEIS`) conta
+  GENOMAS/assemblies cadastrados no banco, não espécies. Se duas
+  montagens de genoma diferentes no banco são da mesma espécie (ex: dois
+  sequenciamentos distintos de um mesmo tipo de organismo), ambas
+  aparecem como hits distintos, mas colapsavam em 1 só no numerador --
+  caso observado: REQ-20260918-0069 mostrava "4.231 Organismos Únicos" /
+  "8.466 genomas" = 50,0%, enquanto a contagem por genoma (a que já
+  tínhamos validado manualmente) era 6.735/8.466 = 79,5%. Esse cálculo
+  por espécie fazia sentido quando foi escrito (25/08): na época
+  `results.pass.csv` ainda tinha 1 linha por CONTIG bruto (sem
+  agrupamento por genoma), então contar por espécie era o único jeito de
+  aproximar "organismo" sem inflar o numerador com contigs fragmentados
+  do mesmo genoma. Isso mudou com o agrupamento por genoma em
+  `_evaluate_hit_loc` (10/09, ver entrada acima sobre
+  `--max_target_seqs`) -- desde então `results.pass.csv` já tem no máximo
+  ~1 linha por GENOMA, não por contig, então `len(lista_bacterias)`
+  (contagem de `Subject_ID` únicos) passou a ser a contagem correta de
+  genomas.
+
+  **Fix**: `total_organismos_unicos` em `run_pipeline` (`main.py` e
+  `main_issues.py`) agora usa `len(lista_bacterias)` (genoma) em vez de
+  `len(meta_dict)` (espécie) pras estatísticas de cobertura. O próprio
+  texto do template (`docs/template.html`) já dizia "X de Y **genomas**
+  captados" -- confirmando que a unidade esperada sempre foi genoma, só o
+  cálculo por trás estava em espécie. `meta_dict` continua agrupado por
+  espécie normalmente, só não pra essa estatística -- a árvore
+  taxonômica de navegação (`leaf_metadata`) não muda.
 
 - **`data/refseq` é um symlink pra um HD externo que precisa ser montado
   manualmente depois de reboot** -- se comandos que deveriam achar
