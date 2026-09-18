@@ -421,7 +421,18 @@ def run_pipeline(req, req_id):
     mismatches = int(req.get('Máximo de Mismatches na extremidade 3', 0) or 0)
     e_value = str(req.get('E-value máximo', 10.0) or 10.0)
     cobertura = str(req.get('Cobertura mínima', 0) or 0)
-    max_hits = str(req.get('Limite de hits', 30000) or 30000)
+    # Teto de segurança do servidor: ver comentário completo equivalente em
+    # main.py (run_pipeline) -- essa versão (canal GitHub Issues) nunca
+    # teve esse teto, aceitando qualquer valor digitado na Issue sem
+    # limite nenhum. 30000 é o mesmo teto validado em 17/09/2026 (pico de
+    # ~114GB de RAM/87%, sem OOM, testado manualmente contra o banco
+    # "eucariotos" com ~8.400 genomas).
+    LIMITE_MAXIMO_HITS = 30000
+    max_hits_solicitado = int(req.get('Limite de hits', LIMITE_MAXIMO_HITS) or LIMITE_MAXIMO_HITS)
+    if max_hits_solicitado > LIMITE_MAXIMO_HITS:
+        print(f"⚠️ 'Limite de hits' pedido ({max_hits_solicitado}) acima do teto de segurança "
+              f"({LIMITE_MAXIMO_HITS}) -- usando o teto pra evitar estourar a memória do servidor.")
+    max_hits = str(min(max_hits_solicitado, LIMITE_MAXIMO_HITS))
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
     # ==========================================

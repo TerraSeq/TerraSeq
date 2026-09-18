@@ -308,8 +308,11 @@ código.
    - `run_parse_blastn._call_blastn` monta e roda o `blastn` de fato
      (`-task blastn-short`, `-word_size 7`, `-dbsize` fixo pra e-value
      consistente entre bancos de tamanhos diferentes, `-max_target_seqs`
-     limitado a **5000** como teto de segurança contra OOM independente
-     do que o usuário pediu).
+     limitado a **30000** como teto de segurança contra OOM independente
+     do que o usuário pediu -- ver seção de bugs resolvidos: esse teto é
+     por CONTIG dentro do próprio `blastn`, não por genoma, e um valor
+     baixo demais corta a busca antes de alcançar boa parte de um banco
+     combinado grande, mesmo sem nenhum erro).
    - `_blast_to_dict` agrupa os hits por sequência-alvo (`sseqid`).
    - `_evaluate_hit_loc` cruza hits *forward*/*reverse* da mesma
      sequência, agrupa por **genoma** (heurística de prefixo de accession
@@ -492,6 +495,30 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   local + taxdump em memória), Entrez só como fallback raro. Bônus:
   quando o fallback é necessário, é feito em lote (`efetch` com múltiplos
   IDs por chamada) em vez de um por vez.
+
+- **`--max_target_seqs` baixo demais (5000) silenciosamente subestimava a
+  cobertura em bancos combinados grandes** -- é um teto do PRÓPRIO
+  `blastn`, por CONTIG, aplicado durante a busca em si (não algo que o
+  código Python controla depois). Com o banco "eucariotos" crescendo pra
+  ~8.400 genomas, o `blastn` batia no teto de 5000 contigs (fwd e rev,
+  cada um separadamente) bem antes de alcançar a maioria dos genomas do
+  banco -- sem erro nenhum, só devolvendo pouquíssimos hits reais (caso
+  observado: 8.466 genomas no banco, só 227 cobertos). O agrupamento por
+  genoma (`_evaluate_hit_loc`) não resolve isso sozinho: ele só otimiza o
+  que o `blastn` já decidiu reportar, não recupera dados que o `blastn`
+  nunca chegou a examinar. Diagnosticado contando `sseqid`/genoma
+  distintos no `saida__blastn.out` bruto e comparando com o valor do
+  teto (bateram exatamente 5000/5000 nos dois sentidos). Fix: teto subido
+  pra **30000** (`LIMITE_MAXIMO_HITS` em `main.py` e `main_issues.py` --
+  esse último não tinha teto nenhum antes, corrigido junto). Testado
+  manualmente sem `--amp_seq`: pico de ~114GB de RAM (87% de 125GB) só no
+  `blastn`, sem OOM -- aceitável porque o `blastn` termina e libera essa
+  memória ANTES da extração de amplicon começar (não acumula com a etapa
+  seguinte). Se o banco combinado continuar crescendo, esse teto pode
+  precisar subir de novo -- o sintoma é sempre o mesmo: cobertura caindo
+  sem erro nenhum no log, e a contagem de `sseqid` distintos por direção
+  em `saida__blastn.out` (`cut -f1,2 arquivo | sort -u | ...`) batendo
+  exatamente no valor do teto atual.
 
 - **`data/refseq` é um symlink pra um HD externo que precisa ser montado
   manualmente depois de reboot** -- se comandos que deveriam achar

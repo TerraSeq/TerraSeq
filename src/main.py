@@ -504,10 +504,25 @@ def run_pipeline(req, req_id):
     # amplicon, 2-8kb "long read", por hit) chegou a consumir ~123GB de RAM
     # numa máquina de 125GB e foi morta pelo OOM killer do Linux -- sem esse
     # teto, qualquer pesquisador digitando um número alto no formulário
-    # consegue derrubar o servidor sem querer. 5000 hits já é generoso pra
-    # medir cobertura (o banco "eucariotos" tem ~8.300 genomas no total) e
-    # fica bem longe do ponto que travou a máquina.
-    LIMITE_MAXIMO_HITS = 5000
+    # consegue derrubar o servidor sem querer.
+    #
+    # Esse OOM antigo era do PYTHON (pareamento fwd x rev O(N²) sem
+    # agrupar por sseqid + extração de amplicon completo de TODO hit bruto),
+    # não do blastn -- já corrigido em run_parse_blastn.py (agrupamento por
+    # genoma, para no 1º par válido, então só ~1 amplicon é extraído por
+    # genoma, não por hit). Descobrimos em 17/09/2026 que --max_target_seqs
+    # baixo (5000) tem um efeito colateral sério e não intencional: é um
+    # teto do PRÓPRIO blastn por CONTIG (não por genoma), aplicado durante a
+    # busca -- com bancos combinados grandes (~8.400 genomas), poucos
+    # genomas fragmentados podem consumir toda a cota antes do blastn sequer
+    # alcançar milhares de outros genomas, sem erro nenhum, só cobertura
+    # artificialmente baixa (caso real: 8.466 genomas no banco, só 227
+    # cobertos com teto 5000 vs. cobertura muito maior com teto mais alto).
+    # Testado manualmente com 30000: pico de ~114GB de RAM (87%) só no
+    # blastn (sem --amp_seq rodando junto), terminou sem OOM. Como o blastn
+    # roda e termina ANTES da extração de amplicon começar (memória liberada
+    # entre as etapas, não acumula), 30000 é aceito como novo teto.
+    LIMITE_MAXIMO_HITS = 30000
     max_hits_solicitado = int(req.get('Limite de hits', LIMITE_MAXIMO_HITS) or LIMITE_MAXIMO_HITS)
     if max_hits_solicitado > LIMITE_MAXIMO_HITS:
         print(f"⚠️ 'Limite de hits' pedido ({max_hits_solicitado}) acima do teto de segurança "
