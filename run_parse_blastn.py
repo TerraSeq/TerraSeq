@@ -160,16 +160,44 @@ def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, ou
     # busca/extensao usado continua sendo o do megablast. A NCBI recomenda
     # blastn-short para qualquer query abaixo de 50 pb.
     blastn_bin = os.path.join(CAMINHO_BLAST_BIN, "blastn")
-    cmd = F"{blastn_bin} -task blastn-short -query {query} -db {db} -num_threads {nt} -word_size 7 -evalue {ev} -dbsize {DBSIZE_REFERENCIA} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
 
-    if qcov_hsp_perc > 0:
-        cmd += F" -qcov_hsp_perc {qcov_hsp_perc}"
+    # Bancos combinados (ex: "eucariotos", 28+ grupos taxonomicos) chegam
+    # aqui como uma unica string com varios caminhos separados por espaco
+    # (o "db" recebido de primer_blast_local.py, ja entre aspas). Rodar
+    # isso como UMA chamada de blastn faz todos os bancos disputarem a
+    # MESMA cota de -max_target_seqs -- que e um limite do PROPRIO blastn,
+    # por CONTIG, aplicado durante a propria busca (nao algo que o
+    # pos-processamento em Python consegue compensar depois). Na pratica:
+    # poucos genomas fragmentados em UM dos bancos combinados podem
+    # consumir a cota inteira antes do blastn sequer examinar os outros
+    # bancos -- sem erro nenhum, so cobertura artificialmente baixa (ver
+    # README, secao de bugs resolvidos -- ja aconteceu de verdade: banco
+    # com 8.466 genomas, so 227 cobertos com a cota compartilhada).
+    #
+    # Fix: roda um blastn SEPARADO por banco, cada um com sua PROPRIA cota
+    # cheia de max_target_seqs, e concatena as saidas num unico out_file --
+    # o resto do pipeline (_blast_to_dict em diante) nao precisa saber que
+    # isso mudou, ja que so le um arquivo de outfmt 6 no final. Nenhum
+    # banco consegue mais "roubar" cota de outro, e isso escala sozinho
+    # conforme mais bancos forem adicionados na curadoria futura, sem
+    # precisar reajustar max_target_seqs de novo. Bancos unicos (nao
+    # combinados) continuam se comportando exatamente como antes -- so tem
+    # 1 banco na lista, roda uma unica vez.
+    bancos = db.strip().strip('"').split()
 
-    cmd += F" > {out_file}"
-    
+    open(out_file, "w").close()  # zera/cria -- cada banco abaixo faz append
+
     with open(log_file, "a") as log:
-        subprocess.run(cmd, check=True, shell=True, stderr=log)
-        print(cmd)
+        for banco in bancos:
+            cmd = F"{blastn_bin} -task blastn-short -query {query} -db \"{banco}\" -num_threads {nt} -word_size 7 -evalue {ev} -dbsize {DBSIZE_REFERENCIA} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
+
+            if qcov_hsp_perc > 0:
+                cmd += F" -qcov_hsp_perc {qcov_hsp_perc}"
+
+            cmd += F" >> {out_file}"
+
+            subprocess.run(cmd, check=True, shell=True, stderr=log)
+            print(cmd)
 
 
 def _blast_to_dict(file):
