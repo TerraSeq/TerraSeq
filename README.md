@@ -527,6 +527,34 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   validado sem OOM (pico de ~114GB/87% de RAM rodando um banco grande
   sozinho com esse valor).
 
+- **Extração de sequência do amplicon (`blastdbcmd`) uma chamada por hit
+  era o novo gargalo depois do fix acima.** Resolvida a cobertura (ex:
+  6.735 organismos passando de verdade numa submissão real), a próxima
+  etapa -- extrair a sequência do amplicon de cada hit passante via
+  `blastdbcmd` -- rodava UMA chamada de subprocesso POR LINHA do CSV de
+  resultados, cada chamada reabrindo do zero os 28 bancos combinados do
+  alias. Medido em produção: ~1 extração a cada 2,7s, o que pra 6.735
+  hits extrapolava pra **~5 horas** só nessa etapa (a submissão real
+  REQ-20260918-0069 foi cancelada em andamento por causa disso).
+
+  **Fix**: `extrair_amplicons_via_blastdbcmd` (`primer_blast_local.py`)
+  agora monta um arquivo temporário com uma linha `<accession> <range>
+  <strand>` por hit e chama `blastdbcmd -entry_batch <arquivo>` UMA ÚNICA
+  VEZ pra todos os hits, em vez de um `-entry` por hit (o
+  `-entry_batch` aceita exatamente esse formato por linha, confirmado no
+  `-help` do binário). Os bancos são abertos uma vez só. Segurança: como
+  o alinhamento das sequências de volta pras linhas do CSV é por
+  POSIÇÃO (na mesma ordem do arquivo de lote), o código confere se o
+  número de linhas devolvidas bate com o número de entradas pedidas
+  antes de confiar nesse alinhamento -- se não bater (ex: o
+  `blastdbcmd` pulou alguma entrada silenciosamente), cai automaticamente
+  pro modo antigo (uma chamada por hit, mais lento mas sempre
+  corretamente alinhado) em vez de arriscar associar a sequência errada
+  à linha errada. Linhas com coordenadas inválidas (`start`/`end` <= 0)
+  continuam sendo puladas do lote e marcadas `N/A` direto, como antes.
+  Estimativa (não confirmada em produção ainda): a etapa de extração deve
+  cair de ~5h pra poucos minutos.
+
 - **`data/refseq` é um symlink pra um HD externo que precisa ser montado
   manualmente depois de reboot** -- se comandos que deveriam achar
   arquivos aí derem "No such type of directory" mesmo com o link
