@@ -588,6 +588,32 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   espécie normalmente, só não pra essa estatística -- a árvore
   taxonômica de navegação (`leaf_metadata`) não muda.
 
+- **"Genomas no Banco (Grupo)" (o denominador da Cobertura Estimada)
+  contava genomas que já tinham sido removidos pela curadoria de
+  habitat -- inflando o denominador com genomas que o BLAST nunca
+  consegue achar.** `data/blast_dbs` (o banco de fato pesquisado) é
+  construído por `curar_bancos.py`, que exclui organismos fora de escopo
+  (`TAXIDS_EXCLUIDOS` -- ex: amebas marinhas, isópodes parasitas de
+  peixe) antes de indexar. A Vitrine (`exportar_acervo_genomas.py`) já
+  aplicava essa mesma exclusão antes de somar. Mas
+  `gerar_manifesto_taxid.py` (gera `contagem_organismos.json`, que
+  alimenta `BANCOS_DISPONIVEIS` em `main.py`/`main_issues.py`) contava
+  os genomas direto de `data/refseq` (o download bruto, pré-curadoria),
+  sem aplicar `TAXIDS_EXCLUIDOS` -- caso observado: banco "eucariotos"
+  mostrava 8.466 genomas no relatório, mas a Vitrine (corretamente
+  curada) mostrava só 8.369 pro mesmo conjunto de grupos, uma diferença
+  de 97 genomas que na prática não existem mais no banco pesquisável.
+
+  **Fix**: `_carregar_info_por_genoma` (`gerar_manifesto_taxid.py`) agora
+  importa `TAXIDS_EXCLUIDOS` de `curar_bancos.py` (mesmo padrão já usado
+  em `exportar_acervo_genomas.py`) e descarta genomas com taxId banido
+  antes de contar E antes de entrar no manifesto SQLite de taxonomia --
+  `contagem_organismos.json` passa a refletir o total real de
+  `data/blast_dbs`, não o total bruto de `data/refseq`. Rodar
+  `gerar_manifesto_taxid.py` de novo no servidor pra regenerar
+  `contagem_organismos.json` com os números corretos (não precisa rodar
+  `exportar_acervo_genomas.py` de novo -- a Vitrine já estava certa).
+
 - **`data/refseq` é um symlink pra um HD externo que precisa ser montado
   manualmente depois de reboot** -- se comandos que deveriam achar
   arquivos aí derem "No such type of directory" mesmo com o link

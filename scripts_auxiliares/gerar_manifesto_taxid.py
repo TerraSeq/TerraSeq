@@ -2,6 +2,10 @@ import os
 import glob
 import json
 import sqlite3
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from curar_bancos import TAXIDS_EXCLUIDOS  # noqa: E402
 
 DIRETORIO_ORIGEM = "/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/refseq"
 DIRETORIO_MANIFESTOS = "/home/othin/Documents/tiago/Projeto_completo/pipeline_genoma/data/manifestos"
@@ -44,12 +48,19 @@ CAMINHO_CONTAGEM = os.path.join(DIRETORIO_MANIFESTOS, "contagem_organismos.json"
 TAMANHO_LOTE = 20_000
 
 
-def _carregar_info_por_genoma(pasta_taxon):
-    """Retorna {accession_genoma: (taxid, tamanho_genoma)}."""
+def _carregar_info_por_genoma(pasta_taxon, taxon):
+    """Retorna {accession_genoma: (taxid, tamanho_genoma)}, já descontando a
+    curadoria de habitat (TAXIDS_EXCLUIDOS, de curar_bancos.py) -- esses
+    genomas não existem em data/blast_dbs (o banco de fato pesquisado pelo
+    BLAST), então não devem ser contados aqui nem entrar no manifesto de
+    taxonomia. Sem isso, "Genomas no Banco (Grupo)" e a Cobertura Estimada
+    de cada relatório ficavam inflados com genomas que o BLAST nunca
+    consegue achar (já removidos do banco de busca de verdade)."""
     caminho_relatorio = os.path.join(pasta_taxon, "ncbi_dataset", "data", "assembly_data_report.jsonl")
     mapa = {}
     if not os.path.exists(caminho_relatorio):
         return mapa
+    taxids_banidos = set(TAXIDS_EXCLUIDOS.get(taxon, {}).keys())
     with open(caminho_relatorio, "r", encoding="utf-8", errors="ignore") as f:
         for linha in f:
             linha = linha.strip()
@@ -59,14 +70,14 @@ def _carregar_info_por_genoma(pasta_taxon):
             acc_genoma = dados.get("accession", "")
             taxid = dados.get("organism", {}).get("taxId")
             tamanho = dados.get("assemblyStats", {}).get("totalSequenceLength")
-            if acc_genoma and taxid:
+            if acc_genoma and taxid and str(taxid) not in taxids_banidos:
                 mapa[acc_genoma] = (str(taxid), tamanho)
     return mapa
 
 
 def gerar_manifesto_taxid(taxon, conexao):
     pasta_taxon = os.path.join(DIRETORIO_ORIGEM, taxon)
-    info_por_genoma = _carregar_info_por_genoma(pasta_taxon)
+    info_por_genoma = _carregar_info_por_genoma(pasta_taxon, taxon)
     if not info_por_genoma:
         print(f"  ⚠️ Nenhum assembly_data_report.jsonl encontrado/válido para {taxon}, pulando.")
         return 0
@@ -146,7 +157,10 @@ if __name__ == "__main__":
     # calcular "Genomas no Banco (Grupo)" e a Cobertura Estimada. Antes esses
     # totais eram digitados manualmente no código (BANCOS_DISPONIVEIS) e
     # ficaram desatualizados (a soma dos 18 grupos não batia nem com o total
-    # combinado "refseqsoil" que eles mesmos deveriam somar).
+    # combinado "refseqsoil" que eles mesmos deveriam somar). Já descontada
+    # a curadoria de habitat (TAXIDS_EXCLUIDOS) -- reflete o total real de
+    # data/blast_dbs, não o total bruto de data/refseq (ver
+    # _carregar_info_por_genoma acima).
     with open(CAMINHO_CONTAGEM, "w", encoding="utf-8") as f:
         json.dump(contagem_por_grupo, f, ensure_ascii=False, indent=2)
 
