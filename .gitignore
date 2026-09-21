@@ -1,8 +1,7 @@
 *.csv
 *.out
 *.stderr.log
-data/refseq/*
-!data/refseq/.gitkeep
+data/refseq
 
 data/blast_dbs/*
 !data/blast_dbs/.gitkeep
