@@ -644,6 +644,34 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   "banco de volume único" pra bancos muito grandes por essa via; o
   máximo prático é ~3.9GB/volume.
 
+- **REQ-ID gerado só a partir de data + número da linha na planilha
+  colidia entre submissões diferentes, sobrescrevendo relatórios
+  silenciosamente.** `main.py` montava o ID assim: `REQ-{data}-{linha
+  da planilha}`. Número de linha do Google Sheets NÃO é estável: se uma
+  linha acima for removida ou a planilha for reordenada (ex: ao limpar
+  a coluna `Status` manualmente pra forçar reprocessamento, prática
+  usada várias vezes nesta sessão), as linhas abaixo sobem uma posição.
+  Duas submissões DIFERENTES no mesmo dia podem então cair na mesma
+  linha e gerar o MESMO REQ-ID -- caso real: duas análises com primers
+  diferentes (`V4_Balzano_F/D11_3143R` e depois `V4_Balzano_F/21R`)
+  geraram ambas `REQ-20260921-0073`; a segunda sobrescreveu
+  `result.json`/`primer.fasta`/`sequencias_completas.json` da primeira
+  na mesma pasta, e a Vitrine ficou com duas linhas apontando pro mesmo
+  link, uma delas mostrando estatísticas de uma análise mas abrindo o
+  relatório da outra. O relatório perdido só foi recuperável porque
+  ainda estava no histórico do git (commit anterior à sobrescrita).
+
+  **Fix**: o ID agora vem do `Timestamp` que o próprio Google Forms
+  grava na linha (único por submissão, não muda se a linha se mover):
+  `REQ-{data}-{hora:minuto:segundo}`. Cai pro esquema antigo só se o
+  `Timestamp` estiver ausente/em formato inesperado. Além disso, antes
+  de gravar, o script confere se a pasta `docs/reports/{req_id}` já
+  existe e, se existir (por qualquer motivo imprevisto), acrescenta um
+  sufixo numérico (`-2`, `-3`...) em vez de sobrescrever -- nunca mais
+  deveria perder um relatório silenciosamente. `main_issues.py` (canal
+  do GitHub Issues) já não tinha esse problema -- usa o número da
+  Issue, que o GitHub nunca reaproveita.
+
 ---
 
 ## Troubleshooting rápido
