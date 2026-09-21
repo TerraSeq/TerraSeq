@@ -620,6 +620,25 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   existindo (`ls -la data/` mostra a seta `->`), é isso. Ver comando de
   mount na seção de estrutura do servidor.
 
+- **Sincronização automática do relatório (`main.py`/`main_issues.py`)
+  travava com `fatal: stash failed` / `'data/refseq/.gitkeep' is beyond
+  a symbolic link` sempre que o push era rejeitado (branch remota
+  avançada) e o script tentava `git pull` sozinho.** Causa: `data/refseq`
+  era rastreado no git como uma pasta normal com um `.gitkeep` (truque
+  pra manter pasta vazia versionada), mas no servidor real esse caminho
+  virou um symlink pro HD externo (ver item acima) -- o índice do git
+  ficou com um `.gitkeep` "fantasma" (aparecia como deletado no `git
+  status`, e `data/refseq` em si como não rastreado). Qualquer operação
+  do git que precisasse mexer nesse caminho (merge com árvore não
+  totalmente limpa, autostash) travava tentando atravessar o symlink.
+  **Fix**: removido `data/refseq/.gitkeep` do rastreamento
+  (`git rm --cached`) e o `.gitignore` passou a ignorar `data/refseq`
+  inteiro (era `data/refseq/*` + exceção pro `.gitkeep`) -- esse
+  caminho não é mais gerenciado pelo git, só documentado no README como
+  etapa manual de setup. Se esse erro voltar a acontecer num clone
+  antigo, rodar `git rm --cached data/refseq/.gitkeep` (se o arquivo
+  ainda estiver rastreado) resolve.
+
 - **`-max_file_sz` do `makeblastdb` rejeita qualquer valor ≥ 4 GiB**
   (`BLAST options error: max_file_sz must be < 4 GiB`) -- não existe
   "banco de volume único" pra bancos muito grandes por essa via; o
