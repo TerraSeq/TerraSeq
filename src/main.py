@@ -929,9 +929,39 @@ while True:
                 # ... resto do código continua igualzinho
                 planilha.update_cell(linha_planilha, COL_STATUS, 'running') 
                 
+                # O ID do relatório precisa ser único por SUBMISSÃO, não por
+                # linha da planilha -- número de linha do Google Sheets NÃO É
+                # estável: se uma linha acima for removida (ex: ao limpar
+                # 'Status' manualmente pra reprocessar), todas as linhas
+                # abaixo sobem uma posição. Duas submissões diferentes no
+                # mesmo dia podem cair na mesma linha e gerar o MESMO
+                # REQ-ID, e a segunda sobrescreve os arquivos da primeira
+                # silenciosamente (aconteceu de verdade: duas submissões
+                # distintas com REQ-20260921-0073, uma delas perdida).
+                # Fix: usa o Timestamp que o próprio Google Forms grava na
+                # linha (é único por submissão, não muda se a linha se
+                # mover) em vez do número da linha. Cai pro esquema antigo
+                # (data + linha) só se o Timestamp estiver ausente/em
+                # formato inesperado.
                 hoje_str = datetime.now().strftime('%Y%m%d')
-                req_id = f"REQ-{hoje_str}-{linha_planilha:04d}"
-                
+                timestamp_str = str(req.get('Timestamp', '')).strip()
+                try:
+                    timestamp_dt = datetime.strptime(timestamp_str, '%m/%d/%Y %H:%M:%S')
+                    req_id = f"REQ-{timestamp_dt.strftime('%Y%m%d-%H%M%S')}"
+                except ValueError:
+                    req_id = f"REQ-{hoje_str}-{linha_planilha:04d}"
+
+                # Salvaguarda final: nunca sobrescreve um relatório já
+                # existente, mesmo que o req_id acima colida por algum
+                # motivo imprevisto (ex: Timestamp ausente caindo no
+                # fallback por linha, que ainda pode colidir).
+                raiz_projeto_loop = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+                req_id_base = req_id
+                sufixo = 2
+                while os.path.exists(os.path.join(raiz_projeto_loop, "docs", "reports", req_id)):
+                    req_id = f"{req_id_base}-{sufixo}"
+                    sufixo += 1
+
                 caminho_relatorio, resultado_json = run_pipeline(req, req_id)
 
                 atualizar_vitrine_html(req, req_id, resultado_json)
