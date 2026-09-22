@@ -190,6 +190,49 @@ def extrair_campo_flexivel(dicionario_linha, palavra_chave, padrao="N/A"):
             return valor
     return padrao
 
+def calcular_organismos_nao_capturados(raiz_projeto, grupos_do_banco, especies_capturadas):
+    """
+    Retorna a lista de organismos catalogados nos grupos pesquisados que o
+    primer NÃO capturou nesta análise (por nome de espécie, mesmo nível do
+    "leaf_metadata"/árvore taxonômica -- não é a mesma unidade "por genoma"
+    da Cobertura Estimada, ver comentário em total_organismos_unicos acima).
+
+    Pedido explícito de um orientador usando a plataforma: o relatório só
+    mostrava quem FOI capturado; para decidir se um primer serve pra um
+    estudo, também precisa saber quem NÃO foi -- só assim dá pra saber
+    sobre quais grupos o primer não permite fazer afirmação nenhuma.
+
+    Fonte dos organismos catalogados: docs/dados/acervo_genomas.json (gerado
+    por scripts_auxiliares/exportar_acervo_genomas.py, já descontando a
+    curadoria de habitat). Como esse arquivo é uma exportação estática que
+    precisa ser regenerada manualmente sempre que novos genomas entram no
+    banco (ver README, seção de bugs resolvidos), a lista pode ficar
+    levemente desatualizada em relação ao banco de busca "ao vivo" -- por
+    isso retorna também um aviso quando isso não pode ser conferido.
+    """
+    caminho_acervo = os.path.join(raiz_projeto, "docs", "dados", "acervo_genomas.json")
+    if not os.path.exists(caminho_acervo):
+        return None, "Acervo de genomas (docs/dados/acervo_genomas.json) não encontrado -- não foi possível calcular quem ficou de fora."
+
+    with open(caminho_acervo, "r", encoding="utf-8") as f:
+        acervo = json.load(f)
+
+    todos_organismos_do_banco = set()
+    for banco in acervo.get("bancos", []):
+        if banco.get("id") in grupos_do_banco:
+            todos_organismos_do_banco.update(banco.get("organismos", []))
+
+    if not todos_organismos_do_banco:
+        return None, "Nenhum dos grupos pesquisados foi encontrado no acervo de genomas -- não foi possível calcular quem ficou de fora."
+
+    nao_capturados = sorted(todos_organismos_do_banco - set(especies_capturadas))
+    aviso = None
+    gerado_em = acervo.get("gerado_em")
+    if gerado_em:
+        aviso = f"Lista de organismos do banco conforme acervo_genomas.json (gerado em {gerado_em}) -- pode não refletir genomas adicionados depois dessa data."
+    return nao_capturados, aviso
+
+
 def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map, total_sequences_banco):
     total_organismos = len(lista_ids)
     print(f"🌳 Consultando NCBI para {total_organismos} organismos únicos...")
@@ -642,6 +685,42 @@ def run_pipeline(req, req_id):
         "refseqsoil": (string_banco_completo, total_refseqsoil)
     }
 
+    # Mesmas chaves de BANCOS_DISPONIVEIS acima, mas apontando pra lista de
+    # grupos taxonômicos (não pro caminho/contagem) -- usado só por
+    # calcular_organismos_nao_capturados pra saber quais entradas de
+    # docs/dados/acervo_genomas.json somar pra cada banco escolhido no forms.
+    BANCOS_GRUPOS = {
+        "fungi": set(tags_fungos),
+        "protozoa": set(tags_protozoarios),
+        "eucariotos": set(bancos_eucariotos),
+        "bacteria": {"bacteria"},
+        "archaea": {"archaea"},
+        "nematoda": {"nematoda"},
+        "tardigrada": {"tardigrada"},
+        "rotifera": {"rotifera"},
+        "acari": {"acari"},
+        "collembola": {"collembola"},
+        "minhocas": set(tags_minhocas),
+        "formigas": {"formicidae"},
+        "isopodes": {"isopoda"},
+        "miriapodes": {"myriapoda"},
+        "enchytraeidae": {"enchytraeidae"},
+        "isoptera": {"isoptera"},
+        "cupins": {"isoptera"},
+        "platelmintos": {"platyhelminthes"},
+        "amoebozoa": {"amoebozoa"},
+        "sar": {"sar"},
+        "discoba": {"discoba"},
+        "metamonada": {"metamonada"},
+        "basidiomycota": {"basidiomycota"},
+        "ascomycota": {"ascomycota"},
+        "mucoromycota": {"mucoromycota"},
+        "chytridiomycota": {"chytridiomycota"},
+        "zoopagomycota": {"zoopagomycota"},
+        "glomeromycota": {"glomeromycota"},
+        "refseqsoil": set(bancos_locais_unicos),
+    }
+
     # 1. Busca no dicionário
     if banco_selecionado in BANCOS_DISPONIVEIS:
         arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS[banco_selecionado]
@@ -803,6 +882,10 @@ def run_pipeline(req, req_id):
     print("⚙️ Preparando montagem taxonômica...")
     arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map, total_sequencias_banco)
 
+    organismos_nao_capturados, aviso_nao_capturados = calcular_organismos_nao_capturados(
+        raiz_projeto, BANCOS_GRUPOS.get(banco_selecionado, set()), meta_dict.keys()
+    )
+
     # Extrai as sequências completas (guardadas em "_seq_completa") pra um
     # arquivo separado -- sequencias_completas.json -- que o botão "Baixar
     # FASTA" do relatório busca sob demanda quando a sequência não coube no
@@ -842,6 +925,7 @@ def run_pipeline(req, req_id):
     cobertura_global = (total_organismos_unicos / total_sequencias_banco) if total_sequencias_banco > 0 else 0
     if cobertura_global < 0.60: avisos.append("Cobertura geral baixa. Verifique os filos relevantes.")
     if mismatches > 2: avisos.append("Potenciais off-targets (Tolerância a mismatch alta).")
+    if aviso_nao_capturados: avisos.append(aviso_nao_capturados)
 
     data_bonita = datetime.now().strftime("%d/%m/%Y às %H:%M")
 
@@ -882,6 +966,11 @@ def run_pipeline(req, req_id):
         "functional_tree": papeis_funcionais,
         "taxonomy_tree": arvore_real,
         "leaf_metadata": meta_dict,
+        # Organismos catalogados nos grupos pesquisados que o primer NÃO
+        # capturou nesta análise (por espécie -- ver comentário em
+        # calcular_organismos_nao_capturados acima). None quando não foi
+        # possível calcular (acervo_genomas.json ausente/grupo não mapeado).
+        "not_captured_organisms": organismos_nao_capturados,
         "warnings": avisos
     }
 

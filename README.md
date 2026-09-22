@@ -672,6 +672,36 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   do GitHub Issues) já não tinha esse problema -- usa o número da
   Issue, que o GitHub nunca reaproveita.
 
+- **Feature: relatório agora também lista quem NÃO foi capturado, não só
+  quem foi.** Pedido de um orientador usando a plataforma: pra decidir se
+  um primer serve pra um estudo, precisa saber tanto quem o primer capta
+  (garantir que o grupo de interesse está incluído) quanto quem ele NÃO
+  capta (sobre quem não dá pra fazer nenhuma afirmação). Antes o
+  `result.json` só tinha `leaf_metadata` (quem foi encontrado); agora tem
+  também `not_captured_organisms` -- lista de organismos catalogados nos
+  grupos pesquisados que não apareceram nos resultados desta análise, no
+  mesmo nível (por espécie) do `leaf_metadata`.
+
+  **Implementação**: `calcular_organismos_nao_capturados()`
+  (`main.py`/`main_issues.py`) lê `docs/dados/acervo_genomas.json` (o
+  mesmo arquivo que alimenta o carrossel "Acervo de Genomas" da Vitrine,
+  já com a curadoria de habitat aplicada -- ver
+  `scripts_auxiliares/exportar_acervo_genomas.py`), soma os organismos
+  dos grupos taxonômicos que compõem o banco pesquisado nesta submissão
+  específica (`BANCOS_GRUPOS`, mesmas chaves de `BANCOS_DISPONIVEIS`) e
+  subtrai quem já está no `leaf_metadata` (capturado). `None` quando não
+  dá pra calcular (arquivo ausente ou grupo não mapeado) -- nesse caso o
+  relatório mostra um aviso em vez da lista, em vez de esconder o
+  problema. Como `acervo_genomas.json` é uma exportação estática (precisa
+  ser regenerada manualmente, ver bug acima sobre esse mesmo arquivo
+  ficar desatualizado), a lista pode ficar levemente desatualizada em
+  relação ao banco "ao vivo" -- por isso o relatório sempre mostra a data
+  em que o acervo foi gerado junto com a lista, como aviso.
+
+  Novo painel "Organismos Não Capturados" em `docs/template.html`,
+  espelhando o mesmo padrão visual (busca + tabela) do painel "Inventário
+  de Cobertura" já existente.
+
 ---
 
 ## Troubleshooting rápido

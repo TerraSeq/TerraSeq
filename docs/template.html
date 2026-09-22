@@ -305,7 +305,7 @@
                 <div class="panel">
                     <h2 class="panel-title">Inventário de Cobertura</h2>
                     <input type="text" id="search-taxa" class="search-box" placeholder="Buscar genomas encontrados nesta análise...">
-                    
+
                     <div class="table-container">
                         <table id="table-all-taxa">
                             <thead>
@@ -319,6 +319,29 @@
                             <tbody>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <div class="panel" id="painel-nao-capturados">
+                    <h2 class="panel-title">Organismos Não Capturados</h2>
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: -10px; margin-bottom: 15px;">
+                        Organismos catalogados no(s) banco(s) pesquisado(s) que este par de primers
+                        <strong>não</strong> amplificou nesta análise — sobre eles, o resultado não permite
+                        nenhuma afirmação (nem que estão ausentes na amostra real, só que não foram
+                        detectados nesta busca in silico com os parâmetros usados).
+                    </p>
+                    <p id="nao-capturados-indisponivel" style="display: none; color: var(--text-light); font-style: italic;"></p>
+                    <div id="nao-capturados-conteudo" style="display: none;">
+                        <p id="nao-capturados-resumo" style="font-weight: 600; color: var(--primary); margin-bottom: 10px;"></p>
+                        <input type="text" id="search-nao-capturados" class="search-box" placeholder="Buscar organismo não capturado...">
+                        <div class="table-container">
+                            <table id="table-nao-capturados">
+                                <thead>
+                                    <tr><th>Organismo catalogado no banco, não capturado nesta análise</th></tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -966,7 +989,7 @@
         document.getElementById('search-taxa').addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase().trim();
             const rows = document.querySelectorAll('#table-all-taxa tbody tr');
-            
+
             rows.forEach(row => {
                 const taxonName = row.querySelector('td').textContent.toLowerCase();
                 if (taxonName.includes(query)) {
@@ -974,6 +997,14 @@
                 } else {
                     row.style.display = 'none';
                 }
+            });
+        });
+
+        document.getElementById('search-nao-capturados').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#table-nao-capturados tbody tr');
+            rows.forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
             });
         });
 
@@ -1049,8 +1080,36 @@
                 tbody.appendChild(tr);
             });
 
-            renderBrowser(); 
-            updateChart(fullData); 
+            // "Organismos Não Capturados" -- null quando não foi possível
+            // calcular (acervo_genomas.json ausente ou banco não mapeado,
+            // ver calcular_organismos_nao_capturados em main.py/main_issues.py).
+            const naoCapturados = data.not_captured_organisms;
+            const boxIndisponivel = document.getElementById('nao-capturados-indisponivel');
+            const boxConteudo = document.getElementById('nao-capturados-conteudo');
+            if (naoCapturados === null || naoCapturados === undefined) {
+                boxIndisponivel.style.display = '';
+                boxIndisponivel.textContent = 'Não foi possível calcular quem ficou de fora nesta análise (ver avisos abaixo, se houver).';
+            } else {
+                boxConteudo.style.display = '';
+                const totalCatalogado = naoCapturados.length + organismosUnicos;
+                document.getElementById('nao-capturados-resumo').textContent =
+                    naoCapturados.length === 0
+                        ? `Nenhum -- todos os ${totalCatalogado.toLocaleString('pt-BR')} organismos catalogados no(s) banco(s) pesquisado(s) foram capturados.`
+                        : `${naoCapturados.length.toLocaleString('pt-BR')} de ${totalCatalogado.toLocaleString('pt-BR')} organismos catalogados não foram capturados nesta análise.`;
+
+                const tbodyNaoCapturados = document.querySelector('#table-nao-capturados tbody');
+                naoCapturados.forEach(nome => {
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.style.fontStyle = 'italic';
+                    td.textContent = nome;
+                    tr.appendChild(td);
+                    tbodyNaoCapturados.appendChild(tr);
+                });
+            }
+
+            renderBrowser();
+            updateChart(fullData);
         });
     </script>
 </body>
