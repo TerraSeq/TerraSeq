@@ -716,17 +716,31 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   no servidor: o JS de `docs/template.html` cruza `leaf_metadata` (sempre
   presente, em qualquer relatório, mesmo os mais antigos) com
   `docs/dados/acervo_genomas.json` (fetch relativo
-  `../../dados/acervo_genomas.json`) na hora que a página carrega. Motivo:
-  como a árvore de decisão de quem entra em cada banco (`BANCOS_GRUPOS`)
-  virou uma constante JS espelhando a de `main.py`/`main_issues.py`, o
-  cálculo passou a funcionar retroativamente pra qualquer relatório já
-  publicado, sem reprocessar nada -- só relatórios de antes do campo
-  `metadata.database` existir (17 relatórios, todos de maio/2026) ficam
-  sem essa seção, mostrando um aviso em vez de quebrar. `main.py`/
-  `main_issues.py` continuam calculando e salvando `not_captured_organisms`
-  no `result.json` (não removido, por precaução), mas esse campo não é
-  mais lido pelo template -- é candidato a limpeza futura se ninguém mais
-  depender dele.
+  `../../dados/acervo_genomas.json`) na hora que a página carrega. A
+  árvore de decisão de quem entra em cada banco (`BANCOS_GRUPOS`) virou
+  uma constante JS espelhando a de `main.py`/`main_issues.py`. Como não
+  depende de nada pré-calculado no `result.json`, não precisa reprocessar
+  nenhuma análise pra ativar isso num relatório antigo -- só relatórios de
+  antes do campo `metadata.database` existir (17 relatórios, todos de
+  maio/2026) ficam sem essa seção, mostrando um aviso em vez de quebrar.
+
+  **Pegadinha descoberta na hora de publicar**: cada
+  `docs/reports/REQ-*/index.html` é uma **cópia estática** de
+  `docs/template.html`, feita uma vez com `shutil.copy` no momento em que
+  o relatório é gerado (`main.py`/`main_issues.py`) -- não é um template
+  carregado dinamicamente. Ou seja, editar só `docs/template.html` não
+  ativa nada nos relatórios que já existiam, porque o HTML deles continua
+  sendo a versão antiga congelada. Precisou de um passo extra, mecânico:
+  re-copiar o `template.html` atualizado por cima do `index.html` de cada
+  um dos relatórios já publicados (98 na época). Continua sem reprocessar
+  nenhuma análise -- é só trocar o HTML "casca", já que o cálculo em si lê
+  o `result.json` de cada pasta (que não muda) em tempo de execução no
+  navegador.
+
+  `main.py`/`main_issues.py` continuam calculando e salvando
+  `not_captured_organisms` no `result.json` (não removido, por precaução),
+  mas esse campo não é mais lido pelo template -- é candidato a limpeza
+  futura se ninguém mais depender dele.
 
 ---
 
