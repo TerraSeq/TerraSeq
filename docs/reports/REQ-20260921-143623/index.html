@@ -149,6 +149,37 @@
         .search-box { width: 100%; padding: 10px 15px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; font-size: 0.95em; box-sizing: border-box; background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 15px center; padding-left: 45px;}
         .search-box:focus { border-color: var(--secondary); outline: none; }
 
+        /* Painel "Cobertura por Grupo Taxonômico" */
+        .kpi-row-grupos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .kpi-card-grupos { background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
+        .kpi-card-grupos .num { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        .kpi-card-grupos .lbl { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px; }
+        .kpi-card-grupos.capturado .num { color: var(--success); }
+        .kpi-card-grupos.nao-capturado .num { color: #dc2626; }
+        #table-cobertura-grupos th.num-col, #table-cobertura-grupos td.num-col { text-align: right; }
+        #table-cobertura-grupos tr.grupo-row { cursor: pointer; }
+        #table-cobertura-grupos tr.grupo-row:hover { background: var(--bg-color); }
+        .grupo-nome-cell { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .caret-grupo { display: inline-block; transition: transform 0.15s; color: var(--text-light); font-size: 0.75rem; }
+        tr.grupo-row.aberto .caret-grupo { transform: rotate(90deg); }
+        .barra-cobertura-grupo { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+        .barra-cobertura-grupo .barra-bg { width: 80px; height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
+        .barra-cobertura-grupo .barra-fill { height: 100%; border-radius: 4px; }
+        .barra-cobertura-grupo .pct { font-weight: 700; min-width: 46px; text-align: right; }
+        tr.detalhe-grupo-row td { padding: 0; }
+        tr.detalhe-grupo-row .detalhe-grupo-content { display: none; padding: 16px 18px 20px 36px; background: var(--bg-color); }
+        tr.grupo-row.aberto + tr.detalhe-grupo-row .detalhe-grupo-content { display: block; }
+        .busca-organismo-grupo { width: 100%; padding: 8px 12px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; font-size: 0.85em; box-sizing: border-box; background: var(--card-bg); color: var(--text-main); }
+        .detalhe-grupo-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .detalhe-grupo-col h4 { margin: 0 0 8px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; }
+        .detalhe-grupo-col.col-capturados h4 { color: var(--success); }
+        .detalhe-grupo-col.col-nao-capturados h4 { color: #dc2626; }
+        .lista-especies-grupo { max-height: 200px; overflow-y: auto; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; }
+        .lista-especies-grupo ul { margin: 0; padding-left: 16px; font-size: 0.82rem; }
+        .lista-especies-grupo li { padding: 2px 0; }
+        .lista-especies-grupo .vazia { color: var(--text-light); font-style: italic; font-size: 0.82rem; }
+        .lista-especies-grupo mark { background: #fde68a; color: inherit; border-radius: 2px; padding: 0 1px; }
+
         /* Overlay do Relatório Completo */
         #full-report-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 76, 117, 0.9); z-index: 9999; overflow-y: auto; padding: 40px 20px; }
         .report-content { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; padding: 40px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.3);}
@@ -322,24 +353,31 @@
                     </div>
                 </div>
 
-                <div class="panel" id="painel-nao-capturados">
-                    <h2 class="panel-title">Organismos Não Capturados</h2>
+                <div class="panel" id="painel-cobertura-grupos">
+                    <h2 class="panel-title">Cobertura por Grupo Taxonômico</h2>
                     <p style="color: var(--text-light); font-size: 0.9rem; margin-top: -10px; margin-bottom: 15px;">
-                        Organismos catalogados no(s) banco(s) pesquisado(s) que este par de primers
-                        <strong>não</strong> amplificou nesta análise — sobre eles, o resultado não permite
-                        nenhuma afirmação (nem que estão ausentes na amostra real, só que não foram
-                        detectados nesta busca in silico com os parâmetros usados).
+                        Para cada grupo taxonômico catalogado no(s) banco(s) pesquisado(s): quantos organismos
+                        este par de primers <strong>capturou</strong> e quantos <strong>não</strong> amplificou
+                        nesta análise. Sobre os não capturados, o resultado não permite nenhuma afirmação (nem
+                        que estão ausentes na amostra real, só que não foram detectados nesta busca in silico
+                        com os parâmetros usados). Ordenado do grupo com pior cobertura para o melhor.
                     </p>
-                    <p id="nao-capturados-indisponivel" style="display: none; color: var(--text-light); font-style: italic;"></p>
-                    <div id="nao-capturados-conteudo" style="display: none;">
-                        <p id="nao-capturados-resumo" style="font-weight: 600; color: var(--primary); margin-bottom: 10px;"></p>
-                        <input type="text" id="search-nao-capturados" class="search-box" placeholder="Buscar organismo não capturado...">
+                    <p id="cobertura-grupos-indisponivel" style="display: none; color: var(--text-light); font-style: italic;"></p>
+                    <div id="cobertura-grupos-conteudo" style="display: none;">
+                        <div class="kpi-row-grupos" id="kpi-row-grupos"></div>
+                        <input type="text" id="search-grupos" class="search-box" placeholder="Buscar grupo taxonômico...">
                         <div class="table-container">
-                            <table id="table-nao-capturados">
+                            <table id="table-cobertura-grupos">
                                 <thead>
-                                    <tr><th>Organismo catalogado no banco, não capturado nesta análise</th></tr>
+                                    <tr>
+                                        <th>Grupo</th>
+                                        <th class="num-col">Catalogado</th>
+                                        <th class="num-col">Capturado</th>
+                                        <th class="num-col">Não capturado</th>
+                                        <th class="num-col">Cobertura</th>
+                                    </tr>
                                 </thead>
-                                <tbody></tbody>
+                                <tbody id="tbody-cobertura-grupos"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1000,13 +1038,186 @@
             });
         });
 
-        document.getElementById('search-nao-capturados').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase().trim();
-            const rows = document.querySelectorAll('#table-nao-capturados tbody tr');
-            rows.forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+        // Composição dos bancos "combinados" do formulário -- espelha
+        // BANCOS_GRUPOS em main.py/main_issues.py. "eucariotos" e "refseqsoil"
+        // não entram aqui porque são calculados dinamicamente a partir da
+        // lista de grupos que vier em acervo_genomas.json (ver gruposDoBanco).
+        const GRUPOS_COMPOSTOS = {
+            fungi: ["basidiomycota", "ascomycota", "mucoromycota", "chytridiomycota", "zoopagomycota", "glomeromycota"],
+            protozoa: ["amoebozoa", "sar", "discoba", "metamonada"],
+            minhocas: ["oligochaeta", "enchytraeidae"],
+            formigas: ["formicidae"],
+            isopodes: ["isopoda"],
+            miriapodes: ["myriapoda"],
+            cupins: ["isoptera"],
+            platelmintos: ["platyhelminthes"],
+        };
+
+        function gruposDoBanco(bancoSelecionado, todosGruposDoAcervo) {
+            if (bancoSelecionado === 'eucariotos') {
+                return todosGruposDoAcervo.filter(g => g !== 'bacteria' && g !== 'archaea');
+            }
+            if (bancoSelecionado === 'refseqsoil') {
+                return todosGruposDoAcervo.slice();
+            }
+            if (GRUPOS_COMPOSTOS[bancoSelecionado]) {
+                return GRUPOS_COMPOSTOS[bancoSelecionado];
+            }
+            // Bancos de grupo único (nematoda, tardigrada, acari, ...): a
+            // própria chave do formulário já é o id do grupo no acervo.
+            return todosGruposDoAcervo.includes(bancoSelecionado) ? [bancoSelecionado] : null;
+        }
+
+        function marcarOcorrencias(nome, termo) {
+            if (!termo) return nome;
+            const idx = nome.toLowerCase().indexOf(termo);
+            if (idx === -1) return nome;
+            return nome.slice(0, idx) + '<mark>' + nome.slice(idx, idx + termo.length) + '</mark>' + nome.slice(idx + termo.length);
+        }
+
+        function listaEspeciesHtml(nomes, termoBusca) {
+            const termo = (termoBusca || '').toLowerCase().trim();
+            const filtrados = termo ? nomes.filter(n => n.toLowerCase().includes(termo)) : nomes;
+            if (!filtrados.length) {
+                return `<div class="vazia">${termo ? 'Nenhum organismo encontrado.' : 'Nenhum organismo nesta lista.'}</div>`;
+            }
+            return '<ul>' + filtrados.map(n => `<li>${marcarOcorrencias(n, termo)}</li>`).join('') + '</ul>';
+        }
+
+        function corCoberturaGrupo(pct) {
+            if (pct < 40) return '#dc2626';
+            if (pct < 70) return 'var(--warning)';
+            return 'var(--success)';
+        }
+
+        function renderTabelaCoberturaGrupos(grupos, filtroGrupo) {
+            const corpo = document.getElementById('tbody-cobertura-grupos');
+            corpo.innerHTML = '';
+            const termo = (filtroGrupo || '').toLowerCase().trim();
+            grupos.forEach(g => {
+                if (termo && !g.nome.toLowerCase().includes(termo)) return;
+                const cor = corCoberturaGrupo(g.cobertura);
+
+                const trGrupo = document.createElement('tr');
+                trGrupo.className = 'grupo-row';
+                trGrupo.innerHTML = `
+                    <td class="grupo-nome-cell"><span class="caret-grupo">▶</span> ${g.nome}</td>
+                    <td class="num-col">${g.catalogado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">${g.capturado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">${g.naoCapturado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">
+                        <div class="barra-cobertura-grupo">
+                            <div class="barra-bg"><div class="barra-fill" style="width:${g.cobertura}%; background:${cor};"></div></div>
+                            <span class="pct" style="color:${cor};">${g.cobertura.toFixed(1)}%</span>
+                        </div>
+                    </td>
+                `;
+
+                const trDetalhe = document.createElement('tr');
+                trDetalhe.className = 'detalhe-grupo-row';
+                const td = document.createElement('td');
+                td.colSpan = 5;
+                const idBusca = `busca-organismo-${g.id}`;
+                td.innerHTML = `
+                    <div class="detalhe-grupo-content">
+                        <input type="text" class="busca-organismo-grupo" id="${idBusca}" placeholder="Buscar organismo dentro de ${g.nome}...">
+                        <div class="detalhe-grupo-cols">
+                            <div class="detalhe-grupo-col col-capturados">
+                                <h4>Capturados (${g.capturado})</h4>
+                                <div class="lista-especies-grupo lista-capturados">${listaEspeciesHtml(g.listaCapturados, '')}</div>
+                            </div>
+                            <div class="detalhe-grupo-col col-nao-capturados">
+                                <h4>Não capturados (${g.naoCapturado})</h4>
+                                <div class="lista-especies-grupo lista-nao-capturados">${listaEspeciesHtml(g.listaNaoCapturados, '')}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                trDetalhe.appendChild(td);
+
+                trGrupo.addEventListener('click', () => trGrupo.classList.toggle('aberto'));
+                td.querySelector(`#${idBusca}`).addEventListener('click', e => e.stopPropagation());
+                td.querySelector(`#${idBusca}`).addEventListener('input', e => {
+                    const termoOrganismo = e.target.value;
+                    td.querySelector('.lista-capturados').innerHTML = listaEspeciesHtml(g.listaCapturados, termoOrganismo);
+                    td.querySelector('.lista-nao-capturados').innerHTML = listaEspeciesHtml(g.listaNaoCapturados, termoOrganismo);
+                });
+
+                corpo.appendChild(trGrupo);
+                corpo.appendChild(trDetalhe);
             });
+        }
+
+        document.getElementById('search-grupos').addEventListener('input', function(e) {
+            if (window._gruposCoberturaAtual) renderTabelaCoberturaGrupos(window._gruposCoberturaAtual, e.target.value);
         });
+
+        function carregarCoberturaPorGrupo(data, organismosCapturados) {
+            const boxIndisponivel = document.getElementById('cobertura-grupos-indisponivel');
+            const boxConteudo = document.getElementById('cobertura-grupos-conteudo');
+            const bancoSelecionado = data.metadata && data.metadata.database;
+
+            if (!bancoSelecionado) {
+                boxIndisponivel.style.display = '';
+                boxIndisponivel.textContent = 'Este relatório não registrou qual banco foi pesquisado -- funcionalidade indisponível para relatórios anteriores a essa mudança.';
+                return;
+            }
+
+            fetch('../../dados/acervo_genomas.json').then(r => r.json()).then(acervo => {
+                const todosGrupos = (acervo.bancos || []).map(b => b.id);
+                const idsDoBanco = gruposDoBanco(bancoSelecionado, todosGrupos);
+                if (!idsDoBanco || !idsDoBanco.length) {
+                    boxIndisponivel.style.display = '';
+                    boxIndisponivel.textContent = `Banco "${bancoSelecionado}" não mapeado no acervo de genomas -- não foi possível calcular a cobertura por grupo.`;
+                    return;
+                }
+
+                const grupos = (acervo.bancos || [])
+                    .filter(b => idsDoBanco.includes(b.id))
+                    .map(b => {
+                        const orgs = b.organismos || [];
+                        const capturados = orgs.filter(n => organismosCapturados.has(n));
+                        const naoCapturados = orgs.filter(n => !organismosCapturados.has(n));
+                        return {
+                            id: b.id,
+                            nome: b.nome || b.id,
+                            catalogado: orgs.length,
+                            capturado: capturados.length,
+                            naoCapturado: naoCapturados.length,
+                            cobertura: orgs.length ? (100 * capturados.length / orgs.length) : 0,
+                            listaCapturados: capturados,
+                            listaNaoCapturados: naoCapturados,
+                        };
+                    });
+
+                if (!grupos.length) {
+                    boxIndisponivel.style.display = '';
+                    boxIndisponivel.textContent = `Nenhum grupo do banco "${bancoSelecionado}" foi encontrado no acervo de genomas.`;
+                    return;
+                }
+
+                grupos.sort((a, b) => a.cobertura - b.cobertura);
+                window._gruposCoberturaAtual = grupos;
+
+                const totalCat = grupos.reduce((s, g) => s + g.catalogado, 0);
+                const totalCap = grupos.reduce((s, g) => s + g.capturado, 0);
+                const totalNao = grupos.reduce((s, g) => s + g.naoCapturado, 0);
+                const covGlobal = totalCat ? (100 * totalCap / totalCat).toFixed(1) : '0.0';
+                document.getElementById('kpi-row-grupos').innerHTML = `
+                    <div class="kpi-card-grupos"><div class="num">${grupos.length}</div><div class="lbl">Grupos avaliados</div></div>
+                    <div class="kpi-card-grupos"><div class="num">${totalCat.toLocaleString('pt-BR')}</div><div class="lbl">Catalogado</div></div>
+                    <div class="kpi-card-grupos capturado"><div class="num">${totalCap.toLocaleString('pt-BR')}</div><div class="lbl">Capturado</div></div>
+                    <div class="kpi-card-grupos nao-capturado"><div class="num">${totalNao.toLocaleString('pt-BR')}</div><div class="lbl">Não capturado</div></div>
+                    <div class="kpi-card-grupos"><div class="num">${covGlobal}%</div><div class="lbl">Cobertura global</div></div>
+                `;
+
+                boxConteudo.style.display = '';
+                renderTabelaCoberturaGrupos(grupos, '');
+            }).catch(() => {
+                boxIndisponivel.style.display = '';
+                boxIndisponivel.textContent = 'Não foi possível carregar o acervo de genomas (docs/dados/acervo_genomas.json) -- não foi possível calcular a cobertura por grupo.';
+            });
+        }
 
         fetch('result.json').then(r => r.json()).then(data => {
             fullData = data.taxonomy_tree; 
@@ -1080,33 +1291,14 @@
                 tbody.appendChild(tr);
             });
 
-            // "Organismos Não Capturados" -- null quando não foi possível
-            // calcular (acervo_genomas.json ausente ou banco não mapeado,
-            // ver calcular_organismos_nao_capturados em main.py/main_issues.py).
-            const naoCapturados = data.not_captured_organisms;
-            const boxIndisponivel = document.getElementById('nao-capturados-indisponivel');
-            const boxConteudo = document.getElementById('nao-capturados-conteudo');
-            if (naoCapturados === null || naoCapturados === undefined) {
-                boxIndisponivel.style.display = '';
-                boxIndisponivel.textContent = 'Não foi possível calcular quem ficou de fora nesta análise (ver avisos abaixo, se houver).';
-            } else {
-                boxConteudo.style.display = '';
-                const totalCatalogado = naoCapturados.length + organismosUnicos;
-                document.getElementById('nao-capturados-resumo').textContent =
-                    naoCapturados.length === 0
-                        ? `Nenhum -- todos os ${totalCatalogado.toLocaleString('pt-BR')} organismos catalogados no(s) banco(s) pesquisado(s) foram capturados.`
-                        : `${naoCapturados.length.toLocaleString('pt-BR')} de ${totalCatalogado.toLocaleString('pt-BR')} organismos catalogados não foram capturados nesta análise.`;
-
-                const tbodyNaoCapturados = document.querySelector('#table-nao-capturados tbody');
-                naoCapturados.forEach(nome => {
-                    const tr = document.createElement('tr');
-                    const td = document.createElement('td');
-                    td.style.fontStyle = 'italic';
-                    td.textContent = nome;
-                    tr.appendChild(td);
-                    tbodyNaoCapturados.appendChild(tr);
-                });
-            }
+            // Cobertura por grupo taxonômico -- calculada inteiramente no
+            // cliente a partir de leafMetadata (sempre presente, mesmo em
+            // relatórios antigos) cruzado com docs/dados/acervo_genomas.json.
+            // Não depende de nenhum campo pré-calculado no result.json, então
+            // funciona pra qualquer relatório já existente sem reprocessar
+            // nada -- só pra relatórios de antes do campo metadata.database
+            // existir que a seção fica indisponível (ver carregarCoberturaPorGrupo).
+            carregarCoberturaPorGrupo(data, new Set(Object.keys(leafMetadata)));
 
             renderBrowser();
             updateChart(fullData);
