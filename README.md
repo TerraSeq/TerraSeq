@@ -702,6 +702,32 @@ Registrado aqui pra ninguém perder tempo redescobrindo o mesmo problema.
   espelhando o mesmo padrão visual (busca + tabela) do painel "Inventário
   de Cobertura" já existente.
 
+  **Evolução (mesma sessão seguinte)**: a lista acima veio achatada (uma
+  coluna só, todos os grupos misturados), e ficou difícil de enxergar por
+  grupo taxonômico -- feedback direto do usuário. Painel trocado por
+  "Cobertura por Grupo Taxonômico": uma linha por grupo (Catalogado /
+  Capturado / Não capturado / Cobertura%, ordenado do pior pro melhor),
+  cada linha expansível mostrando as duas listas (capturados e não
+  capturados) lado a lado, com um campo de busca por organismo dentro de
+  cada grupo (destaca o nome buscado e mostra em qual das duas listas ele
+  está, ou em nenhuma).
+
+  **Importante -- isso passou a ser calculado 100% no cliente**, não mais
+  no servidor: o JS de `docs/template.html` cruza `leaf_metadata` (sempre
+  presente, em qualquer relatório, mesmo os mais antigos) com
+  `docs/dados/acervo_genomas.json` (fetch relativo
+  `../../dados/acervo_genomas.json`) na hora que a página carrega. Motivo:
+  como a árvore de decisão de quem entra em cada banco (`BANCOS_GRUPOS`)
+  virou uma constante JS espelhando a de `main.py`/`main_issues.py`, o
+  cálculo passou a funcionar retroativamente pra qualquer relatório já
+  publicado, sem reprocessar nada -- só relatórios de antes do campo
+  `metadata.database` existir (17 relatórios, todos de maio/2026) ficam
+  sem essa seção, mostrando um aviso em vez de quebrar. `main.py`/
+  `main_issues.py` continuam calculando e salvando `not_captured_organisms`
+  no `result.json` (não removido, por precaução), mas esse campo não é
+  mais lido pelo template -- é candidato a limpeza futura se ninguém mais
+  depender dele.
+
 ---
 
 ## Troubleshooting rápido
