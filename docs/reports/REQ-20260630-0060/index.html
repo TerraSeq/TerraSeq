@@ -43,6 +43,11 @@
         .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--secondary); }
         .kpi-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; }
         .kpi-value { font-size: 2.2rem; font-weight: 700; color: var(--primary); line-height: 1; }
+        .kpi-sub { font-size: 0.78rem; color: var(--text-light); margin-top: 6px; line-height: 1.3; }
+
+        /* Ícones ilustrativos dos grupos/funções ecológicas */
+        .icon-badge { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; min-width: 26px; border-radius: 50%; background: var(--accent); margin-right: 8px; font-size: 14px; vertical-align: middle; }
+        .silva-item.active .icon-badge { background: rgba(255,255,255,0.25); }
         
         /* NOVO LAYOUT: GRID PRINCIPAL (Sidebar + Conteúdo) */
         .layout-grid { display: grid; grid-template-columns: 320px 1fr; gap: 30px; align-items: start; }
@@ -56,6 +61,15 @@
         .sidebar { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.04); overflow: hidden; position: sticky; top: 90px;}
         .sidebar-header { background: var(--primary); color: white; padding: 15px 20px; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;}
         .sidebar-content { padding: 25px 20px; }
+
+        /* Em coluna única (mesmo breakpoint do .layout-grid) a sidebar não
+           pode ficar "grudada" (sticky): como ela é mais alta que a tela,
+           ficaria cobrindo a árvore e o gráfico pra sempre ao rolar a
+           página. Regra colocada DEPOIS de ".sidebar" de propósito — como
+           as duas têm a mesma especificidade, a ordem no arquivo decide. */
+        @media (max-width: 992px) {
+            .sidebar { position: static; top: auto; }
+        }
         
         .data-group { margin-bottom: 25px; }
         .data-group:last-child { margin-bottom: 0; }
@@ -97,6 +111,14 @@
 
         /* Card de Metadados da Espécie (Dentro da árvore) */
         .meta-card { display: none; background: #fffcf2; border: 1px solid #fde68a; border-radius: 6px; margin-top: 15px; padding: 20px; border-left: 4px solid var(--warning);}
+
+        /* Ilustração do grupo biológico (Atlas Global da Biodiversidade do
+           Solo) -- aparece ao clicar num Grande Grupo (ex: Minhocas) na
+           Classificação Funcional. Usa placeholder gerado localmente até as
+           imagens reais (com direitos de uso confirmados) serem adicionadas. */
+        .illustration-card { display: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; margin-top: 15px; padding: 15px; text-align: center; }
+        .illustration-card img { max-width: 100%; max-height: 220px; border-radius: 4px; display: block; margin: 0 auto; }
+        .illustration-caption { margin-top: 10px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
         .meta-header { display: flex; align-items: center; gap: 10px; color: var(--warning); font-weight: 700; font-size: 1.1em; border-bottom: 1px solid #fde68a; padding-bottom: 10px; margin-bottom: 12px;}
         .meta-row { display: grid; grid-template-columns: 100px 1fr; margin-bottom: 8px; font-size: 0.9rem; }
         .meta-label { color: var(--text-light); font-weight: 600; }
@@ -105,7 +127,19 @@
 
         /* Gráfico e Tabela */
         .chart-container { position: relative; height: 280px; width: 100%; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);}
-        
+        .chart-canvas-wrap { height: 220px; width: 100%; }
+
+        /* Ajustes para telas de celular — depois das regras base de
+           propósito (mesma especificidade, então a ordem no arquivo decide
+           qual vale). */
+        @media (max-width: 600px) {
+            .silva-col { min-width: 220px; }
+            .silva-browser { height: 320px; }
+            /* Legenda do gráfico passa para embaixo (ver renderPieChart),
+               então o canvas precisa de mais altura pra caber os dois. */
+            .chart-canvas-wrap { height: 300px; }
+        }
+
         .table-container { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
         th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); }
@@ -114,6 +148,37 @@
 
         .search-box { width: 100%; padding: 10px 15px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; font-size: 0.95em; box-sizing: border-box; background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 15px center; padding-left: 45px;}
         .search-box:focus { border-color: var(--secondary); outline: none; }
+
+        /* Painel "Cobertura por Grupo Taxonômico" */
+        .kpi-row-grupos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .kpi-card-grupos { background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
+        .kpi-card-grupos .num { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        .kpi-card-grupos .lbl { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px; }
+        .kpi-card-grupos.capturado .num { color: var(--success); }
+        .kpi-card-grupos.nao-capturado .num { color: #dc2626; }
+        #table-cobertura-grupos th.num-col, #table-cobertura-grupos td.num-col { text-align: right; }
+        #table-cobertura-grupos tr.grupo-row { cursor: pointer; }
+        #table-cobertura-grupos tr.grupo-row:hover { background: var(--bg-color); }
+        .grupo-nome-cell { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .caret-grupo { display: inline-block; transition: transform 0.15s; color: var(--text-light); font-size: 0.75rem; }
+        tr.grupo-row.aberto .caret-grupo { transform: rotate(90deg); }
+        .barra-cobertura-grupo { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+        .barra-cobertura-grupo .barra-bg { width: 80px; height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
+        .barra-cobertura-grupo .barra-fill { height: 100%; border-radius: 4px; }
+        .barra-cobertura-grupo .pct { font-weight: 700; min-width: 46px; text-align: right; }
+        tr.detalhe-grupo-row td { padding: 0; }
+        tr.detalhe-grupo-row .detalhe-grupo-content { display: none; padding: 16px 18px 20px 36px; background: var(--bg-color); }
+        tr.grupo-row.aberto + tr.detalhe-grupo-row .detalhe-grupo-content { display: block; }
+        .busca-organismo-grupo { width: 100%; padding: 8px 12px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; font-size: 0.85em; box-sizing: border-box; background: var(--card-bg); color: var(--text-main); }
+        .detalhe-grupo-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .detalhe-grupo-col h4 { margin: 0 0 8px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; }
+        .detalhe-grupo-col.col-capturados h4 { color: var(--success); }
+        .detalhe-grupo-col.col-nao-capturados h4 { color: #dc2626; }
+        .lista-especies-grupo { max-height: 200px; overflow-y: auto; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; }
+        .lista-especies-grupo ul { margin: 0; padding-left: 16px; font-size: 0.82rem; }
+        .lista-especies-grupo li { padding: 2px 0; }
+        .lista-especies-grupo .vazia { color: var(--text-light); font-style: italic; font-size: 0.82rem; }
+        .lista-especies-grupo mark { background: #fde68a; color: inherit; border-radius: 2px; padding: 0 1px; }
 
         /* Overlay do Relatório Completo */
         #full-report-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 76, 117, 0.9); z-index: 9999; overflow-y: auto; padding: 40px 20px; }
@@ -138,6 +203,8 @@
         
         /* Rodapé Institucional */
         .footer-logo-banner { background-color: #e5e5e5; padding: 30px 20px; display: flex; justify-content: center; align-items: center; gap: 50px; flex-wrap: wrap; border-top: 1px solid #d1d5db; margin-top: 50px;}
+        .brand-logo { display: flex; align-items: center; height: 48px; overflow: hidden; }
+        .brand-logo img { height: 48px; width: auto; max-width: 220px; object-fit: contain; display: block; filter: brightness(1.05); }
         .footer-logo-item { max-width: 120px; max-height: 55px; object-fit: contain; filter: grayscale(100%) opacity(0.7); transition: all 0.3s ease; cursor: pointer;}
         .footer-logo-item:hover { filter: grayscale(0%) opacity(1); transform: scale(1.05);}
         footer { background: #1e293b; color: #94a3b8; text-align: center; padding: 20px; font-size: 0.85em; margin-top: 0;}
@@ -145,7 +212,9 @@
 </head>
 <body>
     <nav class="navbar">
-        <h2>🌿 eDNA SoilCheck</h2>
+        <a href="../../index.html" style="display:flex; align-items:center; text-decoration:none;">
+            <img src="../../imagens/Logo2.png" alt="TerraSeq" style="height:80px; width:auto; display:block; filter: brightness(1.05);">
+        </a>
         <a href="../../index.html" class="btn-voltar">⬅ Voltar ao Sistema</a>
     </nav>
 
@@ -167,12 +236,14 @@
                 <div class="kpi-value" id="uni-org">0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Matches Validados</div>
-                <div class="kpi-value" id="tot-match">0</div>
+                <div class="kpi-title">Genomas no Banco (Grupo)</div>
+                <div class="kpi-value" id="total-genomes">0</div>
+                <div class="kpi-sub" id="total-genomes-sub"></div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-title">Cobertura Estimada</div>
                 <div class="kpi-value" id="est-cov" style="color: var(--success);">0%</div>
+                <div class="kpi-sub" id="est-cov-sub"></div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-title">Média do Amplicon</div>
@@ -232,7 +303,7 @@
                     <div class="tree-controls">
                         <div style="display: flex; gap: 10px;">
                             <button id="btn-taxa" class="btn-tree active" onclick="switchTree('taxa')">🌳 Árvore Taxonômica</button>
-                            <button id="btn-func" class="btn-tree" onclick="switchTree('func')">♻️ CLASSIFICAÇÃO Funcional</button>
+                            <button id="btn-func" class="btn-tree" onclick="switchTree('func')">♻️ Classificação Funcional</button>
                         </div>
                         
                         <div id="func-view-toggles" style="display: none; align-items: center; gap: 8px;">
@@ -250,17 +321,22 @@
                         <div id="meta-content"></div>
                         <button class="btn-full" onclick="openFullReport()">Ver Relatório de Alinhamento</button>
                     </div>
-                    
+
+                    <div id="group-illustration-box" class="illustration-card">
+                        <img id="group-illustration-img" src="" alt="Ilustração do grupo">
+                        <div class="illustration-caption" id="group-illustration-caption"></div>
+                    </div>
+
                     <div class="chart-container">
                         <h3 id="chart-title" style="color: var(--primary); font-weight: 600; font-size: 1rem; text-align: center; margin-top: 0;">Composição</h3>
-                        <div style="height: 220px; width: 100%;"><canvas id="dynamicChart"></canvas></div>
+                        <div class="chart-canvas-wrap"><canvas id="dynamicChart"></canvas></div>
                     </div>
                 </div>
 
                 <div class="panel">
                     <h2 class="panel-title">Inventário de Cobertura</h2>
-                    <input type="text" id="search-taxa" class="search-box" placeholder="Filtrar organismo na tabela...">
-                    
+                    <input type="text" id="search-taxa" class="search-box" placeholder="Buscar genomas encontrados nesta análise...">
+
                     <div class="table-container">
                         <table id="table-all-taxa">
                             <thead>
@@ -274,6 +350,36 @@
                             <tbody>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <div class="panel" id="painel-cobertura-grupos">
+                    <h2 class="panel-title">Cobertura por Grupo Taxonômico</h2>
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: -10px; margin-bottom: 15px;">
+                        Para cada grupo taxonômico catalogado no(s) banco(s) pesquisado(s): quantos organismos
+                        este par de primers <strong>capturou</strong> e quantos <strong>não</strong> amplificou
+                        nesta análise. Sobre os não capturados, o resultado não permite nenhuma afirmação (nem
+                        que estão ausentes na amostra real, só que não foram detectados nesta busca in silico
+                        com os parâmetros usados). Ordenado do grupo com pior cobertura para o melhor.
+                    </p>
+                    <p id="cobertura-grupos-indisponivel" style="display: none; color: var(--text-light); font-style: italic;"></p>
+                    <div id="cobertura-grupos-conteudo" style="display: none;">
+                        <div class="kpi-row-grupos" id="kpi-row-grupos"></div>
+                        <input type="text" id="search-grupos" class="search-box" placeholder="Buscar grupo taxonômico...">
+                        <div class="table-container">
+                            <table id="table-cobertura-grupos">
+                                <thead>
+                                    <tr>
+                                        <th>Grupo</th>
+                                        <th class="num-col">Catalogado</th>
+                                        <th class="num-col">Capturado</th>
+                                        <th class="num-col">Não capturado</th>
+                                        <th class="num-col">Cobertura</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-cobertura-grupos"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -317,11 +423,16 @@
         <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Universidade de Coimbra" class="footer-logo-item" title="Faculty of Sciences and Technology of the University of Coimbra">
         <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="CNPq" class="footer-logo-item" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="FAPES" class="footer-logo-item" title="Fundação de Amparo à Pesquisa e Inovação do Espírito Santo">
+        <img src="../../imagens/footer.png" alt="TerraSeq" class="footer-logo-item" title="In silico primer optimization for Earth biodiversity assessment">
     </div>
 
     <footer>
-        <p>🧬 <strong>eDNA SoilCheck - Plataforma de Bioinformática para Análise do Solo</strong></p>
-        <small>&copy; 2026 Desenvolvido no Laboratório de Bioinformática.</small>
+        <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
+            <img src="../../imagens/Logo3.png" alt="TerraSeq" style="height:22px; width:auto; display:block; opacity:0.95;">
+            <span><strong>TerraSeq</strong></span>
+            <span style="margin-left:2px;">- In silico primer optimization for Earth biodiversity assessment</span>
+        </div>
+        <small>© 2026 Developed by the TerraSeq Team</small>
     </footer>
 
     <script>
@@ -331,6 +442,79 @@
         let functionalData = null;
         let currentActiveTree = 'taxa'; 
         let currentFuncView = 'via1'; 
+
+        // Ícones ilustrativos para os grupos funcionais (Cap. II/IV do Atlas)
+        const FUNCTION_ICONS = {
+            "Engenheiros do Ecossistema": "🏗️",
+            "Decompositores da Serrapilheira": "🍂",
+            "Micropredadores": "🕵️",
+            "Microrganismos": "🦠",
+            "Fora do Escopo Principal": "📦",
+            "Função Indefinida": "❓"
+        };
+        const GROUP_ICONS = {
+            "Enquitreídeos": "🪱",
+            "Formigas": "🐜",
+            "Cupins": "🐛",
+            "Minhocas": "🪱",
+            "Ácaros": "🕷️",
+            "Colêmbolos, Proturos e Dipluros": "🦟",
+            "Isópodes": "🪲",
+            "Miriápodes": "🐍",
+            "Insetos (Adultos e Larvas)": "🐞",
+            "Aracnídeos (Aranhas e Escorpiões)": "🕷️",
+            "Platelmintos": "🎗️",
+            "Protistas": "🔬",
+            "Nematoides": "🪱",
+            "Tardígrados": "🐻",
+            "Rotíferos": "🌀",
+            "Fungos": "🍄",
+            "Archaea": "🧫",
+            "Bactérias": "🦠",
+            "Moluscos": "🐌",
+            "Plantas (Raízes)": "🌱",
+            "Vírus": "☣️",
+            "Megafauna (Vertebrados)": "🦌",
+            "Não Classificado": "❓"
+        };
+        const SIZE_ICONS = {
+            "Microrganismos": "🦠",
+            "Microfauna": "🔬",
+            "Mesofauna": "🐛",
+            "Mesofauna / Macrofauna": "🐛",
+            "Macrofauna": "🐜",
+            "Macrofauna / Megafauna": "🐌",
+            "Megafauna": "🦌",
+            "Flora": "🌱",
+            "Vírus": "☣️",
+            "Indefinido": "❓"
+        };
+        function functionIcon(nome) { return FUNCTION_ICONS[nome] || "♻️"; }
+        function groupIcon(nome) { return GROUP_ICONS[nome] || "📂"; }
+        function sizeIcon(nome) { return SIZE_ICONS[nome] || "📏"; }
+
+        // Ilustrações reais dos grupos, extraídas do Atlas Global da
+        // Biodiversidade do Solo (direitos de uso em confirmação). Preencher
+        // aqui, ex: "Minhocas": "../../imagens/ilustracoes/minhocas.png" --
+        // enquanto uma chave estiver vazia/ausente, o placeholder abaixo
+        // (ícone + nome) é usado no lugar, sem quebrar o layout.
+        const GROUP_ILLUSTRATIONS = {};
+
+        function placeholderIllustration(nome, icone) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">
+                <rect width="100%" height="100%" fill="#eaf3fb"/>
+                <text x="50%" y="42%" font-size="64" text-anchor="middle" dominant-baseline="middle">${icone}</text>
+                <text x="50%" y="80%" font-size="15" fill="#0f4c75" text-anchor="middle" font-family="sans-serif">Ilustração em breve</text>
+            </svg>`;
+            return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+        }
+
+        function showGroupIllustration(nome) {
+            document.getElementById('species-card').style.display = 'none';
+            document.getElementById('group-illustration-img').src = GROUP_ILLUSTRATIONS[nome] || placeholderIllustration(nome, groupIcon(nome));
+            document.getElementById('group-illustration-caption').textContent = nome;
+            document.getElementById('group-illustration-box').style.display = 'block';
+        }
 
         function formatPercent(value) {
             let p = value * 100;
@@ -387,13 +571,19 @@
             if (!speciesData.amplicons || speciesData.amplicons.length === 0) {
                 list.innerHTML = "<p>Nenhum detalhe de amplicon encontrado no log do BLAST.</p>";
             } else {
+                // Accession de cada PRODUTO/amplicon é ${amp.acc} (a sequência
+                // específica onde aquele hit ocorreu) -- NÃO speciesData.info.acc
+                // (só a accession "representante" da espécie, sempre a mesma pra
+                // todos os produtos). Uma espécie pode ter matches em vários
+                // scaffolds/assemblies diferentes; mostrar sempre o mesmo
+                // accession escondia isso.
+                const especieAtual = currentSpecies;
                 speciesData.amplicons.forEach((amp, index) => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
                     card.innerHTML = `
                         <div class="product-header">
-                            <span>Produto #${index + 1} - ${speciesData.info.acc}</span>
-                            <button class="btn-download-fasta" onclick="downloadProductFasta('${speciesData.info.acc}', ${index+1}, '${amp.size}', '${amp.tm}', '${amp.seq}')">📥 Baixar FASTA</button>
+                            <span>Produto #${index + 1} - ${amp.acc}</span>
                         </div>
                         <div class="product-body">
                             <div class="badge-row">
@@ -404,12 +594,25 @@
                             <div class="seq-box">${amp.seq}</div>
                         </div>
                     `;
+
+                    // Sequência fora do orçamento embutido no result.json: baixa sob
+                    // demanda de sequencias_completas.json (arquivo separado, só
+                    // buscado quando o botão é clicado -- não pesa o carregamento
+                    // inicial da página, e a página continua 100% estática).
+                    const btnDownload = document.createElement('button');
+                    btnDownload.className = 'btn-download-fasta';
+                    btnDownload.textContent = '📥 Baixar FASTA';
+                    btnDownload.onclick = amp.omitido
+                        ? () => downloadProductFastaOmitido(especieAtual, index, amp, btnDownload)
+                        : () => downloadProductFasta(amp.acc, index + 1, amp.size, amp.tm, amp.seq);
+                    card.querySelector('.product-header').appendChild(btnDownload);
+
                     list.appendChild(card);
                 });
             }
 
             document.getElementById('full-report-overlay').style.display = 'block';
-            document.body.style.overflow = 'hidden'; 
+            document.body.style.overflow = 'hidden';
         }
 
         function downloadProductFasta(acc, prodNum, size, tm, seq) {
@@ -420,6 +623,40 @@
             }
             let text = `>${acc}_amplicon_${prodNum} [organism=${currentSpecies}] [size=${size}bp] [tm=${tm}°C]\n${formattedSeq}`;
             triggerDownloadFasta(`${acc}_amp_${prodNum}.fasta`, text);
+        }
+
+        // sequencias_completas.json só existe se algum amplicon deste relatório
+        // ficou de fora do orçamento embutido no result.json -- carregado (e
+        // guardado em cache) só na primeira vez que um botão precisar dele.
+        let sequenciasCompletasCache = null;
+        async function carregarSequenciasCompletas() {
+            if (sequenciasCompletasCache !== null) return sequenciasCompletasCache;
+            try {
+                const resp = await fetch('sequencias_completas.json');
+                sequenciasCompletasCache = resp.ok ? await resp.json() : {};
+            } catch (err) {
+                console.error(err);
+                sequenciasCompletasCache = {};
+            }
+            return sequenciasCompletasCache;
+        }
+
+        async function downloadProductFastaOmitido(especie, index, amp, btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Buscando...';
+            btn.disabled = true;
+            try {
+                const dados = await carregarSequenciasCompletas();
+                const seq = dados[especie] ? dados[especie][index] : null;
+                if (!seq) {
+                    alert('Essa sequência não está disponível para download -- ficou fora até do orçamento do arquivo de sequências completas (caso raro, com um número extremo de resultados). Os dados brutos continuam preservados no servidor de processamento.');
+                    return;
+                }
+                downloadProductFasta(amp.acc, index + 1, amp.size, amp.tm, seq);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         function closeFullReport() {
@@ -435,6 +672,7 @@
             document.getElementById(val === 'via1' ? 'btn-via1' : 'btn-via2').classList.add('active');
 
             document.getElementById('species-card').style.display = 'none';
+            document.getElementById('group-illustration-box').style.display = 'none';
             document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Papéis Ecológicos` : `Grupos Biológicos`;
             renderFunctionalBrowser();
         }
@@ -446,8 +684,9 @@
             const browserTaxa = document.getElementById('silva-browser');
             const browserFunc = document.getElementById('functional-browser');
             const viewToggles = document.getElementById('func-view-toggles');
-            
+
             document.getElementById('species-card').style.display = 'none';
+            document.getElementById('group-illustration-box').style.display = 'none';
             
             if(type === 'taxa') {
                 btnTaxa.classList.add('active');
@@ -565,7 +804,7 @@
                     if (totalMatchesFuncao === 0) li.classList.add('empty');
                     
                     let globPerc = globalTotal > 0 ? formatPercent(totalMatchesFuncao / globalTotal) : "0.0%";
-                    li.innerHTML = `<div class="taxon-name">♻️ ${funcao}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${functionIcon(funcao)}</span>${funcao}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     if (totalMatchesFuncao > 0) {
                         li.onclick = () => {
@@ -613,7 +852,7 @@
                     li.className = 'silva-item';
                     let globPerc = globalTotal > 0 ? formatPercent(totalMatchesTamanho / globalTotal) : "0.0%";
                     
-                    li.innerHTML = `<div class="taxon-name">📏 ${tamanho}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${sizeIcon(tamanho)}</span>${tamanho}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     li.onclick = () => {
                         renderTamanhoGroups(gruposPorTamanho[tamanho], totalMatchesTamanho, browser);
@@ -648,13 +887,14 @@
                 const li = document.createElement('li');
                 li.className = 'silva-item';
                 let globPerc = parentMatches > 0 ? formatPercent(totalMatchesGrupo / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name">📂 ${grupo}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${groupIcon(grupo)}</span>${grupo}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                 
                 li.onclick = () => {
                      renderFunctionalSpecies(especiesData, totalMatchesGrupo, browserRef);
                      Array.from(ul2.children).forEach(c => c.classList.remove('active'));
                      li.classList.add('active');
                      document.getElementById('species-card').style.display = 'none';
+                     showGroupIllustration(grupo);
                 };
                 ul2.appendChild(li);
             });
@@ -675,13 +915,14 @@
                 const li = document.createElement('li');
                 li.className = 'silva-item';
                 let globPerc = parentMatches > 0 ? formatPercent(item.matches / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;">📂 ${item.grupo}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal;">♻️ ${item.funcao}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;"><span class="icon-badge">${groupIcon(item.grupo)}</span>${item.grupo}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal; margin-left:34px;">${functionIcon(item.funcao)} ${item.funcao}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
 
                 li.onclick = () => {
                      renderFunctionalSpecies(item.especies, item.matches, browserRef);
                      Array.from(ul2.children).forEach(c => c.classList.remove('active'));
                      li.classList.add('active');
                      document.getElementById('species-card').style.display = 'none';
+                     showGroupIllustration(item.grupo);
                 };
                 ul2.appendChild(li);
             });
@@ -725,6 +966,7 @@
         }
 
         function showSpeciesCard(name) {
+            document.getElementById('group-illustration-box').style.display = 'none';
             currentSpecies = name;
             document.getElementById('meta-title').textContent = name;
             const info = leafMetadata[name].info;
@@ -757,10 +999,13 @@
         function renderPieChart(labels, data) {
             const ctx = document.getElementById('dynamicChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
+            // Em telas estreitas a legenda à direita espreme demais o gráfico
+            // (fica sobreposto/ilegível); embaixo ele tem espaço pra respirar.
+            const legendPosition = window.innerWidth < 600 ? 'bottom' : 'right';
             chartInstance = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'pie',
                 data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#0f4c75', '#3282b8', '#bbe1fa', '#10b981', '#f59e0b', '#cbd5e1'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { family: "'Segoe UI', sans-serif" } } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: legendPosition, labels: { boxWidth: 12, font: { family: "'Segoe UI', sans-serif" } } } } }
             });
         }
 
@@ -782,7 +1027,7 @@
         document.getElementById('search-taxa').addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase().trim();
             const rows = document.querySelectorAll('#table-all-taxa tbody tr');
-            
+
             rows.forEach(row => {
                 const taxonName = row.querySelector('td').textContent.toLowerCase();
                 if (taxonName.includes(query)) {
@@ -792,6 +1037,187 @@
                 }
             });
         });
+
+        // Composição dos bancos "combinados" do formulário -- espelha
+        // BANCOS_GRUPOS em main.py/main_issues.py. "eucariotos" e "refseqsoil"
+        // não entram aqui porque são calculados dinamicamente a partir da
+        // lista de grupos que vier em acervo_genomas.json (ver gruposDoBanco).
+        const GRUPOS_COMPOSTOS = {
+            fungi: ["basidiomycota", "ascomycota", "mucoromycota", "chytridiomycota", "zoopagomycota", "glomeromycota"],
+            protozoa: ["amoebozoa", "sar", "discoba", "metamonada"],
+            minhocas: ["oligochaeta", "enchytraeidae"],
+            formigas: ["formicidae"],
+            isopodes: ["isopoda"],
+            miriapodes: ["myriapoda"],
+            cupins: ["isoptera"],
+            platelmintos: ["platyhelminthes"],
+        };
+
+        function gruposDoBanco(bancoSelecionado, todosGruposDoAcervo) {
+            if (bancoSelecionado === 'eucariotos') {
+                return todosGruposDoAcervo.filter(g => g !== 'bacteria' && g !== 'archaea');
+            }
+            if (bancoSelecionado === 'refseqsoil') {
+                return todosGruposDoAcervo.slice();
+            }
+            if (GRUPOS_COMPOSTOS[bancoSelecionado]) {
+                return GRUPOS_COMPOSTOS[bancoSelecionado];
+            }
+            // Bancos de grupo único (nematoda, tardigrada, acari, ...): a
+            // própria chave do formulário já é o id do grupo no acervo.
+            return todosGruposDoAcervo.includes(bancoSelecionado) ? [bancoSelecionado] : null;
+        }
+
+        function marcarOcorrencias(nome, termo) {
+            if (!termo) return nome;
+            const idx = nome.toLowerCase().indexOf(termo);
+            if (idx === -1) return nome;
+            return nome.slice(0, idx) + '<mark>' + nome.slice(idx, idx + termo.length) + '</mark>' + nome.slice(idx + termo.length);
+        }
+
+        function listaEspeciesHtml(nomes, termoBusca) {
+            const termo = (termoBusca || '').toLowerCase().trim();
+            const filtrados = termo ? nomes.filter(n => n.toLowerCase().includes(termo)) : nomes;
+            if (!filtrados.length) {
+                return `<div class="vazia">${termo ? 'Nenhum organismo encontrado.' : 'Nenhum organismo nesta lista.'}</div>`;
+            }
+            return '<ul>' + filtrados.map(n => `<li>${marcarOcorrencias(n, termo)}</li>`).join('') + '</ul>';
+        }
+
+        function corCoberturaGrupo(pct) {
+            if (pct < 40) return '#dc2626';
+            if (pct < 70) return 'var(--warning)';
+            return 'var(--success)';
+        }
+
+        function renderTabelaCoberturaGrupos(grupos, filtroGrupo) {
+            const corpo = document.getElementById('tbody-cobertura-grupos');
+            corpo.innerHTML = '';
+            const termo = (filtroGrupo || '').toLowerCase().trim();
+            grupos.forEach(g => {
+                if (termo && !g.nome.toLowerCase().includes(termo)) return;
+                const cor = corCoberturaGrupo(g.cobertura);
+
+                const trGrupo = document.createElement('tr');
+                trGrupo.className = 'grupo-row';
+                trGrupo.innerHTML = `
+                    <td class="grupo-nome-cell"><span class="caret-grupo">▶</span> ${g.nome}</td>
+                    <td class="num-col">${g.catalogado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">${g.capturado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">${g.naoCapturado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">
+                        <div class="barra-cobertura-grupo">
+                            <div class="barra-bg"><div class="barra-fill" style="width:${g.cobertura}%; background:${cor};"></div></div>
+                            <span class="pct" style="color:${cor};">${g.cobertura.toFixed(1)}%</span>
+                        </div>
+                    </td>
+                `;
+
+                const trDetalhe = document.createElement('tr');
+                trDetalhe.className = 'detalhe-grupo-row';
+                const td = document.createElement('td');
+                td.colSpan = 5;
+                const idBusca = `busca-organismo-${g.id}`;
+                td.innerHTML = `
+                    <div class="detalhe-grupo-content">
+                        <input type="text" class="busca-organismo-grupo" id="${idBusca}" placeholder="Buscar organismo dentro de ${g.nome}...">
+                        <div class="detalhe-grupo-cols">
+                            <div class="detalhe-grupo-col col-capturados">
+                                <h4>Capturados (${g.capturado})</h4>
+                                <div class="lista-especies-grupo lista-capturados">${listaEspeciesHtml(g.listaCapturados, '')}</div>
+                            </div>
+                            <div class="detalhe-grupo-col col-nao-capturados">
+                                <h4>Não capturados (${g.naoCapturado})</h4>
+                                <div class="lista-especies-grupo lista-nao-capturados">${listaEspeciesHtml(g.listaNaoCapturados, '')}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                trDetalhe.appendChild(td);
+
+                trGrupo.addEventListener('click', () => trGrupo.classList.toggle('aberto'));
+                td.querySelector(`#${idBusca}`).addEventListener('click', e => e.stopPropagation());
+                td.querySelector(`#${idBusca}`).addEventListener('input', e => {
+                    const termoOrganismo = e.target.value;
+                    td.querySelector('.lista-capturados').innerHTML = listaEspeciesHtml(g.listaCapturados, termoOrganismo);
+                    td.querySelector('.lista-nao-capturados').innerHTML = listaEspeciesHtml(g.listaNaoCapturados, termoOrganismo);
+                });
+
+                corpo.appendChild(trGrupo);
+                corpo.appendChild(trDetalhe);
+            });
+        }
+
+        document.getElementById('search-grupos').addEventListener('input', function(e) {
+            if (window._gruposCoberturaAtual) renderTabelaCoberturaGrupos(window._gruposCoberturaAtual, e.target.value);
+        });
+
+        function carregarCoberturaPorGrupo(data, organismosCapturados) {
+            const boxIndisponivel = document.getElementById('cobertura-grupos-indisponivel');
+            const boxConteudo = document.getElementById('cobertura-grupos-conteudo');
+            const bancoSelecionado = data.metadata && data.metadata.database;
+
+            if (!bancoSelecionado) {
+                boxIndisponivel.style.display = '';
+                boxIndisponivel.textContent = 'Este relatório não registrou qual banco foi pesquisado -- funcionalidade indisponível para relatórios anteriores a essa mudança.';
+                return;
+            }
+
+            fetch('../../dados/acervo_genomas.json').then(r => r.json()).then(acervo => {
+                const todosGrupos = (acervo.bancos || []).map(b => b.id);
+                const idsDoBanco = gruposDoBanco(bancoSelecionado, todosGrupos);
+                if (!idsDoBanco || !idsDoBanco.length) {
+                    boxIndisponivel.style.display = '';
+                    boxIndisponivel.textContent = `Banco "${bancoSelecionado}" não mapeado no acervo de genomas -- não foi possível calcular a cobertura por grupo.`;
+                    return;
+                }
+
+                const grupos = (acervo.bancos || [])
+                    .filter(b => idsDoBanco.includes(b.id))
+                    .map(b => {
+                        const orgs = b.organismos || [];
+                        const capturados = orgs.filter(n => organismosCapturados.has(n));
+                        const naoCapturados = orgs.filter(n => !organismosCapturados.has(n));
+                        return {
+                            id: b.id,
+                            nome: b.nome || b.id,
+                            catalogado: orgs.length,
+                            capturado: capturados.length,
+                            naoCapturado: naoCapturados.length,
+                            cobertura: orgs.length ? (100 * capturados.length / orgs.length) : 0,
+                            listaCapturados: capturados,
+                            listaNaoCapturados: naoCapturados,
+                        };
+                    });
+
+                if (!grupos.length) {
+                    boxIndisponivel.style.display = '';
+                    boxIndisponivel.textContent = `Nenhum grupo do banco "${bancoSelecionado}" foi encontrado no acervo de genomas.`;
+                    return;
+                }
+
+                grupos.sort((a, b) => a.cobertura - b.cobertura);
+                window._gruposCoberturaAtual = grupos;
+
+                const totalCat = grupos.reduce((s, g) => s + g.catalogado, 0);
+                const totalCap = grupos.reduce((s, g) => s + g.capturado, 0);
+                const totalNao = grupos.reduce((s, g) => s + g.naoCapturado, 0);
+                const covGlobal = totalCat ? (100 * totalCap / totalCat).toFixed(1) : '0.0';
+                document.getElementById('kpi-row-grupos').innerHTML = `
+                    <div class="kpi-card-grupos"><div class="num">${grupos.length}</div><div class="lbl">Grupos avaliados</div></div>
+                    <div class="kpi-card-grupos"><div class="num">${totalCat.toLocaleString('pt-BR')}</div><div class="lbl">Catalogado</div></div>
+                    <div class="kpi-card-grupos capturado"><div class="num">${totalCap.toLocaleString('pt-BR')}</div><div class="lbl">Capturado</div></div>
+                    <div class="kpi-card-grupos nao-capturado"><div class="num">${totalNao.toLocaleString('pt-BR')}</div><div class="lbl">Não capturado</div></div>
+                    <div class="kpi-card-grupos"><div class="num">${covGlobal}%</div><div class="lbl">Cobertura global</div></div>
+                `;
+
+                boxConteudo.style.display = '';
+                renderTabelaCoberturaGrupos(grupos, '');
+            }).catch(() => {
+                boxIndisponivel.style.display = '';
+                boxIndisponivel.textContent = 'Não foi possível carregar o acervo de genomas (docs/dados/acervo_genomas.json) -- não foi possível calcular a cobertura por grupo.';
+            });
+        }
 
         fetch('result.json').then(r => r.json()).then(data => {
             fullData = data.taxonomy_tree; 
@@ -804,8 +1230,8 @@
             globalPrimers = `${data.primers.forward} / ${data.primers.reverse}`; 
             globalType = data.metadata.organism;
                     
-            document.getElementById('tot-match').textContent = csvTotalMatches;
-            document.getElementById('uni-org').textContent = data.summary.unique_organisms || Object.keys(leafMetadata).length;
+            const organismosUnicos = data.summary.unique_organisms || Object.keys(leafMetadata).length;
+            document.getElementById('uni-org').textContent = organismosUnicos;
             document.getElementById('req-id').textContent = data.request_id;
             document.getElementById('sub-date').textContent = data.metadata.submitted_at;
             document.getElementById('sub-by').textContent = data.metadata.submitted_by;
@@ -813,6 +1239,17 @@
             document.getElementById('rev').textContent = data.primers.reverse;
             document.getElementById('est-cov').textContent = formatPercent(data.summary.estimated_coverage);
             document.getElementById('mean-amp').textContent = data.summary.mean_amplicon_size + ' bp';
+
+            // Total de genomas disponíveis no banco de dados para o grupo pesquisado,
+            // e quanto desse total foi "captado" pelos resultados do PCR in silico.
+            const totalGenomasBanco = data.summary.total_sequences_checked || 0;
+            const nomeGrupoBanco = data.metadata.database
+                ? data.metadata.database.charAt(0).toUpperCase() + data.metadata.database.slice(1)
+                : "Banco";
+            document.getElementById('total-genomes').textContent = totalGenomasBanco.toLocaleString('pt-BR');
+            document.getElementById('total-genomes-sub').textContent = `Total catalogado para "${nomeGrupoBanco}"`;
+            document.getElementById('est-cov-sub').textContent =
+                `${organismosUnicos.toLocaleString('pt-BR')} de ${totalGenomasBanco.toLocaleString('pt-BR')} genomas de "${nomeGrupoBanco}" captados`;
 
             if(data.metadata) {
                 document.getElementById('param-banco').textContent = data.metadata.database || "Protozoa";
@@ -831,19 +1268,40 @@
             allTaxaList.forEach(taxon => {
                 let icon = taxon.isLeaf ? '<span style="color:var(--warning); margin-right:5px;">🦠</span>' : '';
                 let isBold = taxon.depth <= 2 ? 'font-weight: 700; color: var(--primary);' : 'font-weight: 500;';
-                        
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="${isBold}">${icon}${taxon.name}</td>
-                        <td style="color: var(--text-light); font-size: 0.85em;">Nível ${taxon.depth}</td>
-                        <td style="font-weight: 600;">${taxon.matches}</td>
-                        <td style="font-weight: 600;"><span style="color:var(--success); background: #d1fae5; padding: 2px 8px; border-radius: 4px;">${formatPercent(taxon.matches / globalTotal)}</span></td>
-                    </tr>
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="${isBold}">${icon}${taxon.name}</td>
+                    <td style="color: var(--text-light); font-size: 0.85em;">Nível ${taxon.depth}</td>
+                    <td style="font-weight: 600;">${taxon.matches}</td>
+                    <td style="font-weight: 600;"><span style="color:var(--success); background: #d1fae5; padding: 2px 8px; border-radius: 4px;">${formatPercent(taxon.matches / globalTotal)}</span></td>
                 `;
+                // Só espécies (folhas da árvore) têm metadados (accession, descrição,
+                // amplicons) pra abrir o card -- níveis taxonômicos mais altos
+                // (filo, classe, etc.) não têm um genoma único associado.
+                if (taxon.isLeaf && leafMetadata[taxon.name]) {
+                    tr.style.cursor = 'pointer';
+                    tr.title = 'Clique para ver os detalhes deste genoma';
+                    tr.onclick = () => {
+                        switchTree('taxa');
+                        showSpeciesCard(taxon.name);
+                        document.getElementById('species-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    };
+                }
+                tbody.appendChild(tr);
             });
 
-            renderBrowser(); 
-            updateChart(fullData); 
+            // Cobertura por grupo taxonômico -- calculada inteiramente no
+            // cliente a partir de leafMetadata (sempre presente, mesmo em
+            // relatórios antigos) cruzado com docs/dados/acervo_genomas.json.
+            // Não depende de nenhum campo pré-calculado no result.json, então
+            // funciona pra qualquer relatório já existente sem reprocessar
+            // nada -- só pra relatórios de antes do campo metadata.database
+            // existir que a seção fica indisponível (ver carregarCoberturaPorGrupo).
+            carregarCoberturaPorGrupo(data, new Set(Object.keys(leafMetadata)));
+
+            renderBrowser();
+            updateChart(fullData);
         });
     </script>
 </body>
