@@ -1096,20 +1096,20 @@
             const termo = (filtroGrupo || '').toLowerCase().trim();
             grupos.forEach(g => {
                 if (termo && !g.nome.toLowerCase().includes(termo)) return;
-                const cor = corCoberturaGrupo(g.cobertura);
+                const cor = g.semGrupo ? 'var(--text-light)' : corCoberturaGrupo(g.cobertura);
 
                 const trGrupo = document.createElement('tr');
                 trGrupo.className = 'grupo-row';
                 trGrupo.innerHTML = `
                     <td class="grupo-nome-cell"><span class="caret-grupo">▶</span> ${g.nome}</td>
-                    <td class="num-col">${g.catalogado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">${g.semGrupo ? '—' : g.catalogado.toLocaleString('pt-BR')}</td>
                     <td class="num-col">${g.capturado.toLocaleString('pt-BR')}</td>
-                    <td class="num-col">${g.naoCapturado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">${g.semGrupo ? '—' : g.naoCapturado.toLocaleString('pt-BR')}</td>
                     <td class="num-col">
-                        <div class="barra-cobertura-grupo">
+                        ${g.semGrupo ? '<span class="pct" style="color:var(--text-light);" title="Espécies capturadas que não estão listadas em nenhum grupo do acervo">—</span>' : `<div class="barra-cobertura-grupo">
                             <div class="barra-bg"><div class="barra-fill" style="width:${g.cobertura}%; background:${cor};"></div></div>
                             <span class="pct" style="color:${cor};">${g.cobertura.toFixed(1)}%</span>
-                        </div>
+                        </div>`}
                     </td>
                 `;
 
@@ -1177,18 +1177,23 @@
                     return;
                 }
 
+                // Uma espécie que aparece em dois grupos do acervo só é contada
+                // como capturada no primeiro, pra não duplicar no total.
+                const jaContados = new Set();
                 const grupos = (acervo.bancos || [])
                     .filter(b => idsDoBanco.includes(b.id))
                     .map(b => {
                         const orgs = b.organismos || [];
                         const capturados = orgs.filter(n => organismosCapturados.has(n));
                         const naoCapturados = orgs.filter(n => !organismosCapturados.has(n));
+                        const capturadosNovos = capturados.filter(n => !jaContados.has(n));
+                        capturadosNovos.forEach(n => jaContados.add(n));
                         // Unidade: GENOMAS (mesma do topo do relatório) quando o
                         // relatório tem o dado; senão, nomes de espécie.
                         const catalogado = temGenomas ? (b.genomas || orgs.length) : orgs.length;
                         const capturado = temGenomas
-                            ? Math.min(catalogado, capturados.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0))
-                            : capturados.length;
+                            ? Math.min(catalogado, capturadosNovos.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0))
+                            : capturadosNovos.length;
                         return {
                             id: b.id,
                             nome: b.nome || b.id,
@@ -1208,15 +1213,38 @@
                 }
 
                 grupos.sort((a, b) => a.cobertura - b.cobertura);
+                const nGrupos = grupos.length;
+
+                // Espécies capturadas que não pertencem a nenhum grupo do
+                // acervo (ex: nome de accession em vez de espécie, ou nome
+                // grafado diferente) -- entram numa linha à parte pra o total
+                // do painel bater com o do topo do relatório.
+                const semGrupo = Object.keys(leafMetadata).filter(n => !jaContados.has(n));
+                if (semGrupo.length) {
+                    const gen = temGenomas ? semGrupo.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0) : semGrupo.length;
+                    grupos.push({
+                        id: 'sem-grupo',
+                        nome: 'Sem grupo no acervo',
+                        semGrupo: true,
+                        catalogado: 0,
+                        capturado: gen,
+                        naoCapturado: 0,
+                        cobertura: 0,
+                        listaCapturados: semGrupo,
+                        listaNaoCapturados: [],
+                    });
+                }
                 window._gruposCoberturaAtual = grupos;
 
                 const totalCat = grupos.reduce((s, g) => s + g.catalogado, 0);
                 const totalCap = grupos.reduce((s, g) => s + g.capturado, 0);
-                const totalNao = grupos.reduce((s, g) => s + g.naoCapturado, 0);
+                // Catalogado − capturado (não a soma das linhas): as espécies da linha
+                // "Sem grupo no acervo" foram capturadas mas não têm catálogo.
+                const totalNao = Math.max(0, totalCat - totalCap);
                 const covGlobal = totalCat ? (100 * totalCap / totalCat).toFixed(1) : '0.0';
                 const unidade = temGenomas ? 'genomas' : 'espécies';
                 document.getElementById('kpi-row-grupos').innerHTML = `
-                    <div class="kpi-card-grupos"><div class="num">${grupos.length}</div><div class="lbl">Grupos avaliados</div></div>
+                    <div class="kpi-card-grupos"><div class="num">${nGrupos}</div><div class="lbl">Grupos avaliados</div></div>
                     <div class="kpi-card-grupos"><div class="num">${totalCat.toLocaleString('pt-BR')}</div><div class="lbl">Catalogado (${unidade})</div></div>
                     <div class="kpi-card-grupos capturado"><div class="num">${totalCap.toLocaleString('pt-BR')}</div><div class="lbl">Capturado (${unidade})</div></div>
                     <div class="kpi-card-grupos nao-capturado"><div class="num">${totalNao.toLocaleString('pt-BR')}</div><div class="lbl">Não capturado (${unidade})</div></div>
