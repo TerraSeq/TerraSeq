@@ -1123,11 +1123,11 @@
                         <input type="text" class="busca-organismo-grupo" id="${idBusca}" placeholder="Buscar organismo dentro de ${g.nome}...">
                         <div class="detalhe-grupo-cols">
                             <div class="detalhe-grupo-col col-capturados">
-                                <h4>Capturados (${g.capturado})</h4>
+                                <h4>Capturados (${g.listaCapturados.length} espécies)</h4>
                                 <div class="lista-especies-grupo lista-capturados">${listaEspeciesHtml(g.listaCapturados, '')}</div>
                             </div>
                             <div class="detalhe-grupo-col col-nao-capturados">
-                                <h4>Não capturados (${g.naoCapturado})</h4>
+                                <h4>Não capturados (${g.listaNaoCapturados.length} espécies)</h4>
                                 <div class="lista-especies-grupo lista-nao-capturados">${listaEspeciesHtml(g.listaNaoCapturados, '')}</div>
                             </div>
                         </div>
@@ -1152,10 +1152,15 @@
             if (window._gruposCoberturaAtual) renderTabelaCoberturaGrupos(window._gruposCoberturaAtual, e.target.value);
         });
 
-        function carregarCoberturaPorGrupo(data, organismosCapturados) {
+        function carregarCoberturaPorGrupo(data, leafMetadata) {
             const boxIndisponivel = document.getElementById('cobertura-grupos-indisponivel');
             const boxConteudo = document.getElementById('cobertura-grupos-conteudo');
             const bancoSelecionado = data.metadata && data.metadata.database;
+            const organismosCapturados = new Set(Object.keys(leafMetadata));
+            // Relatórios novos trazem "genomas_capturados" por espécie (quantos
+            // sequenciamentos distintos o primer pegou); os antigos não, e caem
+            // na contagem por nome de espécie.
+            const temGenomas = Object.values(leafMetadata).some(v => typeof v.genomas_capturados === 'number');
 
             if (!bancoSelecionado) {
                 boxIndisponivel.style.display = '';
@@ -1178,13 +1183,19 @@
                         const orgs = b.organismos || [];
                         const capturados = orgs.filter(n => organismosCapturados.has(n));
                         const naoCapturados = orgs.filter(n => !organismosCapturados.has(n));
+                        // Unidade: GENOMAS (mesma do topo do relatório) quando o
+                        // relatório tem o dado; senão, nomes de espécie.
+                        const catalogado = temGenomas ? (b.genomas || orgs.length) : orgs.length;
+                        const capturado = temGenomas
+                            ? Math.min(catalogado, capturados.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0))
+                            : capturados.length;
                         return {
                             id: b.id,
                             nome: b.nome || b.id,
-                            catalogado: orgs.length,
-                            capturado: capturados.length,
-                            naoCapturado: naoCapturados.length,
-                            cobertura: orgs.length ? (100 * capturados.length / orgs.length) : 0,
+                            catalogado: catalogado,
+                            capturado: capturado,
+                            naoCapturado: catalogado - capturado,
+                            cobertura: catalogado ? (100 * capturado / catalogado) : 0,
                             listaCapturados: capturados,
                             listaNaoCapturados: naoCapturados,
                         };
@@ -1203,11 +1214,12 @@
                 const totalCap = grupos.reduce((s, g) => s + g.capturado, 0);
                 const totalNao = grupos.reduce((s, g) => s + g.naoCapturado, 0);
                 const covGlobal = totalCat ? (100 * totalCap / totalCat).toFixed(1) : '0.0';
+                const unidade = temGenomas ? 'genomas' : 'espécies';
                 document.getElementById('kpi-row-grupos').innerHTML = `
                     <div class="kpi-card-grupos"><div class="num">${grupos.length}</div><div class="lbl">Grupos avaliados</div></div>
-                    <div class="kpi-card-grupos"><div class="num">${totalCat.toLocaleString('pt-BR')}</div><div class="lbl">Catalogado</div></div>
-                    <div class="kpi-card-grupos capturado"><div class="num">${totalCap.toLocaleString('pt-BR')}</div><div class="lbl">Capturado</div></div>
-                    <div class="kpi-card-grupos nao-capturado"><div class="num">${totalNao.toLocaleString('pt-BR')}</div><div class="lbl">Não capturado</div></div>
+                    <div class="kpi-card-grupos"><div class="num">${totalCat.toLocaleString('pt-BR')}</div><div class="lbl">Catalogado (${unidade})</div></div>
+                    <div class="kpi-card-grupos capturado"><div class="num">${totalCap.toLocaleString('pt-BR')}</div><div class="lbl">Capturado (${unidade})</div></div>
+                    <div class="kpi-card-grupos nao-capturado"><div class="num">${totalNao.toLocaleString('pt-BR')}</div><div class="lbl">Não capturado (${unidade})</div></div>
                     <div class="kpi-card-grupos"><div class="num">${covGlobal}%</div><div class="lbl">Cobertura global</div></div>
                 `;
 
@@ -1298,7 +1310,7 @@
             // funciona pra qualquer relatório já existente sem reprocessar
             // nada -- só pra relatórios de antes do campo metadata.database
             // existir que a seção fica indisponível (ver carregarCoberturaPorGrupo).
-            carregarCoberturaPorGrupo(data, new Set(Object.keys(leafMetadata)));
+            carregarCoberturaPorGrupo(data, leafMetadata);
 
             renderBrowser();
             updateChart(fullData);

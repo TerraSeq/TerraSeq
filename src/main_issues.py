@@ -720,6 +720,15 @@ def run_pipeline(req, req_id):
     print("⚙️ Preparando montagem taxonômica...")
     arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
 
+    # Quantos GENOMAS (sequenciamentos) distintos foram capturados de cada
+    # espécie -- o painel "Cobertura por Grupo Taxonômico" do template soma
+    # isso por grupo pra mostrar genomas (mesma unidade do topo do relatório)
+    # em vez de só contar nomes de espécie.
+    for dados_especie in meta_dict.values():
+        dados_especie["genomas_capturados"] = taxonomia_local.contar_genomas_distintos(
+            [amp["acc"] for amp in dados_especie["amplicons"]]
+        )
+
     organismos_nao_capturados, aviso_nao_capturados = calcular_organismos_nao_capturados(
         raiz_projeto, BANCOS_GRUPOS.get(banco_selecionado, set()), meta_dict.keys()
     )
