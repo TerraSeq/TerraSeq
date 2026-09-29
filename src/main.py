@@ -60,16 +60,22 @@ EMAIL_SENHA = _obter_env_obrigatoria("EMAIL_SENHA")
 GITHUB_REPO_OWNER = os.environ.get("GITHUB_REPO_OWNER", "TerraSeq")
 GITHUB_REPO_NAME = os.environ.get("GITHUB_REPO_NAME", "pipeline_genoma")
 
-caminho_credenciais = os.path.join(
-    os.path.dirname(__file__),
-    os.environ.get("GOOGLE_CREDENTIALS_PATH", "credentials.json")
-)
-scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-credentials = Credentials.from_service_account_file(caminho_credenciais, scopes=scopes)
-client = gspread.authorize(credentials)
+# TERRASEQ_SEM_PLANILHA=1 permite importar este módulo só pra reaproveitar
+# run_pipeline (ex: scripts_auxiliares/reprocessar_relatorios.py) sem conectar
+# na planilha do Google nem iniciar o monitoramento das submissões.
+SEM_PLANILHA = os.environ.get("TERRASEQ_SEM_PLANILHA") == "1"
 
-NOME_DA_PLANILHA = os.environ.get("NOME_DA_PLANILHA", "Submissoes_Primers_Pipeline")
-planilha = client.open(NOME_DA_PLANILHA).sheet1
+if not SEM_PLANILHA:
+    caminho_credenciais = os.path.join(
+        os.path.dirname(__file__),
+        os.environ.get("GOOGLE_CREDENTIALS_PATH", "credentials.json")
+    )
+    scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    credentials = Credentials.from_service_account_file(caminho_credenciais, scopes=scopes)
+    client = gspread.authorize(credentials)
+
+    NOME_DA_PLANILHA = os.environ.get("NOME_DA_PLANILHA", "Submissoes_Primers_Pipeline")
+    planilha = client.open(NOME_DA_PLANILHA).sheet1
 
 # ==========================================
 # MOTOR DE CLASSIFICAÇÃO ECOLÓGICA (Global Soil Biodiversity Atlas)
@@ -1007,88 +1013,93 @@ def run_pipeline(req, req_id):
     shutil.copy(os.path.join(raiz_projeto, "docs/template.html"), os.path.join(pasta_resultado, "index.html"))
     return f"docs/reports/{req_id}", resultado_json
 
-print("\n✅ SCRIPT ONLINE - Monitorando Planilha...")
-try:
-    cabecalhos = planilha.row_values(1)
-    COL_STATUS = cabecalhos.index('Status') + 1
-    COL_LINK = cabecalhos.index('Result_path') + 1
-except ValueError:
-    print("❌ Erro fatal: Colunas Status ou Result_path não encontradas.")
-    sys.exit()
-
-while True:
+def monitorar_planilha():
+    print("\n✅ SCRIPT ONLINE - Monitorando Planilha...")
     try:
-        registros = planilha.get_all_records()
-        for index, req in enumerate(registros):
-            linha_planilha = index + 2 
-            
-            # Se não tiver nenhum primer preenchido, é uma linha fantasma. Pule para a próxima!
-            if str(req.get('Primer forward', '')).strip() == '':
-                continue
-            # --------------------------------------
-            
-            status_atual = str(req.get('Status', '')).strip().lower()
-            
-            if status_atual == '' or status_atual == 'pending':
-                print(f"\n🔔 Nova requisição encontrada na linha {linha_planilha}!")
-                # ... resto do código continua igualzinho
-                planilha.update_cell(linha_planilha, COL_STATUS, 'running') 
-                
-                # O ID do relatório precisa ser único por SUBMISSÃO, não por
-                # linha da planilha -- número de linha do Google Sheets NÃO É
-                # estável: se uma linha acima for removida (ex: ao limpar
-                # 'Status' manualmente pra reprocessar), todas as linhas
-                # abaixo sobem uma posição. Duas submissões diferentes no
-                # mesmo dia podem cair na mesma linha e gerar o MESMO
-                # REQ-ID, e a segunda sobrescreve os arquivos da primeira
-                # silenciosamente (aconteceu de verdade: duas submissões
-                # distintas com REQ-20260921-0073, uma delas perdida).
-                # Fix: usa o Timestamp que o próprio Google Forms grava na
-                # linha (é único por submissão, não muda se a linha se
-                # mover) em vez do número da linha. Cai pro esquema antigo
-                # (data + linha) só se o Timestamp estiver ausente/em
-                # formato inesperado.
-                hoje_str = datetime.now().strftime('%Y%m%d')
-                timestamp_str = str(req.get('Timestamp', '')).strip()
-                try:
-                    timestamp_dt = datetime.strptime(timestamp_str, '%m/%d/%Y %H:%M:%S')
-                    req_id = f"REQ-{timestamp_dt.strftime('%Y%m%d-%H%M%S')}"
-                except ValueError:
-                    req_id = f"REQ-{hoje_str}-{linha_planilha:04d}"
+        cabecalhos = planilha.row_values(1)
+        COL_STATUS = cabecalhos.index('Status') + 1
+        COL_LINK = cabecalhos.index('Result_path') + 1
+    except ValueError:
+        print("❌ Erro fatal: Colunas Status ou Result_path não encontradas.")
+        sys.exit()
 
-                # Salvaguarda final: nunca sobrescreve um relatório já
-                # existente, mesmo que o req_id acima colida por algum
-                # motivo imprevisto (ex: Timestamp ausente caindo no
-                # fallback por linha, que ainda pode colidir).
-                raiz_projeto_loop = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-                req_id_base = req_id
-                sufixo = 2
-                while os.path.exists(os.path.join(raiz_projeto_loop, "docs", "reports", req_id)):
-                    req_id = f"{req_id_base}-{sufixo}"
-                    sufixo += 1
+    while True:
+        try:
+            registros = planilha.get_all_records()
+            for index, req in enumerate(registros):
+                linha_planilha = index + 2 
+            
+                # Se não tiver nenhum primer preenchido, é uma linha fantasma. Pule para a próxima!
+                if str(req.get('Primer forward', '')).strip() == '':
+                    continue
+                # --------------------------------------
+            
+                status_atual = str(req.get('Status', '')).strip().lower()
+            
+                if status_atual == '' or status_atual == 'pending':
+                    print(f"\n🔔 Nova requisição encontrada na linha {linha_planilha}!")
+                    # ... resto do código continua igualzinho
+                    planilha.update_cell(linha_planilha, COL_STATUS, 'running') 
+                
+                    # O ID do relatório precisa ser único por SUBMISSÃO, não por
+                    # linha da planilha -- número de linha do Google Sheets NÃO É
+                    # estável: se uma linha acima for removida (ex: ao limpar
+                    # 'Status' manualmente pra reprocessar), todas as linhas
+                    # abaixo sobem uma posição. Duas submissões diferentes no
+                    # mesmo dia podem cair na mesma linha e gerar o MESMO
+                    # REQ-ID, e a segunda sobrescreve os arquivos da primeira
+                    # silenciosamente (aconteceu de verdade: duas submissões
+                    # distintas com REQ-20260921-0073, uma delas perdida).
+                    # Fix: usa o Timestamp que o próprio Google Forms grava na
+                    # linha (é único por submissão, não muda se a linha se
+                    # mover) em vez do número da linha. Cai pro esquema antigo
+                    # (data + linha) só se o Timestamp estiver ausente/em
+                    # formato inesperado.
+                    hoje_str = datetime.now().strftime('%Y%m%d')
+                    timestamp_str = str(req.get('Timestamp', '')).strip()
+                    try:
+                        timestamp_dt = datetime.strptime(timestamp_str, '%m/%d/%Y %H:%M:%S')
+                        req_id = f"REQ-{timestamp_dt.strftime('%Y%m%d-%H%M%S')}"
+                    except ValueError:
+                        req_id = f"REQ-{hoje_str}-{linha_planilha:04d}"
 
-                caminho_relatorio, resultado_json = run_pipeline(req, req_id)
+                    # Salvaguarda final: nunca sobrescreve um relatório já
+                    # existente, mesmo que o req_id acima colida por algum
+                    # motivo imprevisto (ex: Timestamp ausente caindo no
+                    # fallback por linha, que ainda pode colidir).
+                    raiz_projeto_loop = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+                    req_id_base = req_id
+                    sufixo = 2
+                    while os.path.exists(os.path.join(raiz_projeto_loop, "docs", "reports", req_id)):
+                        req_id = f"{req_id_base}-{sufixo}"
+                        sufixo += 1
 
-                atualizar_vitrine_html(req, req_id, resultado_json)
+                    caminho_relatorio, resultado_json = run_pipeline(req, req_id)
+
+                    atualizar_vitrine_html(req, req_id, resultado_json)
                 
-                planilha.update_cell(linha_planilha, COL_LINK, caminho_relatorio) 
-                planilha.update_cell(linha_planilha, COL_STATUS, 'completed')
+                    planilha.update_cell(linha_planilha, COL_LINK, caminho_relatorio) 
+                    planilha.update_cell(linha_planilha, COL_STATUS, 'completed')
                 
-                publicar_no_github(req_id)
+                    publicar_no_github(req_id)
                 
-                email_usuario = str(req.get('Email', '')).strip()
-                enviar_email_notificacao(email_usuario, req_id)
+                    email_usuario = str(req.get('Email', '')).strip()
+                    enviar_email_notificacao(email_usuario, req_id)
                 
-                print("✨ Processamento da linha concluído com sucesso. Aguardando próximas...")
+                    print("✨ Processamento da linha concluído com sucesso. Aguardando próximas...")
                     
-        time.sleep(10)
-    except Exception as e:
-        print(f"\n🔥 ERRO FATAL DETECTADO NA EXECUÇÃO PRINCIPAL:")
-        traceback.print_exc()
-        if isinstance(e, subprocess.CalledProcessError):
-            print("\n📋 SAÍDA DO COMANDO QUE FALHOU (stderr):")
-            print(e.stderr or "(vazio)")
-            print("\n📋 SAÍDA DO COMANDO QUE FALHOU (stdout):")
-            print(e.stdout or "(vazio)")
-        print("Reiniciando a varredura em 10 segundos...")
-        time.sleep(10)
+            time.sleep(10)
+        except Exception as e:
+            print(f"\n🔥 ERRO FATAL DETECTADO NA EXECUÇÃO PRINCIPAL:")
+            traceback.print_exc()
+            if isinstance(e, subprocess.CalledProcessError):
+                print("\n📋 SAÍDA DO COMANDO QUE FALHOU (stderr):")
+                print(e.stderr or "(vazio)")
+                print("\n📋 SAÍDA DO COMANDO QUE FALHOU (stdout):")
+                print(e.stdout or "(vazio)")
+            print("Reiniciando a varredura em 10 segundos...")
+            time.sleep(10)
+
+
+if not SEM_PLANILHA:
+    monitorar_planilha()
