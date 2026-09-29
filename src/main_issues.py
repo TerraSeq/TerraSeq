@@ -735,7 +735,8 @@ def run_pipeline(req, req_id):
     # Cobertura = GENOMAS únicos batidos (len(lista_bacterias)) sobre o total
     # de genomas do grupo -- mesma unidade dos dois lados. Ver comentário
     # completo (com histórico) equivalente em main.py.
-    total_organismos_unicos = len(lista_bacterias)
+    # Conta assemblies (sequenciamentos), não accessions -- ver main.py.
+    total_organismos_unicos = taxonomia_local.contar_genomas_distintos(lista_bacterias)
     cobertura_global = (total_organismos_unicos / total_sequencias_banco) if total_sequencias_banco > 0 else 0
     if cobertura_global < 0.60: avisos.append("Cobertura geral baixa. Verifique os filos relevantes.")
     if mismatches > 2: avisos.append("Potenciais off-targets (Tolerância a mismatch alta).")

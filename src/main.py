@@ -921,7 +921,14 @@ def run_pipeline(req, req_id):
     # genomas catalogados o primer detectou", é 6.735 / 8.466 = 79,5%).
     # meta_dict continua agrupado por espécie só para a árvore taxonômica
     # de navegação (leaf_metadata) -- não para esta estatística de cobertura.
-    total_organismos_unicos = len(lista_bacterias)
+    #
+    # ATUALIZAÇÃO: len(lista_bacterias) conta ACCESSIONS (scaffolds/
+    # cromossomos), não genomas -- só contigs WGS eram agrupados, então
+    # genomas com accessions NW_/NC_/cromossomos contavam várias vezes (ex:
+    # 294 scaffolds de um mesmo isolado = "294 genomas"), inflando a
+    # cobertura (79,2% contra ~50% por espécie no REQ-20260922-0082). Agora
+    # cada sequenciamento (assembly) conta 1 -- ver contar_genomas_distintos.
+    total_organismos_unicos = taxonomia_local.contar_genomas_distintos(lista_bacterias)
     cobertura_global = (total_organismos_unicos / total_sequencias_banco) if total_sequencias_banco > 0 else 0
     if cobertura_global < 0.60: avisos.append("Cobertura geral baixa. Verifique os filos relevantes.")
     if mismatches > 2: avisos.append("Potenciais off-targets (Tolerância a mismatch alta).")
