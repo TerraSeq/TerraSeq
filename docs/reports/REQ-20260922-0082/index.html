@@ -1096,20 +1096,20 @@
             const termo = (filtroGrupo || '').toLowerCase().trim();
             grupos.forEach(g => {
                 if (termo && !g.nome.toLowerCase().includes(termo)) return;
-                const cor = corCoberturaGrupo(g.cobertura);
+                const cor = g.semGrupo ? 'var(--text-light)' : corCoberturaGrupo(g.cobertura);
 
                 const trGrupo = document.createElement('tr');
                 trGrupo.className = 'grupo-row';
                 trGrupo.innerHTML = `
                     <td class="grupo-nome-cell"><span class="caret-grupo">▶</span> ${g.nome}</td>
-                    <td class="num-col">${g.catalogado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">${g.semGrupo ? '—' : g.catalogado.toLocaleString('pt-BR')}</td>
                     <td class="num-col">${g.capturado.toLocaleString('pt-BR')}</td>
-                    <td class="num-col">${g.naoCapturado.toLocaleString('pt-BR')}</td>
+                    <td class="num-col">${g.semGrupo ? '—' : g.naoCapturado.toLocaleString('pt-BR')}</td>
                     <td class="num-col">
-                        <div class="barra-cobertura-grupo">
+                        ${g.semGrupo ? '<span class="pct" style="color:var(--text-light);" title="Espécies capturadas que não estão listadas em nenhum grupo do acervo">—</span>' : `<div class="barra-cobertura-grupo">
                             <div class="barra-bg"><div class="barra-fill" style="width:${g.cobertura}%; background:${cor};"></div></div>
                             <span class="pct" style="color:${cor};">${g.cobertura.toFixed(1)}%</span>
-                        </div>
+                        </div>`}
                     </td>
                 `;
 
@@ -1123,11 +1123,11 @@
                         <input type="text" class="busca-organismo-grupo" id="${idBusca}" placeholder="Buscar organismo dentro de ${g.nome}...">
                         <div class="detalhe-grupo-cols">
                             <div class="detalhe-grupo-col col-capturados">
-                                <h4>Capturados (${g.capturado})</h4>
+                                <h4>Capturados (${g.listaCapturados.length} espécies)</h4>
                                 <div class="lista-especies-grupo lista-capturados">${listaEspeciesHtml(g.listaCapturados, '')}</div>
                             </div>
                             <div class="detalhe-grupo-col col-nao-capturados">
-                                <h4>Não capturados (${g.naoCapturado})</h4>
+                                <h4>Não capturados (${g.listaNaoCapturados.length} espécies)</h4>
                                 <div class="lista-especies-grupo lista-nao-capturados">${listaEspeciesHtml(g.listaNaoCapturados, '')}</div>
                             </div>
                         </div>
@@ -1152,10 +1152,15 @@
             if (window._gruposCoberturaAtual) renderTabelaCoberturaGrupos(window._gruposCoberturaAtual, e.target.value);
         });
 
-        function carregarCoberturaPorGrupo(data, organismosCapturados) {
+        function carregarCoberturaPorGrupo(data, leafMetadata) {
             const boxIndisponivel = document.getElementById('cobertura-grupos-indisponivel');
             const boxConteudo = document.getElementById('cobertura-grupos-conteudo');
             const bancoSelecionado = data.metadata && data.metadata.database;
+            const organismosCapturados = new Set(Object.keys(leafMetadata));
+            // Relatórios novos trazem "genomas_capturados" por espécie (quantos
+            // sequenciamentos distintos o primer pegou); os antigos não, e caem
+            // na contagem por nome de espécie.
+            const temGenomas = Object.values(leafMetadata).some(v => typeof v.genomas_capturados === 'number');
 
             if (!bancoSelecionado) {
                 boxIndisponivel.style.display = '';
@@ -1172,19 +1177,30 @@
                     return;
                 }
 
+                // Uma espécie que aparece em dois grupos do acervo só é contada
+                // como capturada no primeiro, pra não duplicar no total.
+                const jaContados = new Set();
                 const grupos = (acervo.bancos || [])
                     .filter(b => idsDoBanco.includes(b.id))
                     .map(b => {
                         const orgs = b.organismos || [];
                         const capturados = orgs.filter(n => organismosCapturados.has(n));
                         const naoCapturados = orgs.filter(n => !organismosCapturados.has(n));
+                        const capturadosNovos = capturados.filter(n => !jaContados.has(n));
+                        capturadosNovos.forEach(n => jaContados.add(n));
+                        // Unidade: GENOMAS (mesma do topo do relatório) quando o
+                        // relatório tem o dado; senão, nomes de espécie.
+                        const catalogado = temGenomas ? (b.genomas || orgs.length) : orgs.length;
+                        const capturado = temGenomas
+                            ? Math.min(catalogado, capturadosNovos.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0))
+                            : capturadosNovos.length;
                         return {
                             id: b.id,
                             nome: b.nome || b.id,
-                            catalogado: orgs.length,
-                            capturado: capturados.length,
-                            naoCapturado: naoCapturados.length,
-                            cobertura: orgs.length ? (100 * capturados.length / orgs.length) : 0,
+                            catalogado: catalogado,
+                            capturado: capturado,
+                            naoCapturado: catalogado - capturado,
+                            cobertura: catalogado ? (100 * capturado / catalogado) : 0,
                             listaCapturados: capturados,
                             listaNaoCapturados: naoCapturados,
                         };
@@ -1197,17 +1213,41 @@
                 }
 
                 grupos.sort((a, b) => a.cobertura - b.cobertura);
+                const nGrupos = grupos.length;
+
+                // Espécies capturadas que não pertencem a nenhum grupo do
+                // acervo (ex: nome de accession em vez de espécie, ou nome
+                // grafado diferente) -- entram numa linha à parte pra o total
+                // do painel bater com o do topo do relatório.
+                const semGrupo = Object.keys(leafMetadata).filter(n => !jaContados.has(n));
+                if (semGrupo.length) {
+                    const gen = temGenomas ? semGrupo.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0) : semGrupo.length;
+                    grupos.push({
+                        id: 'sem-grupo',
+                        nome: 'Sem grupo no acervo',
+                        semGrupo: true,
+                        catalogado: 0,
+                        capturado: gen,
+                        naoCapturado: 0,
+                        cobertura: 0,
+                        listaCapturados: semGrupo,
+                        listaNaoCapturados: [],
+                    });
+                }
                 window._gruposCoberturaAtual = grupos;
 
                 const totalCat = grupos.reduce((s, g) => s + g.catalogado, 0);
                 const totalCap = grupos.reduce((s, g) => s + g.capturado, 0);
-                const totalNao = grupos.reduce((s, g) => s + g.naoCapturado, 0);
+                // Catalogado − capturado (não a soma das linhas): as espécies da linha
+                // "Sem grupo no acervo" foram capturadas mas não têm catálogo.
+                const totalNao = Math.max(0, totalCat - totalCap);
                 const covGlobal = totalCat ? (100 * totalCap / totalCat).toFixed(1) : '0.0';
+                const unidade = temGenomas ? 'genomas' : 'espécies';
                 document.getElementById('kpi-row-grupos').innerHTML = `
-                    <div class="kpi-card-grupos"><div class="num">${grupos.length}</div><div class="lbl">Grupos avaliados</div></div>
-                    <div class="kpi-card-grupos"><div class="num">${totalCat.toLocaleString('pt-BR')}</div><div class="lbl">Catalogado</div></div>
-                    <div class="kpi-card-grupos capturado"><div class="num">${totalCap.toLocaleString('pt-BR')}</div><div class="lbl">Capturado</div></div>
-                    <div class="kpi-card-grupos nao-capturado"><div class="num">${totalNao.toLocaleString('pt-BR')}</div><div class="lbl">Não capturado</div></div>
+                    <div class="kpi-card-grupos"><div class="num">${nGrupos}</div><div class="lbl">Grupos avaliados</div></div>
+                    <div class="kpi-card-grupos"><div class="num">${totalCat.toLocaleString('pt-BR')}</div><div class="lbl">Catalogado (${unidade})</div></div>
+                    <div class="kpi-card-grupos capturado"><div class="num">${totalCap.toLocaleString('pt-BR')}</div><div class="lbl">Capturado (${unidade})</div></div>
+                    <div class="kpi-card-grupos nao-capturado"><div class="num">${totalNao.toLocaleString('pt-BR')}</div><div class="lbl">Não capturado (${unidade})</div></div>
                     <div class="kpi-card-grupos"><div class="num">${covGlobal}%</div><div class="lbl">Cobertura global</div></div>
                 `;
 
@@ -1298,7 +1338,7 @@
             // funciona pra qualquer relatório já existente sem reprocessar
             // nada -- só pra relatórios de antes do campo metadata.database
             // existir que a seção fica indisponível (ver carregarCoberturaPorGrupo).
-            carregarCoberturaPorGrupo(data, new Set(Object.keys(leafMetadata)));
+            carregarCoberturaPorGrupo(data, leafMetadata);
 
             renderBrowser();
             updateChart(fullData);
