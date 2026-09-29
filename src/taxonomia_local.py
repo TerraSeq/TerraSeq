@@ -146,6 +146,55 @@ def descricao_e_tamanho_por_accession(acc):
     return (linha[0], linha[1]) if linha else (None, None)
 
 
+def _normalizar_accession(subject_id):
+    partes = subject_id.split('|')
+    acc = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
+    return acc.split('.')[0]
+
+
+def contar_genomas_distintos(subject_ids):
+    """Quantos GENOMAS (assemblies) distintos os subject_ids representam.
+
+    Uma sequência do BLAST (sseqid) é só um scaffold/cromossomo/contig; um
+    genoma sequenciado tem vários. Contar sseqids inflava "genomas
+    capturados" (ex: 294 scaffolds do mesmo isolado de Rhipicephalus
+    microplus contavam como 294 genomas). Aqui cada sequenciamento vale 1,
+    não importa quantos scaffolds ou quantas vezes o primer anelou nele.
+
+    Chave do genoma, da mais à menos confiável:
+      1. coluna "genoma" do manifesto (accession do assembly, GCF_/GCA_),
+         presente em manifestos gerados pela versão atual de
+         gerar_manifesto_taxid.py;
+      2. (taxId, tamanho total do assembly) -- funciona com manifestos
+         antigos, sem precisar regenerar; dois assemblies distintos da mesma
+         espécie com exatamente o mesmo tamanho total são praticamente
+         impossíveis;
+      3. o próprio accession, se a sequência não estiver no manifesto.
+    """
+    conexao = _conectar_manifesto()
+    chaves = set()
+    for subject_id in subject_ids:
+        acc = _normalizar_accession(subject_id)
+        chave = None
+        if conexao is not None:
+            try:
+                linha = conexao.execute("SELECT genoma FROM sequencias WHERE accession = ?", (acc,)).fetchone()
+                if linha and linha[0]:
+                    chave = linha[0]
+            except sqlite3.OperationalError:
+                # Manifesto antigo, sem a coluna "genoma".
+                try:
+                    linha = conexao.execute(
+                        "SELECT taxid, genoma_tamanho FROM sequencias WHERE accession = ?", (acc,)
+                    ).fetchone()
+                    if linha and linha[1]:
+                        chave = f"{linha[0]}:{linha[1]}"
+                except sqlite3.OperationalError:
+                    pass
+        chaves.add(chave or acc)
+    return len(chaves)
+
+
 def _carregar_contagem_organismos():
     global _contagem_organismos
     if _contagem_organismos is not None:

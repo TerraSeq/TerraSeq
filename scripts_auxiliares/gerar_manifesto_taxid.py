@@ -100,16 +100,16 @@ def gerar_manifesto_taxid(taxon, conexao):
                         # pra bater exatamente com a chave de busca.
                         acc_sequencia = partes[0].split(".")[0]
                         descricao = partes[1] if len(partes) > 1 else ""
-                        lote.append((acc_sequencia, taxid, descricao, tamanho_genoma))
+                        lote.append((acc_sequencia, taxid, descricao, tamanho_genoma, acc_genoma))
                         total_sequencias += 1
                         if len(lote) >= TAMANHO_LOTE:
                             conexao.executemany(
-                                "INSERT OR REPLACE INTO sequencias VALUES (?, ?, ?, ?)", lote
+                                "INSERT OR REPLACE INTO sequencias VALUES (?, ?, ?, ?, ?)", lote
                             )
                             lote = []
 
     if lote:
-        conexao.executemany("INSERT OR REPLACE INTO sequencias VALUES (?, ?, ?, ?)", lote)
+        conexao.executemany("INSERT OR REPLACE INTO sequencias VALUES (?, ?, ?, ?, ?)", lote)
     conexao.commit()
 
     print(f"  -> {taxon}: {total_sequencias} sequência(s) mapeada(s) de {len(info_por_genoma)} genoma(s)")
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     conexao.execute(
         "CREATE TABLE IF NOT EXISTS sequencias ("
         "accession TEXT PRIMARY KEY, taxid TEXT NOT NULL, "
-        "descricao TEXT, genoma_tamanho INTEGER)"
+        "descricao TEXT, genoma_tamanho INTEGER, genoma TEXT)"
     )
 
     grupos = [f.name for f in os.scandir(DIRETORIO_ORIGEM) if f.is_dir()]
