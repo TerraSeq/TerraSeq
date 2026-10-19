@@ -610,10 +610,12 @@ def run_pipeline(req, req_id):
     if banco_selecionado in BANCOS_DISPONIVEIS:
         arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS[banco_selecionado]
     else:
-        # Fallback de segurança: Se digitar errado, roda contra o Atlas completo
-        print(f"⚠️ Banco '{banco_selecionado}' não mapeado. Usando o banco completo 'refseqsoil' por segurança.")
-        arquivo_alvo, total_sequencias_banco = BANCOS_DISPONIVEIS["refseqsoil"]
-        banco_selecionado = "refseqsoil"  # Atualiza o nome para o log/JSON ficar correto
+        # Antes: caía em silêncio no "refseqsoil" (o maior banco, horas de BLAST) e o
+        # usuário não sabia que o banco pedido não existia. Agora volta pra ele.
+        raise notificacoes.PedidoInvalido(
+            notificacoes.validar_pedido(req, bancos_validos=set(BANCOS_DISPONIVEIS))
+            or [(f'Banco de dados "{banco_selecionado}" não reconhecido.', f'Database "{banco_selecionado}" not recognized.')]
+        )
 
     # 2. Resolução do caminho (Lógica Híbrida)
     if " " in arquivo_alvo or arquivo_alvo.startswith("/"):

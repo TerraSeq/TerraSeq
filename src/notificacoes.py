@@ -79,6 +79,16 @@ def validar_pedido(req, bancos_validos=None):
     problemas = []
     problemas += _problemas_primer("Primer forward", "Primer forward", "forward primer", req)
     problemas += _problemas_primer("Primer reverse", "Primer reverse", "reverse primer", req)
+    fwd = str(req.get("Primer forward", "")).strip().upper()
+    rev = str(req.get("Primer reverse", "")).strip().upper()
+    if fwd and fwd == rev:
+        problemas.append(("Os primers forward e reverse são idênticos; confira se o reverse foi copiado corretamente.",
+                          "The forward and reverse primers are identical; check that the reverse primer was copied correctly."))
+
+    email = str(req.get("Email", "")).strip()
+    if email and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+        problemas.append((f'E-mail "{email}" inválido; sem um e-mail correto não conseguimos enviar o resultado.',
+                          f'E-mail "{email}" is invalid; without a valid e-mail we cannot send you the result.'))
 
     def campo(chave, padrao):
         v = req.get(chave, padrao)
@@ -97,9 +107,9 @@ def validar_pedido(req, bancos_validos=None):
                           f"Minimum amplicon size ({tmin}) is greater than the maximum ({tmax})."))
 
     mm = _inteiro(campo("Máximo de Mismatches na extremidade 3", 0))
-    if mm is None:
-        problemas.append(("Máximo de mismatches deve ser um número inteiro, 0 ou maior (ex.: 3).",
-                          "Maximum mismatches must be a whole number, 0 or greater (e.g. 3)."))
+    if mm is None or not 0 <= mm <= 5:
+        problemas.append(("Máximo de mismatches deve ser um número inteiro de 0 a 5 (ex.: 3).",
+                          "Maximum mismatches must be a whole number from 0 to 5 (e.g. 3)."))
 
     ev = _decimal(campo("E-value máximo", 10.0))
     if ev is None or ev <= 0:
@@ -123,7 +133,11 @@ def validar_pedido(req, bancos_validos=None):
 
     if bancos_validos is not None:
         banco = str(req.get("Banco de Dados", "")).strip().lower()
-        if banco not in bancos_validos:
+        if not banco:
+            opcoes = ", ".join(sorted(bancos_validos))
+            problemas.append((f"Banco de dados não informado. Opções: {opcoes}.",
+                              f"Database not provided. Options: {opcoes}."))
+        elif banco not in bancos_validos:
             opcoes = ", ".join(sorted(bancos_validos))
             problemas.append((f'Banco de dados "{banco}" não reconhecido. Opções: {opcoes}.',
                               f'Database "{banco}" not recognized. Options: {opcoes}.'))
