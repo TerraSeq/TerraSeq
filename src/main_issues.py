@@ -862,7 +862,10 @@ def parse_issue_body(body):
     for sec in sections:
         if not sec.strip(): continue
         lines = sec.strip().split('\n')
-        key = lines[0].strip()
+        # O formulário da Issue (solicitacao_analise.yml) usa "→" nos rótulos dos
+        # primers ("Primer Forward (5' → 3')"); o parser procura "->". Sem essa
+        # normalização os primers chegavam vazios em toda Issue.
+        key = lines[0].strip().replace('\u2192', '->')
         value = '\n'.join(lines[1:]).strip()
         if value == "_No response_": value = ""
         data[key] = value
@@ -889,38 +892,46 @@ def parse_issue_body(body):
 # ==========================================
 # LOOP PRINCIPAL DO MOTOR GITHUB ISSUES
 # ==========================================
-print("\n✅ SCRIPT HÍBRIDO ONLINE - Monitorando GitHub Issues...")
+# TERRASEQ_SEM_ISSUES=1 permite importar este módulo só pra reaproveitar
+# run_pipeline/parse_issue_body (ex: scripts_auxiliares/testar_pipeline.py) sem
+# iniciar o monitoramento das Issues.
+def monitorar_issues():
+    print("\n✅ SCRIPT HÍBRIDO ONLINE - Monitorando GitHub Issues...")
 
-while True:
-    try:
-        issues = buscar_requisicoes_github()
-        for issue in issues:
-            numero_issue = issue['number']
-            corpo = issue['body']
+    while True:
+        try:
+            issues = buscar_requisicoes_github()
+            for issue in issues:
+                numero_issue = issue['number']
+                corpo = issue['body']
             
-            print(f"\n🔔 Nova requisição encontrada na Issue #{numero_issue}!")
+                print(f"\n🔔 Nova requisição encontrada na Issue #{numero_issue}!")
             
-            url_issue = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues/{numero_issue}"
-            requests.patch(url_issue, headers=HEADERS, json={"labels": ["running"]})
+                url_issue = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues/{numero_issue}"
+                requests.patch(url_issue, headers=HEADERS, json={"labels": ["running"]})
 
-            req_mapeado = parse_issue_body(corpo)
+                req_mapeado = parse_issue_body(corpo)
             
-            hoje_str = datetime.now().strftime('%Y%m%d')
-            req_id = f"REQ-{hoje_str}-ISSUE{numero_issue:04d}"
+                hoje_str = datetime.now().strftime('%Y%m%d')
+                req_id = f"REQ-{hoje_str}-ISSUE{numero_issue:04d}"
             
-            caminho_relatorio, resultado_json = run_pipeline(req_mapeado, req_id)
-            atualizar_vitrine_html(req_mapeado, req_id, resultado_json)
-            publicar_no_github(req_id)
+                caminho_relatorio, resultado_json = run_pipeline(req_mapeado, req_id)
+                atualizar_vitrine_html(req_mapeado, req_id, resultado_json)
+                publicar_no_github(req_id)
             
-            email_usuario = req_mapeado.get('Email', '')
-            enviar_email_notificacao(email_usuario, req_id)
+                email_usuario = req_mapeado.get('Email', '')
+                enviar_email_notificacao(email_usuario, req_id)
             
-            atualizar_status_issue(numero_issue, req_id)
+                atualizar_status_issue(numero_issue, req_id)
             
-            print(f"✨ Issue #{numero_issue} finalizada com sucesso! Aguardando próximas...")
+                print(f"✨ Issue #{numero_issue} finalizada com sucesso! Aguardando próximas...")
             
-        time.sleep(15)
+            time.sleep(15)
         
-    except Exception as e:
-        print(f"\n🔥 ERRO NA VARREDURA DE ISSUES: {e}")
-        time.sleep(15)
+        except Exception as e:
+            print(f"\n🔥 ERRO NA VARREDURA DE ISSUES: {e}")
+            time.sleep(15)
+
+
+if os.environ.get("TERRASEQ_SEM_ISSUES") != "1":
+    monitorar_issues()
