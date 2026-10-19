@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eDNA SoilCheck | Relatório In Silico</title>
+    <title>eDNA SoilCheck | In Silico Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -28,6 +28,12 @@
         .navbar h2 { margin: 0; font-weight: 600; font-size: 1.5rem; letter-spacing: 0.5px; }
         .btn-voltar { color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.2s; background: rgba(255,255,255,0.1);}
         .btn-voltar:hover { background: white; color: var(--primary);}
+        .navbar { flex-wrap: wrap; gap: 10px; }
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .lang-toggle { display: inline-flex; border: 1px solid rgba(255,255,255,0.35); border-radius: 20px; padding: 3px; background: rgba(255,255,255,0.08); }
+        .lang-toggle button { border: none; background: transparent; color: #bbe1fa; font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.4px; padding: 5px 13px; border-radius: 16px; cursor: pointer; transition: 0.2s; }
+        .lang-toggle button.active { background: white; color: var(--primary); }
+        .lang-toggle button:hover:not(.active) { color: white; }
 
         .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
         
@@ -215,38 +221,44 @@
         <a href="../../index.html" style="display:flex; align-items:center; text-decoration:none;">
             <img src="../../imagens/Logo2.png" alt="TerraSeq" style="height:80px; width:auto; display:block; filter: brightness(1.05);">
         </a>
-        <a href="../../index.html" class="btn-voltar">⬅ Voltar ao Sistema</a>
+        <div class="nav-right">
+            <div class="lang-toggle" role="group" aria-label="Idioma / Language">
+                <button type="button" data-lang-btn="en" class="active">EN</button>
+                <button type="button" data-lang-btn="pt">PT</button>
+            </div>
+            <a href="../../index.html" class="btn-voltar" data-i18n="nav.voltar">⬅ Back to Home</a>
+        </div>
     </nav>
 
     <div class="container">
         
         <div class="report-header">
             <div>
-                <h1>Relatório In Silico PCR</h1>
-                <p>Auditoria de cobertura taxonômica e validação de marcadores</p>
+                <h1 data-i18n="rel.titulo">In Silico PCR Report</h1>
+                <p data-i18n="rel.sub">Taxonomic coverage audit and marker validation</p>
             </div>
             <div>
-                <span class="badge-status">✔ Análise Concluída</span>
+                <span class="badge-status" data-i18n="rel.concluida">✔ Analysis Completed</span>
             </div>
         </div>
 
         <div class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-title">Organismos Únicos</div>
+                <div class="kpi-title" data-i18n="kpi.organismos">Unique Organisms</div>
                 <div class="kpi-value" id="uni-org">0</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Genomas no Banco (Grupo)</div>
+                <div class="kpi-title" data-i18n="kpi.genomasBanco">Genomes in Database (Group)</div>
                 <div class="kpi-value" id="total-genomes">0</div>
                 <div class="kpi-sub" id="total-genomes-sub"></div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Cobertura Estimada</div>
+                <div class="kpi-title" data-i18n="kpi.cobertura">Estimated Coverage</div>
                 <div class="kpi-value" id="est-cov" style="color: var(--success);">0%</div>
                 <div class="kpi-sub" id="est-cov-sub"></div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Média do Amplicon</div>
+                <div class="kpi-title" data-i18n="kpi.mediaAmplicon">Mean Amplicon Size</div>
                 <div class="kpi-value" id="mean-amp">0 bp</div>
             </div>
         </div>
@@ -254,42 +266,40 @@
         <div class="layout-grid">
             
             <aside class="sidebar">
-                <div class="sidebar-header">
-                    📊 Detalhes da Execução
-                </div>
+                <div class="sidebar-header" data-i18n="side.detalhes">📊 Run Details</div>
                 <div class="sidebar-content">
                     
                     <div class="data-group">
-                        <div class="data-group-title">Rastreabilidade</div>
-                        <div class="data-row"><span class="data-label">ID da Requisição</span><span class="data-value" id="req-id">-</span></div>
-                        <div class="data-row"><span class="data-label">Data da Simulação</span><span class="data-value" id="sub-date">-</span></div>
-                        <div class="data-row"><span class="data-label">Pesquisador</span><span class="data-value" id="sub-by">-</span></div>
+                        <div class="data-group-title" data-i18n="side.rastreabilidade">Traceability</div>
+                        <div class="data-row"><span class="data-label" data-i18n="side.idReq">Request ID</span><span class="data-value" id="req-id">-</span></div>
+                        <div class="data-row"><span class="data-label" data-i18n="side.dataSim">Simulation Date</span><span class="data-value" id="sub-date">-</span></div>
+                        <div class="data-row"><span class="data-label" data-i18n="side.pesquisador">Researcher</span><span class="data-value" id="sub-by">-</span></div>
                     </div>
 
                     <div class="data-group">
-                        <div class="data-group-title">Marcadores (5' → 3')</div>
+                        <div class="data-group-title" data-i18n="side.marcadores">Markers (5' → 3')</div>
                         <div class="data-row">
-                            <span class="data-label">Primer Forward</span>
+                            <span class="data-label" data-i18n="side.fwd">Forward Primer</span>
                             <span class="data-value mono" id="fwd">-</span>
                         </div>
                         <div class="data-row">
-                            <span class="data-label">Primer Reverse</span>
+                            <span class="data-label" data-i18n="side.rev">Reverse Primer</span>
                             <span class="data-value mono" id="rev">-</span>
                         </div>
                     </div>
 
                     <div class="data-group">
-                        <div class="data-group-title">Parâmetros BLAST</div>
-                        <div class="data-row"><span class="data-label">Banco Alvo</span><span class="data-value" style="font-weight: 700; color: var(--primary);" id="param-banco">-</span></div>
+                        <div class="data-group-title" data-i18n="side.blast">BLAST Parameters</div>
+                        <div class="data-row"><span class="data-label" data-i18n="side.bancoAlvo">Target Database</span><span class="data-value" style="font-weight: 700; color: var(--primary);" id="param-banco">-</span></div>
                         
                         <div class="param-grid" style="margin-top: 15px;">
-                            <div class="data-row"><span class="data-label">Mismatch (3')</span><span class="data-value" id="param-mismatches">-</span></div>
-                            <div class="data-row"><span class="data-label">E-value Max</span><span class="data-value" id="param-evalue">-</span></div>
-                            <div class="data-row"><span class="data-label">Tm Mínima</span><span class="data-value" id="param-tm">-</span></div>
-                            <div class="data-row"><span class="data-label">Cob. Mínima</span><span class="data-value" id="param-cobertura">-</span></div>
-                            <div class="data-row"><span class="data-label">Hits (Limite)</span><span class="data-value" id="param-hits">-</span></div>
+                            <div class="data-row"><span class="data-label" data-i18n="side.mismatch">Mismatch (3')</span><span class="data-value" id="param-mismatches">-</span></div>
+                            <div class="data-row"><span class="data-label" data-i18n="side.evalue">Max E-value</span><span class="data-value" id="param-evalue">-</span></div>
+                            <div class="data-row"><span class="data-label" data-i18n="side.tm">Min Tm</span><span class="data-value" id="param-tm">-</span></div>
+                            <div class="data-row"><span class="data-label" data-i18n="side.cobMin">Min. Coverage</span><span class="data-value" id="param-cobertura">-</span></div>
+                            <div class="data-row"><span class="data-label" data-i18n="side.hits">Hits (Limit)</span><span class="data-value" id="param-hits">-</span></div>
                         </div>
-                        <div class="data-row" style="margin-top: 10px;"><span class="data-label">Janela do Amplicon</span><span class="data-value" id="param-tamanho">-</span></div>
+                        <div class="data-row" style="margin-top: 10px;"><span class="data-label" data-i18n="side.janela">Amplicon Window</span><span class="data-value" id="param-tamanho">-</span></div>
                     </div>
 
                 </div>
@@ -298,18 +308,18 @@
             <main class="main-content">
                 
                 <div class="panel">
-                    <h2 class="panel-title">Navegador Taxonômico e Funcional</h2>
+                    <h2 class="panel-title" data-i18n="nav.navegador">Taxonomic and Functional Browser</h2>
                     
                     <div class="tree-controls">
                         <div style="display: flex; gap: 10px;">
-                            <button id="btn-taxa" class="btn-tree active" onclick="switchTree('taxa')">🌳 Árvore Taxonômica</button>
-                            <button id="btn-func" class="btn-tree" onclick="switchTree('func')">♻️ Classificação Funcional</button>
+                            <button id="btn-taxa" class="btn-tree active" onclick="switchTree('taxa')" data-i18n="nav.arvoreTax">🌳 Taxonomic Tree</button>
+                            <button id="btn-func" class="btn-tree" onclick="switchTree('func')" data-i18n="nav.classFunc">♻️ Functional Classification</button>
                         </div>
                         
                         <div id="func-view-toggles" style="display: none; align-items: center; gap: 8px;">
-                            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-light); text-transform: uppercase;">Agrupar por:</span>
-                            <button id="btn-via1" class="btn-tree active" style="padding: 4px 10px; font-size: 0.8rem;" onclick="changeFuncView('via1')">Função</button>
-                            <button id="btn-via2" class="btn-tree" style="padding: 4px 10px; font-size: 0.8rem;" onclick="changeFuncView('via2')">Grupo</button>
+                            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-light); text-transform: uppercase;" data-i18n="nav.agruparPor">Group by:</span>
+                            <button id="btn-via1" class="btn-tree active" style="padding: 4px 10px; font-size: 0.8rem;" onclick="changeFuncView('via1')" data-i18n="nav.funcao">Function</button>
+                            <button id="btn-via2" class="btn-tree" style="padding: 4px 10px; font-size: 0.8rem;" onclick="changeFuncView('via2')" data-i18n="nav.grupo">Group</button>
                         </div>
                     </div>
 
@@ -319,32 +329,32 @@
                     <div id="species-card" class="meta-card">
                         <div class="meta-header">🦠 <span id="meta-title"></span></div>
                         <div id="meta-content"></div>
-                        <button class="btn-full" onclick="openFullReport()">Ver Relatório de Alinhamento</button>
+                        <button class="btn-full" onclick="openFullReport()" data-i18n="nav.verAlinhamento">View Alignment Report</button>
                     </div>
 
                     <div id="group-illustration-box" class="illustration-card">
-                        <img id="group-illustration-img" src="" alt="Ilustração do grupo">
+                        <img id="group-illustration-img" src="" alt="Group illustration">
                         <div class="illustration-caption" id="group-illustration-caption"></div>
                     </div>
 
                     <div class="chart-container">
-                        <h3 id="chart-title" style="color: var(--primary); font-weight: 600; font-size: 1rem; text-align: center; margin-top: 0;">Composição</h3>
+                        <h3 id="chart-title" style="color: var(--primary); font-weight: 600; font-size: 1rem; text-align: center; margin-top: 0;">Composition</h3>
                         <div class="chart-canvas-wrap"><canvas id="dynamicChart"></canvas></div>
                     </div>
                 </div>
 
                 <div class="panel">
-                    <h2 class="panel-title">Inventário de Cobertura</h2>
-                    <input type="text" id="search-taxa" class="search-box" placeholder="Buscar genomas encontrados nesta análise...">
+                    <h2 class="panel-title" data-i18n="inv.titulo">Coverage Inventory</h2>
+                    <input type="text" id="search-taxa" class="search-box" data-i18n-placeholder="inv.buscar" placeholder="Search genomes found in this analysis...">
 
                     <div class="table-container">
                         <table id="table-all-taxa">
                             <thead>
                                 <tr>
-                                    <th>Táxon Identificado</th>
-                                    <th>Nível Hierárquico</th>
-                                    <th>Qtd. Matches</th>
-                                    <th>Representação</th>
+                                    <th data-i18n="inv.taxon">Identified Taxon</th>
+                                    <th data-i18n="inv.nivel">Hierarchical Level</th>
+                                    <th data-i18n="inv.matches">Match Count</th>
+                                    <th data-i18n="inv.repres">Representation</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -354,27 +364,21 @@
                 </div>
 
                 <div class="panel" id="painel-cobertura-grupos">
-                    <h2 class="panel-title">Cobertura por Grupo Taxonômico</h2>
-                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: -10px; margin-bottom: 15px;">
-                        Para cada grupo taxonômico catalogado no(s) banco(s) pesquisado(s): quantos organismos
-                        este par de primers <strong>capturou</strong> e quantos <strong>não</strong> amplificou
-                        nesta análise. Sobre os não capturados, o resultado não permite nenhuma afirmação (nem
-                        que estão ausentes na amostra real, só que não foram detectados nesta busca in silico
-                        com os parâmetros usados). Ordenado do grupo com pior cobertura para o melhor.
-                    </p>
+                    <h2 class="panel-title" data-i18n="cob.titulo">Coverage by Taxonomic Group</h2>
+                    <p data-i18n="cob.intro" style="color: var(--text-light); font-size: 0.9rem; margin-top: -10px; margin-bottom: 15px;">For each taxonomic group catalogued in the searched database(s): how many organisms this primer pair <strong>captured</strong> and how many it did <strong>not</strong> amplify in this analysis. For the non-captured ones, the result supports no claim (not even that they are absent from the real sample, only that they were not detected in this in silico search with the parameters used). Sorted from the group with the worst coverage to the best.</p>
                     <p id="cobertura-grupos-indisponivel" style="display: none; color: var(--text-light); font-style: italic;"></p>
                     <div id="cobertura-grupos-conteudo" style="display: none;">
                         <div class="kpi-row-grupos" id="kpi-row-grupos"></div>
-                        <input type="text" id="search-grupos" class="search-box" placeholder="Buscar grupo taxonômico...">
+                        <input type="text" id="search-grupos" class="search-box" data-i18n-placeholder="cob.buscarGrupo" placeholder="Search taxonomic group...">
                         <div class="table-container">
                             <table id="table-cobertura-grupos">
                                 <thead>
                                     <tr>
-                                        <th>Grupo</th>
-                                        <th class="num-col">Catalogado</th>
-                                        <th class="num-col">Capturado</th>
-                                        <th class="num-col">Não capturado</th>
-                                        <th class="num-col">Cobertura</th>
+                                        <th data-i18n="cob.thGrupo">Group</th>
+                                        <th class="num-col" data-i18n="cob.thCatalogado">Catalogued</th>
+                                        <th class="num-col" data-i18n="cob.thCapturado">Captured</th>
+                                        <th class="num-col" data-i18n="cob.thNaoCapturado">Not captured</th>
+                                        <th class="num-col" data-i18n="cob.thCobertura">Coverage</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-cobertura-grupos"></tbody>
@@ -391,28 +395,28 @@
         <div class="report-content">
             <span class="close-report" onclick="closeFullReport()">&times;</span>
             <div class="report-header-blue">
-                <span>📋 DETALHES DA SIMULAÇÃO IN SILICO</span>
-                <button class="btn-download-fasta" id="btn-download-genome">📥 Baixar Genoma (.fasta)</button>
+                <span data-i18n="ov.titulo">📋 IN SILICO SIMULATION DETAILS</span>
+                <button class="btn-download-fasta" id="btn-download-genome" data-i18n="ov.baixarGenoma">📥 Download Genome (.fasta)</button>
             </div>
             
             <div style="margin-bottom: 30px; background: #f8fafc; padding: 25px; border-radius: 8px; border: 1px solid var(--border);">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;">Organismo Alvo</span><br>
+                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;" data-i18n="ov.organismoAlvo">Target Organism</span><br>
                         <span id="rep-specie" style="font-size: 1.3em; font-weight: 700; color: var(--primary);">-</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;">Tipo/Grupo</span><br>
+                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;" data-i18n="ov.tipoGrupo">Type/Group</span><br>
                         <span id="rep-type" style="font-weight: 600; font-size: 1.1em; color: var(--text-main);">-</span>
                     </div>
                     <div style="grid-column: 1 / -1;">
-                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;">Primers Utilizados (Fwd / Rev)</span><br>
+                        <span style="color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; font-weight: 700;" data-i18n="ov.primersUsados">Primers Used (Fwd / Rev)</span><br>
                         <span id="rep-primers" style="font-family: monospace; color: var(--secondary); font-weight: 700; font-size: 1.1em; background: white; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; display: inline-block; margin-top: 5px;">-</span>
                     </div>
                 </div>
             </div>
 
-            <h3 style="color: var(--primary); border-bottom: 2px solid var(--bg-color); padding-bottom: 10px;">Amplicons Gerados</h3>
+            <h3 style="color: var(--primary); border-bottom: 2px solid var(--bg-color); padding-bottom: 10px;" data-i18n="ov.amplicons">Generated Amplicons</h3>
             <div id="amplicons-list"></div>
         </div>
     </div>
@@ -442,6 +446,330 @@
         let functionalData = null;
         let currentActiveTree = 'taxa'; 
         let currentFuncView = 'via1'; 
+
+        // ---- Idioma: inglês por padrão, português opcional (EN | PT) ----
+        // Mesma chave de localStorage da página inicial (index.html): a
+        // escolha feita lá vale aqui. Só é gravada quando o visitante clica
+        // no seletor; sem escolha explícita, vale o padrão (inglês).
+        let idiomaAtual = "en";
+        const CHAVE_IDIOMA = "terraseq-lang-v2";
+
+        const DICIONARIO = {
+            pt: {
+                "pagina.titulo": "eDNA SoilCheck | Relatório In Silico",
+                "nav.voltar": "⬅ Voltar ao Sistema",
+                "rel.titulo": "Relatório In Silico PCR",
+                "rel.sub": "Auditoria de cobertura taxonômica e validação de marcadores",
+                "rel.concluida": "✔ Análise Concluída",
+                "kpi.organismos": "Organismos Únicos",
+                "kpi.genomasBanco": "Genomas no Banco (Grupo)",
+                "kpi.cobertura": "Cobertura Estimada",
+                "kpi.mediaAmplicon": "Média do Amplicon",
+                "side.detalhes": "📊 Detalhes da Execução",
+                "side.rastreabilidade": "Rastreabilidade",
+                "side.idReq": "ID da Requisição",
+                "side.dataSim": "Data da Simulação",
+                "side.pesquisador": "Pesquisador",
+                "side.marcadores": "Marcadores (5' → 3')",
+                "side.fwd": "Primer Forward",
+                "side.rev": "Primer Reverse",
+                "side.blast": "Parâmetros BLAST",
+                "side.bancoAlvo": "Banco Alvo",
+                "side.mismatch": "Mismatch (3')",
+                "side.evalue": "E-value Max",
+                "side.tm": "Tm Mínima",
+                "side.cobMin": "Cob. Mínima",
+                "side.hits": "Hits (Limite)",
+                "side.janela": "Janela do Amplicon",
+                "nav.navegador": "Navegador Taxonômico e Funcional",
+                "nav.arvoreTax": "🌳 Árvore Taxonômica",
+                "nav.classFunc": "♻️ Classificação Funcional",
+                "nav.agruparPor": "Agrupar por:",
+                "nav.funcao": "Função",
+                "nav.grupo": "Grupo",
+                "nav.verAlinhamento": "Ver Relatório de Alinhamento",
+                "nav.composicao": "Composição",
+                "inv.titulo": "Inventário de Cobertura",
+                "inv.buscar": "Buscar genomas encontrados nesta análise...",
+                "inv.taxon": "Táxon Identificado",
+                "inv.nivel": "Nível Hierárquico",
+                "inv.matches": "Qtd. Matches",
+                "inv.repres": "Representação",
+                "cob.titulo": "Cobertura por Grupo Taxonômico",
+                "cob.intro": "Para cada grupo taxonômico catalogado no(s) banco(s) pesquisado(s): quantos organismos este par de primers <strong>capturou</strong> e quantos <strong>não</strong> amplificou nesta análise. Sobre os não capturados, o resultado não permite nenhuma afirmação (nem que estão ausentes na amostra real, só que não foram detectados nesta busca in silico com os parâmetros usados). Ordenado do grupo com pior cobertura para o melhor.",
+                "cob.buscarGrupo": "Buscar grupo taxonômico...",
+                "cob.thGrupo": "Grupo",
+                "cob.thCatalogado": "Catalogado",
+                "cob.thCapturado": "Capturado",
+                "cob.thNaoCapturado": "Não capturado",
+                "cob.thCobertura": "Cobertura",
+                "ov.titulo": "📋 DETALHES DA SIMULAÇÃO IN SILICO",
+                "ov.baixarGenoma": "📥 Baixar Genoma (.fasta)",
+                "ov.organismoAlvo": "Organismo Alvo",
+                "ov.tipoGrupo": "Tipo/Grupo",
+                "ov.primersUsados": "Primers Utilizados (Fwd / Rev)",
+                "ov.amplicons": "Amplicons Gerados",
+                "js.ilustracao": "Ilustração em breve",
+                "js.buscandoNcbi": "⏳ Buscando no NCBI...",
+                "js.falhaNcbi": "Não foi possível extrair a sequência completa automaticamente do NCBI. Baixando arquivo estruturado de referência.",
+                "js.falhaBuscaManual": "Falha na busca automática. Baixe manualmente em:",
+                "js.semAmplicon": "Nenhum detalhe de amplicon encontrado no log do BLAST.",
+                "js.produto": "Produto",
+                "js.tamanho": "Tamanho",
+                "js.posicao": "Posição",
+                "js.baixarFasta": "📥 Baixar FASTA",
+                "js.buscando": "⏳ Buscando...",
+                "js.seqIndisponivel": "Essa sequência não está disponível para download -- ficou fora até do orçamento do arquivo de sequências completas (caso raro, com um número extremo de resultados). Os dados brutos continuam preservados no servidor de processamento.",
+                "js.papeisEcologicos": "Papéis Ecológicos",
+                "js.gruposBiologicos": "Grupos Biológicos",
+                "js.composicaoTax": "Composição Taxonômica",
+                "js.subdivisao": "Subdivisão",
+                "js.outrosTaxons": "Outros Táxons",
+                "js.dominio": "Domínio",
+                "js.papelEcologico": "Papel Ecológico",
+                "js.tamanhoBiologico": "Tamanho Biológico",
+                "js.grandeGrupo": "Grande Grupo",
+                "js.gruposIdentificados": "Grupos Identificados",
+                "js.especiesAfetadas": "Espécies Afetadas",
+                "js.descricao": "Descrição",
+                "js.tamanhoGenoma": "Tamanho Genoma",
+                "js.nivel": "Nível",
+                "js.cliqueDetalhes": "Clique para ver os detalhes deste genoma",
+                "js.banco": "Banco",
+                "js.totalCatalogado": "Total catalogado para \"{banco}\"",
+                "js.captados": "{n} de {total} genomas de \"{banco}\" captados",
+                "cob.gruposAvaliados": "Grupos avaliados",
+                "cob.catalogado": "Catalogado ({unidade})",
+                "cob.capturado": "Capturado ({unidade})",
+                "cob.naoCapturado": "Não capturado ({unidade})",
+                "cob.coberturaGlobal": "Cobertura global",
+                "cob.unidGenomas": "genomas",
+                "cob.unidEspecies": "espécies",
+                "cob.semGrupo": "Sem grupo no acervo",
+                "cob.semGrupoDica": "Espécies capturadas que não estão listadas em nenhum grupo do acervo",
+                "cob.buscarDentro": "Buscar organismo dentro de {grupo}...",
+                "cob.capturadosH": "Capturados ({n} espécies)",
+                "cob.naoCapturadosH": "Não capturados ({n} espécies)",
+                "cob.nenhumEncontrado": "Nenhum organismo encontrado.",
+                "cob.nenhumLista": "Nenhum organismo nesta lista.",
+                "cob.erroSemBanco": "Este relatório não registrou qual banco foi pesquisado -- funcionalidade indisponível para relatórios anteriores a essa mudança.",
+                "cob.erroNaoMapeado": "Banco \"{banco}\" não mapeado no acervo de genomas -- não foi possível calcular a cobertura por grupo.",
+                "cob.erroSemGrupos": "Nenhum grupo do banco \"{banco}\" foi encontrado no acervo de genomas.",
+                "cob.erroAcervo": "Não foi possível carregar o acervo de genomas (docs/dados/acervo_genomas.json) -- não foi possível calcular a cobertura por grupo."
+            },
+            en: {
+                "pagina.titulo": "eDNA SoilCheck | In Silico Report",
+                "nav.voltar": "⬅ Back to Home",
+                "rel.titulo": "In Silico PCR Report",
+                "rel.sub": "Taxonomic coverage audit and marker validation",
+                "rel.concluida": "✔ Analysis Completed",
+                "kpi.organismos": "Unique Organisms",
+                "kpi.genomasBanco": "Genomes in Database (Group)",
+                "kpi.cobertura": "Estimated Coverage",
+                "kpi.mediaAmplicon": "Mean Amplicon Size",
+                "side.detalhes": "📊 Run Details",
+                "side.rastreabilidade": "Traceability",
+                "side.idReq": "Request ID",
+                "side.dataSim": "Simulation Date",
+                "side.pesquisador": "Researcher",
+                "side.marcadores": "Markers (5' → 3')",
+                "side.fwd": "Forward Primer",
+                "side.rev": "Reverse Primer",
+                "side.blast": "BLAST Parameters",
+                "side.bancoAlvo": "Target Database",
+                "side.mismatch": "Mismatch (3')",
+                "side.evalue": "Max E-value",
+                "side.tm": "Min Tm",
+                "side.cobMin": "Min. Coverage",
+                "side.hits": "Hits (Limit)",
+                "side.janela": "Amplicon Window",
+                "nav.navegador": "Taxonomic and Functional Browser",
+                "nav.arvoreTax": "🌳 Taxonomic Tree",
+                "nav.classFunc": "♻️ Functional Classification",
+                "nav.agruparPor": "Group by:",
+                "nav.funcao": "Function",
+                "nav.grupo": "Group",
+                "nav.verAlinhamento": "View Alignment Report",
+                "nav.composicao": "Composition",
+                "inv.titulo": "Coverage Inventory",
+                "inv.buscar": "Search genomes found in this analysis...",
+                "inv.taxon": "Identified Taxon",
+                "inv.nivel": "Hierarchical Level",
+                "inv.matches": "Match Count",
+                "inv.repres": "Representation",
+                "cob.titulo": "Coverage by Taxonomic Group",
+                "cob.intro": "For each taxonomic group catalogued in the searched database(s): how many organisms this primer pair <strong>captured</strong> and how many it did <strong>not</strong> amplify in this analysis. For the non-captured ones, the result supports no claim (not even that they are absent from the real sample, only that they were not detected in this in silico search with the parameters used). Sorted from the group with the worst coverage to the best.",
+                "cob.buscarGrupo": "Search taxonomic group...",
+                "cob.thGrupo": "Group",
+                "cob.thCatalogado": "Catalogued",
+                "cob.thCapturado": "Captured",
+                "cob.thNaoCapturado": "Not captured",
+                "cob.thCobertura": "Coverage",
+                "ov.titulo": "📋 IN SILICO SIMULATION DETAILS",
+                "ov.baixarGenoma": "📥 Download Genome (.fasta)",
+                "ov.organismoAlvo": "Target Organism",
+                "ov.tipoGrupo": "Type/Group",
+                "ov.primersUsados": "Primers Used (Fwd / Rev)",
+                "ov.amplicons": "Generated Amplicons",
+                "js.ilustracao": "Illustration coming soon",
+                "js.buscandoNcbi": "⏳ Fetching from NCBI...",
+                "js.falhaNcbi": "Could not automatically retrieve the full sequence from NCBI. Downloading a structured reference file instead.",
+                "js.falhaBuscaManual": "Automatic fetch failed. Download manually at:",
+                "js.semAmplicon": "No amplicon details found in the BLAST log.",
+                "js.produto": "Product",
+                "js.tamanho": "Size",
+                "js.posicao": "Position",
+                "js.baixarFasta": "📥 Download FASTA",
+                "js.buscando": "⏳ Fetching...",
+                "js.seqIndisponivel": "This sequence is not available for download -- it fell outside even the budget of the full-sequences file (rare case, with an extreme number of results). The raw data is still preserved on the processing server.",
+                "js.papeisEcologicos": "Ecological Roles",
+                "js.gruposBiologicos": "Biological Groups",
+                "js.composicaoTax": "Taxonomic Composition",
+                "js.subdivisao": "Subdivision",
+                "js.outrosTaxons": "Other Taxa",
+                "js.dominio": "Domain",
+                "js.papelEcologico": "Ecological Role",
+                "js.tamanhoBiologico": "Biological Size",
+                "js.grandeGrupo": "Major Group",
+                "js.gruposIdentificados": "Identified Groups",
+                "js.especiesAfetadas": "Species Detected",
+                "js.descricao": "Description",
+                "js.tamanhoGenoma": "Genome Size",
+                "js.nivel": "Level",
+                "js.cliqueDetalhes": "Click to see this genome's details",
+                "js.banco": "Database",
+                "js.totalCatalogado": "Total catalogued for \"{banco}\"",
+                "js.captados": "{n} of {total} \"{banco}\" genomes captured",
+                "cob.gruposAvaliados": "Groups evaluated",
+                "cob.catalogado": "Catalogued ({unidade})",
+                "cob.capturado": "Captured ({unidade})",
+                "cob.naoCapturado": "Not captured ({unidade})",
+                "cob.coberturaGlobal": "Overall coverage",
+                "cob.unidGenomas": "genomes",
+                "cob.unidEspecies": "species",
+                "cob.semGrupo": "Not matched to an archive group",
+                "cob.semGrupoDica": "Captured species that are not listed in any archive group",
+                "cob.buscarDentro": "Search organism within {grupo}...",
+                "cob.capturadosH": "Captured ({n} species)",
+                "cob.naoCapturadosH": "Not captured ({n} species)",
+                "cob.nenhumEncontrado": "No organism found.",
+                "cob.nenhumLista": "No organism in this list.",
+                "cob.erroSemBanco": "This report did not record which database was searched -- feature unavailable for reports generated before this change.",
+                "cob.erroNaoMapeado": "Database \"{banco}\" is not mapped in the genome archive -- coverage by group could not be computed.",
+                "cob.erroSemGrupos": "No group of database \"{banco}\" was found in the genome archive.",
+                "cob.erroAcervo": "Could not load the genome archive (docs/dados/acervo_genomas.json) -- coverage by group could not be computed."
+            }
+        };
+
+        // Vocabulário fixo gerado pelo pipeline em português (main.py:
+        // REGRAS_CLASSIFICACAO_ECOLOGICA). O result.json guarda esses nomes em
+        // português e eles servem de chave interna (ícones, agrupamentos);
+        // aqui só mudam na TELA, via tr().
+        const VOCAB_EN = {
+            "Engenheiros do Ecossistema": "Ecosystem Engineers",
+            "Decompositores da Serrapilheira": "Litter Decomposers",
+            "Micropredadores": "Micropredators",
+            "Microrganismos": "Microorganisms",
+            "Fora do Escopo Principal": "Outside Main Scope",
+            "Função Indefinida": "Undefined Function",
+            "Enquitreídeos": "Enchytraeids",
+            "Formigas": "Ants",
+            "Cupins": "Termites",
+            "Minhocas": "Earthworms",
+            "Ácaros": "Mites",
+            "Colêmbolos, Proturos e Dipluros": "Springtails, Proturans and Diplurans",
+            "Isópodes": "Isopods",
+            "Miriápodes": "Myriapods",
+            "Insetos (Adultos e Larvas)": "Insects (Adults and Larvae)",
+            "Aracnídeos (Aranhas e Escorpiões)": "Arachnids (Spiders and Scorpions)",
+            "Platelmintos": "Flatworms",
+            "Protistas": "Protists",
+            "Nematoides": "Nematodes",
+            "Tardígrados": "Tardigrades",
+            "Rotíferos": "Rotifers",
+            "Fungos": "Fungi",
+            "Bactérias": "Bacteria",
+            "Moluscos": "Molluscs",
+            "Plantas (Raízes)": "Plants (Roots)",
+            "Vírus": "Viruses",
+            "Megafauna (Vertebrados)": "Megafauna (Vertebrates)",
+            "Não Classificado": "Unclassified",
+            "Indefinido": "Undefined"
+        };
+
+        let reportData = null;
+        let currentChartNode = null;
+        let currentGroupName = null;
+        let estadoCobertura = null;
+
+        function localeAtual() { return idiomaAtual === "en" ? "en-US" : "pt-BR"; }
+
+        function t(chave, vars) {
+            let txt = (DICIONARIO[idiomaAtual] && DICIONARIO[idiomaAtual][chave]) || chave;
+            if (vars) Object.keys(vars).forEach(k => { txt = txt.split('{' + k + '}').join(vars[k]); });
+            return txt;
+        }
+
+        function tr(nome) { return (idiomaAtual === "en" && VOCAB_EN[nome]) || nome; }
+
+        // Nomes dos bancos do formulário que estão em português (os demais são nomes
+        // científicos e valem nos dois idiomas).
+        const BANCOS_EN = {
+            eucariotos: "Eukaryotes", minhocas: "Earthworms", formigas: "Ants", isopodes: "Isopods",
+            miriapodes: "Myriapods", cupins: "Termites", platelmintos: "Flatworms"
+        };
+        function bancoExibido(db) {
+            if (!db) return t('js.banco');
+            if (idiomaAtual === "en" && BANCOS_EN[db.toLowerCase()]) return BANCOS_EN[db.toLowerCase()];
+            return db.charAt(0).toUpperCase() + db.slice(1);
+        }
+
+        function aplicarIdioma(lang) {
+            idiomaAtual = lang;
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const texto = DICIONARIO[lang][el.getAttribute("data-i18n")];
+                if (texto !== undefined) el.innerHTML = texto;
+            });
+            document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+                const texto = DICIONARIO[lang][el.getAttribute("data-i18n-placeholder")];
+                if (texto !== undefined) el.placeholder = texto;
+            });
+            document.querySelectorAll("[data-lang-btn]").forEach(btn => {
+                btn.classList.toggle("active", btn.dataset.langBtn === lang);
+            });
+            document.documentElement.setAttribute("lang", lang);
+            document.title = DICIONARIO[lang]["pagina.titulo"];
+            refrescarDinamico();
+        }
+
+        // Reaplica o que é montado via JS (depende dos dados já carregados).
+        function refrescarDinamico() {
+            atualizarTextosKpi();
+            document.querySelectorAll('#table-all-taxa tbody tr').forEach(linha => {
+                const td = linha.children[1];
+                if (td && td.dataset.depth !== undefined) td.textContent = t('js.nivel') + ' ' + td.dataset.depth;
+                if (linha.dataset.clicavel) linha.title = t('js.cliqueDetalhes');
+            });
+            renderCoberturaGrupos();
+            if (!fullData) return;
+
+            // O gráfico depende do Chart.js (CDN); se ele não carregou, o resto
+            // da tela ainda precisa ser traduzido.
+            try {
+                if (currentActiveTree === 'taxa') {
+                    renderBrowser();
+                    updateChart(currentChartNode || fullData);
+                } else {
+                    document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? t('js.papeisEcologicos') : t('js.gruposBiologicos');
+                    renderFunctionalBrowser();
+                }
+            } catch (err) { console.error(err); }
+            const cartaoEspecie = document.getElementById('species-card');
+            if (cartaoEspecie.style.display === 'block' && currentSpecies && leafMetadata[currentSpecies]) showSpeciesCard(currentSpecies);
+            const caixaGrupo = document.getElementById('group-illustration-box');
+            if (caixaGrupo.style.display === 'block' && currentGroupName) showGroupIllustration(currentGroupName);
+            if (document.getElementById('full-report-overlay').style.display === 'block' && currentSpecies) openFullReport();
+        }
 
         // Ícones ilustrativos para os grupos funcionais (Cap. II/IV do Atlas)
         const FUNCTION_ICONS = {
@@ -504,15 +832,16 @@
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">
                 <rect width="100%" height="100%" fill="#eaf3fb"/>
                 <text x="50%" y="42%" font-size="64" text-anchor="middle" dominant-baseline="middle">${icone}</text>
-                <text x="50%" y="80%" font-size="15" fill="#0f4c75" text-anchor="middle" font-family="sans-serif">Ilustração em breve</text>
+                <text x="50%" y="80%" font-size="15" fill="#0f4c75" text-anchor="middle" font-family="sans-serif">${t('js.ilustracao')}</text>
             </svg>`;
             return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
         }
 
         function showGroupIllustration(nome) {
+            currentGroupName = nome;
             document.getElementById('species-card').style.display = 'none';
             document.getElementById('group-illustration-img').src = GROUP_ILLUSTRATIONS[nome] || placeholderIllustration(nome, groupIcon(nome));
-            document.getElementById('group-illustration-caption').textContent = nome;
+            document.getElementById('group-illustration-caption').textContent = tr(nome);
             document.getElementById('group-illustration-box').style.display = 'block';
         }
 
@@ -543,21 +872,21 @@
             btnGenome.onclick = async () => {
                 const originalText = btnGenome.innerHTML;
                 try {
-                    btnGenome.innerHTML = "⏳ Buscando no NCBI...";
+                    btnGenome.innerHTML = t('js.buscandoNcbi');
                     btnGenome.disabled = true;
                     
                     const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${speciesData.info.acc}&rettype=fasta&retmode=text`;
                     const response = await fetch(url);
                     
-                    if (!response.ok) throw new Error("Falha ao consultar servidor NCBI");
+                    if (!response.ok) throw new Error("Failed to query NCBI server");
                     const fastaText = await response.text();
                     
                     triggerDownloadFasta(`${speciesData.info.acc}_completo.fasta`, fastaText);
                 } catch (err) {
                     console.error(err);
-                    alert("Não foi possível extrair a sequência completa automaticamente do NCBI. Baixando arquivo estruturado de referência.");
+                    alert(t('js.falhaNcbi'));
                     
-                    let fallbackText = `>${speciesData.info.acc} ${speciesData.info.desc} | Length: ${speciesData.info.length} bp\n; Falha na busca automática. Baixe manualmente em: https://www.ncbi.nlm.nih.gov/nuccore/${speciesData.info.acc}\n`;
+                    let fallbackText = `>${speciesData.info.acc} ${speciesData.info.desc} | Length: ${speciesData.info.length} bp\n; ${t('js.falhaBuscaManual')} https://www.ncbi.nlm.nih.gov/nuccore/${speciesData.info.acc}\n`;
                     triggerDownloadFasta(`${speciesData.info.acc}_ref.fasta`, fallbackText);
                 } finally {
                     btnGenome.innerHTML = originalText;
@@ -569,7 +898,7 @@
             list.innerHTML = "";
 
             if (!speciesData.amplicons || speciesData.amplicons.length === 0) {
-                list.innerHTML = "<p>Nenhum detalhe de amplicon encontrado no log do BLAST.</p>";
+                list.innerHTML = "<p>" + t('js.semAmplicon') + "</p>";
             } else {
                 // Accession de cada PRODUTO/amplicon é ${amp.acc} (a sequência
                 // específica onde aquele hit ocorreu) -- NÃO speciesData.info.acc
@@ -583,13 +912,13 @@
                     card.className = 'product-card';
                     card.innerHTML = `
                         <div class="product-header">
-                            <span>Produto #${index + 1} - ${amp.acc}</span>
+                            <span>${t('js.produto')} #${index + 1} - ${amp.acc}</span>
                         </div>
                         <div class="product-body">
                             <div class="badge-row">
-                                <span class="badge badge-green">📏 Tamanho: ${amp.size} bp</span>
+                                <span class="badge badge-green">📏 ${t('js.tamanho')}: ${amp.size} bp</span>
                                 <span class="badge badge-blue">🌡️ Tm: ${amp.tm}°C</span>
-                                <span class="badge badge-orange" style="background: var(--warning);">📍 Posição: ${amp.start} - ${amp.end}</span>
+                                <span class="badge badge-orange" style="background: var(--warning);">📍 ${t('js.posicao')}: ${amp.start} - ${amp.end}</span>
                             </div>
                             <div class="seq-box">${amp.seq}</div>
                         </div>
@@ -601,7 +930,7 @@
                     // inicial da página, e a página continua 100% estática).
                     const btnDownload = document.createElement('button');
                     btnDownload.className = 'btn-download-fasta';
-                    btnDownload.textContent = '📥 Baixar FASTA';
+                    btnDownload.textContent = t('js.baixarFasta');
                     btnDownload.onclick = amp.omitido
                         ? () => downloadProductFastaOmitido(especieAtual, index, amp, btnDownload)
                         : () => downloadProductFasta(amp.acc, index + 1, amp.size, amp.tm, amp.seq);
@@ -643,13 +972,13 @@
 
         async function downloadProductFastaOmitido(especie, index, amp, btn) {
             const originalText = btn.innerHTML;
-            btn.innerHTML = '⏳ Buscando...';
+            btn.innerHTML = t('js.buscando');
             btn.disabled = true;
             try {
                 const dados = await carregarSequenciasCompletas();
                 const seq = dados[especie] ? dados[especie][index] : null;
                 if (!seq) {
-                    alert('Essa sequência não está disponível para download -- ficou fora até do orçamento do arquivo de sequências completas (caso raro, com um número extremo de resultados). Os dados brutos continuam preservados no servidor de processamento.');
+                    alert(t('js.seqIndisponivel'));
                     return;
                 }
                 downloadProductFasta(amp.acc, index + 1, amp.size, amp.tm, seq);
@@ -673,7 +1002,7 @@
 
             document.getElementById('species-card').style.display = 'none';
             document.getElementById('group-illustration-box').style.display = 'none';
-            document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Papéis Ecológicos` : `Grupos Biológicos`;
+            document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? t('js.papeisEcologicos') : t('js.gruposBiologicos');
             renderFunctionalBrowser();
         }
 
@@ -694,7 +1023,7 @@
                 browserTaxa.style.display = 'flex';
                 browserFunc.style.display = 'none';
                 viewToggles.style.display = 'none';
-                document.getElementById('chart-title').innerHTML = `Composição Taxonômica`;
+                document.getElementById('chart-title').innerHTML = t('js.composicaoTax');
                 updateChart(fullData); 
             } else {
                 btnFunc.classList.add('active');
@@ -702,7 +1031,7 @@
                 browserTaxa.style.display = 'none';
                 browserFunc.style.display = 'flex';
                 viewToggles.style.display = 'flex';            
-                document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? `Papéis Ecológicos` : `Grupos Biológicos`;
+                document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? t('js.papeisEcologicos') : t('js.gruposBiologicos');
                 renderFunctionalBrowser(); 
             }
         }
@@ -718,7 +1047,7 @@
                 if (fullData.name === "Root") match = fullData.children.find(c => c.name === d);
                 rootChildren.push(match || { name: d, matches: 0, coverage: 0, children: [], rank: "domain" });
             });
-            browser.appendChild(createColumn(rootChildren, globalTotal, 0, "Domínio"));
+            browser.appendChild(createColumn(rootChildren, globalTotal, 0, t('js.dominio')));
 
             let currentLevelNodes = rootChildren;
             for (let i = 0; i < currentPath.length; i++) {
@@ -784,7 +1113,7 @@
             let dataFunc = [];
 
             if (currentFuncView === 'via1') {
-                col1.innerHTML = `<div class="silva-col-header">Papel Ecológico <span>${Object.keys(functionalData).length}</span></div>`;
+                col1.innerHTML = `<div class="silva-col-header">${t('js.papelEcologico')} <span>${Object.keys(functionalData).length}</span></div>`;
 
                 Object.keys(functionalData).forEach(funcao => {
                     const gruposNessaFuncao = functionalData[funcao];
@@ -795,7 +1124,7 @@
                     });
 
                     if(totalMatchesFuncao > 0) {
-                        labelsFunc.push(funcao);
+                        labelsFunc.push(tr(funcao));
                         dataFunc.push(totalMatchesFuncao);
                     }
 
@@ -804,7 +1133,7 @@
                     if (totalMatchesFuncao === 0) li.classList.add('empty');
                     
                     let globPerc = globalTotal > 0 ? formatPercent(totalMatchesFuncao / globalTotal) : "0.0%";
-                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${functionIcon(funcao)}</span>${funcao}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${functionIcon(funcao)}</span>${tr(funcao)}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     if (totalMatchesFuncao > 0) {
                         li.onclick = () => {
@@ -839,20 +1168,20 @@
                 });
 
                 const keys = Object.keys(gruposPorTamanho);
-                col1.innerHTML = `<div class="silva-col-header">Tamanho Biológico <span>${keys.length}</span></div>`;
+                col1.innerHTML = `<div class="silva-col-header">${t('js.tamanhoBiologico')} <span>${keys.length}</span></div>`;
 
                 keys.sort((a,b) => b.localeCompare(a)).forEach(tamanho => {
                     let totalMatchesTamanho = 0;
                     gruposPorTamanho[tamanho].forEach(g => { totalMatchesTamanho += g.matches; });
                     
-                    labelsFunc.push(tamanho);
+                    labelsFunc.push(tr(tamanho));
                     dataFunc.push(totalMatchesTamanho);
 
                     const li = document.createElement('li');
                     li.className = 'silva-item';
                     let globPerc = globalTotal > 0 ? formatPercent(totalMatchesTamanho / globalTotal) : "0.0%";
                     
-                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${sizeIcon(tamanho)}</span>${tamanho}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${sizeIcon(tamanho)}</span>${tr(tamanho)}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     li.onclick = () => {
                         renderTamanhoGroups(gruposPorTamanho[tamanho], totalMatchesTamanho, browser);
@@ -875,7 +1204,7 @@
             
             const col2 = document.createElement('div');
             col2.className = 'silva-col';
-            col2.innerHTML = `<div class="silva-col-header">Grande Grupo <span>${Object.keys(gruposData).length}</span></div>`;
+            col2.innerHTML = `<div class="silva-col-header">${t('js.grandeGrupo')} <span>${Object.keys(gruposData).length}</span></div>`;
             const ul2 = document.createElement('ul');
             ul2.className = 'silva-list';
 
@@ -887,7 +1216,7 @@
                 const li = document.createElement('li');
                 li.className = 'silva-item';
                 let globPerc = parentMatches > 0 ? formatPercent(totalMatchesGrupo / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${groupIcon(grupo)}</span>${grupo}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${groupIcon(grupo)}</span>${tr(grupo)}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
                 
                 li.onclick = () => {
                      renderFunctionalSpecies(especiesData, totalMatchesGrupo, browserRef);
@@ -907,7 +1236,7 @@
             
             const col2 = document.createElement('div');
             col2.className = 'silva-col';
-            col2.innerHTML = `<div class="silva-col-header">Grupos Identificados <span>${listaGrupos.length}</span></div>`;
+            col2.innerHTML = `<div class="silva-col-header">${t('js.gruposIdentificados')} <span>${listaGrupos.length}</span></div>`;
             const ul2 = document.createElement('ul');
             ul2.className = 'silva-list';
 
@@ -915,7 +1244,7 @@
                 const li = document.createElement('li');
                 li.className = 'silva-item';
                 let globPerc = parentMatches > 0 ? formatPercent(item.matches / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;"><span class="icon-badge">${groupIcon(item.grupo)}</span>${item.grupo}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal; margin-left:34px;">${functionIcon(item.funcao)} ${item.funcao}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;"><span class="icon-badge">${groupIcon(item.grupo)}</span>${tr(item.grupo)}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal; margin-left:34px;">${functionIcon(item.funcao)} ${tr(item.funcao)}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
 
                 li.onclick = () => {
                      renderFunctionalSpecies(item.especies, item.matches, browserRef);
@@ -944,7 +1273,7 @@
 
             const col3 = document.createElement('div');
             col3.className = 'silva-col';
-            col3.innerHTML = `<div class="silva-col-header">Espécies Afetadas <span>${listaFinal.length}</span></div>`;
+            col3.innerHTML = `<div class="silva-col-header">${t('js.especiesAfetadas')} <span>${listaFinal.length}</span></div>`;
             const ul3 = document.createElement('ul');
             ul3.className = 'silva-list';
 
@@ -972,13 +1301,14 @@
             const info = leafMetadata[name].info;
             document.getElementById('meta-content').innerHTML = `
                 <div class="meta-row"><span class="meta-label">ID / Accession</span><a href="https://www.ncbi.nlm.nih.gov/nuccore/${info.acc}" target="_blank" style="color: var(--secondary); text-decoration: none; font-weight: 700;">${info.acc} ↗</a></div>
-                <div class="meta-row"><span class="meta-label">Descrição</span><span style="color: var(--text-main); font-size: 0.9em;">${info.desc}</span></div>
-                <div class="meta-row"><span class="meta-label">Tamanho Genoma</span><span style="color:var(--primary); font-weight:bold;">${info.length} bp</span></div>
+                <div class="meta-row"><span class="meta-label">${t('js.descricao')}</span><span style="color: var(--text-main); font-size: 0.9em;">${info.desc}</span></div>
+                <div class="meta-row"><span class="meta-label">${t('js.tamanhoGenoma')}</span><span style="color:var(--primary); font-weight:bold;">${info.length} bp</span></div>
             `;
             document.getElementById('species-card').style.display = 'block';
         }
 
         function updateChart(targetNode) {
+            currentChartNode = targetNode;
             let title = document.getElementById('chart-title');
             let itemsToPlot = targetNode.children;
             if (!itemsToPlot || itemsToPlot.length === 0) {
@@ -986,13 +1316,13 @@
                 renderPieChart([targetNode.name], [targetNode.matches]);
                 return;
             }
-            title.innerHTML = `Subdivisão: ${targetNode.name}`;
+            title.innerHTML = `${t('js.subdivisao')}: ${targetNode.name}`;
             let sorted = [...itemsToPlot].sort((a,b) => b.matches - a.matches);
             let top5 = sorted.slice(0, 5);
             let others = sorted.slice(5).reduce((sum, c) => sum + c.matches, 0);
             let labels = top5.map(c => c.name);
             let data = top5.map(c => c.matches);
-            if (others > 0) { labels.push("Outros Táxons"); data.push(others); }
+            if (others > 0) { labels.push(t('js.outrosTaxons')); data.push(others); }
             renderPieChart(labels, data);
         }
 
@@ -1079,7 +1409,7 @@
             const termo = (termoBusca || '').toLowerCase().trim();
             const filtrados = termo ? nomes.filter(n => n.toLowerCase().includes(termo)) : nomes;
             if (!filtrados.length) {
-                return `<div class="vazia">${termo ? 'Nenhum organismo encontrado.' : 'Nenhum organismo nesta lista.'}</div>`;
+                return `<div class="vazia">${termo ? t('cob.nenhumEncontrado') : t('cob.nenhumLista')}</div>`;
             }
             return '<ul>' + filtrados.map(n => `<li>${marcarOcorrencias(n, termo)}</li>`).join('') + '</ul>';
         }
@@ -1094,19 +1424,21 @@
             const corpo = document.getElementById('tbody-cobertura-grupos');
             corpo.innerHTML = '';
             const termo = (filtroGrupo || '').toLowerCase().trim();
+            const nf = n => n.toLocaleString(localeAtual());
             grupos.forEach(g => {
-                if (termo && !g.nome.toLowerCase().includes(termo)) return;
+                const nomeExibido = g.semGrupo ? t('cob.semGrupo') : g.nome;
+                if (termo && !nomeExibido.toLowerCase().includes(termo)) return;
                 const cor = g.semGrupo ? 'var(--text-light)' : corCoberturaGrupo(g.cobertura);
 
                 const trGrupo = document.createElement('tr');
                 trGrupo.className = 'grupo-row';
                 trGrupo.innerHTML = `
-                    <td class="grupo-nome-cell"><span class="caret-grupo">▶</span> ${g.nome}</td>
-                    <td class="num-col">${g.semGrupo ? '—' : g.catalogado.toLocaleString('pt-BR')}</td>
-                    <td class="num-col">${g.capturado.toLocaleString('pt-BR')}</td>
-                    <td class="num-col">${g.semGrupo ? '—' : g.naoCapturado.toLocaleString('pt-BR')}</td>
+                    <td class="grupo-nome-cell"><span class="caret-grupo">▶</span> ${nomeExibido}</td>
+                    <td class="num-col">${g.semGrupo ? '—' : nf(g.catalogado)}</td>
+                    <td class="num-col">${nf(g.capturado)}</td>
+                    <td class="num-col">${g.semGrupo ? '—' : nf(g.naoCapturado)}</td>
                     <td class="num-col">
-                        ${g.semGrupo ? '<span class="pct" style="color:var(--text-light);" title="Espécies capturadas que não estão listadas em nenhum grupo do acervo">—</span>' : `<div class="barra-cobertura-grupo">
+                        ${g.semGrupo ? `<span class="pct" style="color:var(--text-light);" title="${t('cob.semGrupoDica')}">—</span>` : `<div class="barra-cobertura-grupo">
                             <div class="barra-bg"><div class="barra-fill" style="width:${g.cobertura}%; background:${cor};"></div></div>
                             <span class="pct" style="color:${cor};">${g.cobertura.toFixed(1)}%</span>
                         </div>`}
@@ -1120,14 +1452,14 @@
                 const idBusca = `busca-organismo-${g.id}`;
                 td.innerHTML = `
                     <div class="detalhe-grupo-content">
-                        <input type="text" class="busca-organismo-grupo" id="${idBusca}" placeholder="Buscar organismo dentro de ${g.nome}...">
+                        <input type="text" class="busca-organismo-grupo" id="${idBusca}" placeholder="${t('cob.buscarDentro', { grupo: nomeExibido })}">
                         <div class="detalhe-grupo-cols">
                             <div class="detalhe-grupo-col col-capturados">
-                                <h4>Capturados (${g.listaCapturados.length} espécies)</h4>
+                                <h4>${t('cob.capturadosH', { n: g.listaCapturados.length })}</h4>
                                 <div class="lista-especies-grupo lista-capturados">${listaEspeciesHtml(g.listaCapturados, '')}</div>
                             </div>
                             <div class="detalhe-grupo-col col-nao-capturados">
-                                <h4>Não capturados (${g.listaNaoCapturados.length} espécies)</h4>
+                                <h4>${t('cob.naoCapturadosH', { n: g.listaNaoCapturados.length })}</h4>
                                 <div class="lista-especies-grupo lista-nao-capturados">${listaEspeciesHtml(g.listaNaoCapturados, '')}</div>
                             </div>
                         </div>
@@ -1153,8 +1485,6 @@
         });
 
         function carregarCoberturaPorGrupo(data, leafMetadata) {
-            const boxIndisponivel = document.getElementById('cobertura-grupos-indisponivel');
-            const boxConteudo = document.getElementById('cobertura-grupos-conteudo');
             const bancoSelecionado = data.metadata && data.metadata.database;
             const organismosCapturados = new Set(Object.keys(leafMetadata));
             // Relatórios novos trazem "genomas_capturados" por espécie (quantos
@@ -1163,8 +1493,8 @@
             const temGenomas = Object.values(leafMetadata).some(v => typeof v.genomas_capturados === 'number');
 
             if (!bancoSelecionado) {
-                boxIndisponivel.style.display = '';
-                boxIndisponivel.textContent = 'Este relatório não registrou qual banco foi pesquisado -- funcionalidade indisponível para relatórios anteriores a essa mudança.';
+                estadoCobertura = { erro: { chave: 'cob.erroSemBanco' } };
+                renderCoberturaGrupos();
                 return;
             }
 
@@ -1172,8 +1502,8 @@
                 const todosGrupos = (acervo.bancos || []).map(b => b.id);
                 const idsDoBanco = gruposDoBanco(bancoSelecionado, todosGrupos);
                 if (!idsDoBanco || !idsDoBanco.length) {
-                    boxIndisponivel.style.display = '';
-                    boxIndisponivel.textContent = `Banco "${bancoSelecionado}" não mapeado no acervo de genomas -- não foi possível calcular a cobertura por grupo.`;
+                    estadoCobertura = { erro: { chave: 'cob.erroNaoMapeado', vars: { banco: bancoSelecionado } } };
+                    renderCoberturaGrupos();
                     return;
                 }
 
@@ -1207,8 +1537,8 @@
                     });
 
                 if (!grupos.length) {
-                    boxIndisponivel.style.display = '';
-                    boxIndisponivel.textContent = `Nenhum grupo do banco "${bancoSelecionado}" foi encontrado no acervo de genomas.`;
+                    estadoCobertura = { erro: { chave: 'cob.erroSemGrupos', vars: { banco: bancoSelecionado } } };
+                    renderCoberturaGrupos();
                     return;
                 }
 
@@ -1224,7 +1554,7 @@
                     const gen = temGenomas ? semGrupo.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0) : semGrupo.length;
                     grupos.push({
                         id: 'sem-grupo',
-                        nome: 'Sem grupo no acervo',
+                        nome: '',
                         semGrupo: true,
                         catalogado: 0,
                         capturado: gen,
@@ -1239,23 +1569,61 @@
                 const totalCat = grupos.reduce((s, g) => s + g.catalogado, 0);
                 const totalCap = grupos.reduce((s, g) => s + g.capturado, 0);
                 // Catalogado − capturado (não a soma das linhas): as espécies da linha
-                // "Sem grupo no acervo" foram capturadas mas não têm catálogo.
+                // "sem grupo no acervo" foram capturadas mas não têm catálogo.
                 const totalNao = Math.max(0, totalCat - totalCap);
                 const covGlobal = totalCat ? (100 * totalCap / totalCat).toFixed(1) : '0.0';
-                const unidade = temGenomas ? 'genomas' : 'espécies';
-                document.getElementById('kpi-row-grupos').innerHTML = `
-                    <div class="kpi-card-grupos"><div class="num">${nGrupos}</div><div class="lbl">Grupos avaliados</div></div>
-                    <div class="kpi-card-grupos"><div class="num">${totalCat.toLocaleString('pt-BR')}</div><div class="lbl">Catalogado (${unidade})</div></div>
-                    <div class="kpi-card-grupos capturado"><div class="num">${totalCap.toLocaleString('pt-BR')}</div><div class="lbl">Capturado (${unidade})</div></div>
-                    <div class="kpi-card-grupos nao-capturado"><div class="num">${totalNao.toLocaleString('pt-BR')}</div><div class="lbl">Não capturado (${unidade})</div></div>
-                    <div class="kpi-card-grupos"><div class="num">${covGlobal}%</div><div class="lbl">Cobertura global</div></div>
-                `;
 
-                boxConteudo.style.display = '';
-                renderTabelaCoberturaGrupos(grupos, '');
+                estadoCobertura = { grupos, nGrupos, totalCat, totalCap, totalNao, covGlobal, temGenomas };
+                renderCoberturaGrupos();
             }).catch(() => {
+                estadoCobertura = { erro: { chave: 'cob.erroAcervo' } };
+                renderCoberturaGrupos();
+            });
+        }
+
+        // Desenha (ou redesenha, ao trocar de idioma) o painel a partir do estado calculado.
+        function renderCoberturaGrupos() {
+            const e = estadoCobertura;
+            if (!e) return;
+            const boxIndisponivel = document.getElementById('cobertura-grupos-indisponivel');
+            const boxConteudo = document.getElementById('cobertura-grupos-conteudo');
+            if (e.erro) {
                 boxIndisponivel.style.display = '';
-                boxIndisponivel.textContent = 'Não foi possível carregar o acervo de genomas (docs/dados/acervo_genomas.json) -- não foi possível calcular a cobertura por grupo.';
+                boxIndisponivel.textContent = t(e.erro.chave, e.erro.vars);
+                boxConteudo.style.display = 'none';
+                return;
+            }
+            boxIndisponivel.style.display = 'none';
+            const nf = n => n.toLocaleString(localeAtual());
+            const unidade = e.temGenomas ? t('cob.unidGenomas') : t('cob.unidEspecies');
+            document.getElementById('kpi-row-grupos').innerHTML = `
+                <div class="kpi-card-grupos"><div class="num">${e.nGrupos}</div><div class="lbl">${t('cob.gruposAvaliados')}</div></div>
+                <div class="kpi-card-grupos"><div class="num">${nf(e.totalCat)}</div><div class="lbl">${t('cob.catalogado', { unidade })}</div></div>
+                <div class="kpi-card-grupos capturado"><div class="num">${nf(e.totalCap)}</div><div class="lbl">${t('cob.capturado', { unidade })}</div></div>
+                <div class="kpi-card-grupos nao-capturado"><div class="num">${nf(e.totalNao)}</div><div class="lbl">${t('cob.naoCapturado', { unidade })}</div></div>
+                <div class="kpi-card-grupos"><div class="num">${e.covGlobal}%</div><div class="lbl">${t('cob.coberturaGlobal')}</div></div>
+            `;
+            boxConteudo.style.display = '';
+            renderTabelaCoberturaGrupos(e.grupos, document.getElementById('search-grupos').value);
+        }
+
+        // Textos dos cartões do topo que dependem do idioma (e dos números do relatório).
+        function atualizarTextosKpi() {
+            if (!reportData) return;
+            const data = reportData;
+            const organismosUnicos = data.summary.unique_organisms || Object.keys(leafMetadata).length;
+            const totalGenomasBanco = data.summary.total_sequences_checked || 0;
+            const nomeGrupoBanco = bancoExibido(data.metadata.database);
+            document.getElementById('param-banco').textContent = nomeGrupoBanco;
+            // A data vem do pipeline como "dd/mm/aaaa às hh:mm".
+            const dataSim = String(data.metadata.submitted_at || '-');
+            document.getElementById('sub-date').textContent = idiomaAtual === 'en' ? dataSim.replace(' às ', ' at ') : dataSim;
+            document.getElementById('total-genomes').textContent = totalGenomasBanco.toLocaleString(localeAtual());
+            document.getElementById('total-genomes-sub').textContent = t('js.totalCatalogado', { banco: nomeGrupoBanco });
+            document.getElementById('est-cov-sub').textContent = t('js.captados', {
+                n: organismosUnicos.toLocaleString(localeAtual()),
+                total: totalGenomasBanco.toLocaleString(localeAtual()),
+                banco: nomeGrupoBanco
             });
         }
 
@@ -1280,19 +1648,12 @@
             document.getElementById('est-cov').textContent = formatPercent(data.summary.estimated_coverage);
             document.getElementById('mean-amp').textContent = data.summary.mean_amplicon_size + ' bp';
 
-            // Total de genomas disponíveis no banco de dados para o grupo pesquisado,
-            // e quanto desse total foi "captado" pelos resultados do PCR in silico.
-            const totalGenomasBanco = data.summary.total_sequences_checked || 0;
-            const nomeGrupoBanco = data.metadata.database
-                ? data.metadata.database.charAt(0).toUpperCase() + data.metadata.database.slice(1)
-                : "Banco";
-            document.getElementById('total-genomes').textContent = totalGenomasBanco.toLocaleString('pt-BR');
-            document.getElementById('total-genomes-sub').textContent = `Total catalogado para "${nomeGrupoBanco}"`;
-            document.getElementById('est-cov-sub').textContent =
-                `${organismosUnicos.toLocaleString('pt-BR')} de ${totalGenomasBanco.toLocaleString('pt-BR')} genomas de "${nomeGrupoBanco}" captados`;
+            // Total de genomas no banco do grupo pesquisado e quanto foi "captado"
+            // pelo PCR in silico (textos dependem do idioma, ver atualizarTextosKpi).
+            reportData = data;
+            atualizarTextosKpi();
 
             if(data.metadata) {
-                document.getElementById('param-banco').textContent = data.metadata.database || "Protozoa";
                 document.getElementById('param-evalue').textContent = data.metadata.e_value !== undefined ? data.metadata.e_value : "-";
                 document.getElementById('param-mismatches').textContent = data.metadata.max_mismatches !== undefined ? data.metadata.max_mismatches : "-";
                 document.getElementById('param-tm').textContent = (data.metadata.min_tm !== undefined ? data.metadata.min_tm : "-") + " °C";
@@ -1312,7 +1673,7 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="${isBold}">${icon}${taxon.name}</td>
-                    <td style="color: var(--text-light); font-size: 0.85em;">Nível ${taxon.depth}</td>
+                    <td data-depth="${taxon.depth}" style="color: var(--text-light); font-size: 0.85em;">${t('js.nivel')} ${taxon.depth}</td>
                     <td style="font-weight: 600;">${taxon.matches}</td>
                     <td style="font-weight: 600;"><span style="color:var(--success); background: #d1fae5; padding: 2px 8px; border-radius: 4px;">${formatPercent(taxon.matches / globalTotal)}</span></td>
                 `;
@@ -1321,7 +1682,7 @@
                 // (filo, classe, etc.) não têm um genoma único associado.
                 if (taxon.isLeaf && leafMetadata[taxon.name]) {
                     tr.style.cursor = 'pointer';
-                    tr.title = 'Clique para ver os detalhes deste genoma';
+                    tr.title = t('js.cliqueDetalhes'); tr.dataset.clicavel = '1';
                     tr.onclick = () => {
                         switchTree('taxa');
                         showSpeciesCard(taxon.name);
@@ -1343,6 +1704,21 @@
             renderBrowser();
             updateChart(fullData);
         });
+
+        document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                aplicarIdioma(btn.dataset.langBtn);
+                try { localStorage.setItem(CHAVE_IDIOMA, btn.dataset.langBtn); } catch (e) {}
+            });
+        });
+        (function () {
+            let idiomaInicial = "en";
+            try {
+                const salvo = localStorage.getItem(CHAVE_IDIOMA);
+                if (salvo === "pt" || salvo === "en") idiomaInicial = salvo;
+            } catch (e) {}
+            aplicarIdioma(idiomaInicial);
+        })();
     </script>
 </body>
 </html>
