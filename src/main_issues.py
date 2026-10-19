@@ -10,6 +10,7 @@ import sys
 import requests
 from Bio import Entrez
 import taxonomia_local
+import notificacoes
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -122,26 +123,8 @@ def validate_primer(seq):
     return True
 
 def enviar_email_notificacao(email_destino, req_id):
-    print("📧 Preparando disparo de e-mail...")
-    if not email_destino or "@" not in email_destino: 
-        print(f"   ⏩ E-mail ignorado: Destinatário ausente ou inválido ({email_destino}).")
-        return
     link_pages = f"https://{REPO_OWNER}.github.io/{REPO_NAME}/reports/{req_id}/"
-    msg = MIMEMultipart()
-    msg['From'] = EMAIL_REMETENTE
-    msg['To'] = email_destino
-    msg['Subject'] = f"🧬 Análise in silico Concluída ({req_id})"
-    corpo = f"Olá,\n\nSua simulação de PCR foi concluída com sucesso!\nID: {req_id}\n\nAcesse o relatório: {link_pages}\n\n⚠️ Aviso Importante: O servidor web leva de 1 a 2 minutos para realizar a publicação dos arquivos. Se você acessar o link e esbarrar em um 'Erro 404' (Página não encontrada), não se preocupe! Aguarde alguns instantes e atualize a página (Ctrl + F5).\n\nAtt,\nEquipe de Bioinformática"
-    msg.attach(MIMEText(corpo, 'plain', 'utf-8'))
-    try:
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
-        server.starttls()
-        server.login(EMAIL_REMETENTE, EMAIL_SENHA)
-        server.sendmail(EMAIL_REMETENTE, email_destino, msg.as_string())
-        server.quit()
-        print(f"   ✅ E-mail enviado com sucesso para: {email_destino}")
-    except Exception as e:
-        print(f"   ⚠️ Erro ao enviar e-mail: {e}")
+    notificacoes.enviar_email_sucesso(email_destino, req_id, link_pages)
 
 # ==========================================
 # FUNÇÕES DE TAXONOMIA E GITHUB PAGES
@@ -442,6 +425,11 @@ def atualizar_vitrine_html(req, req_id, resultado_json=None):
 # MOTOR PRINCIPAL (RUN PIPELINE)
 # ==========================================
 def run_pipeline(req, req_id):
+    # Confere o pedido antes de qualquer BLAST (ver notificacoes.validar_pedido).
+    problemas = notificacoes.validar_pedido(req)
+    if problemas:
+        raise notificacoes.PedidoInvalido(problemas)
+
     raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     pasta_resultado = os.path.join(raiz_projeto, f"docs/reports/{req_id}")
     os.makedirs(pasta_resultado, exist_ok=True)
@@ -840,13 +828,11 @@ def buscar_requisicoes_github():
         print(f"⚠️ Erro de conexão com GitHub: {e}")
     return []
 
-def atualizar_status_issue(numero_issue, req_id):
+def atualizar_status_issue(numero_issue, req_id, numero_analise=None):
     url_comments = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues/{numero_issue}/comments"
     link_pages = f"https://{REPO_OWNER}.github.io/{REPO_NAME}/reports/{req_id}/"
-    
-    corpo_comentario = {
-        "body": f"✅ **Análise in silico concluída com sucesso!**\n\nO pipeline do laboratório processou seus primers. O relatório interativo com a árvore taxonômica e a cobertura já está disponível.\n\n👉 **[Acessar Relatório Completo]({link_pages})**\n\n> ⚠️ **Aviso Importante:** O servidor do GitHub Pages leva de 1 a 2 minutos para concluir o deploy. Se você clicar no link agora e ver uma tela de **Erro 404** (Page not found) ou a página em branco, aguarde alguns instantes e force a atualização da página (`F5` ou `Ctrl + F5`)."
-    }
+
+    corpo_comentario = {"body": notificacoes.comentario_sucesso(numero_analise or numero_issue, link_pages)}
     ok = True
     r = requests.post(url_comments, headers=HEADERS, json=corpo_comentario, timeout=30)
     if r.status_code != 201:
@@ -873,6 +859,7 @@ ROTULOS_DO_FLUXO = {
     "analise-pendente": ("fbca04", "Aguardando processamento pelo pipeline"),
     "running": ("0e8a16", "Em processamento pelo pipeline"),
     "analise-concluida": ("1d76db", "Análise concluída"),
+    "analise-com-erro": ("d73a4a", "Pedido não processado (erro ou dado inválido)"),
 }
 
 def verificar_repositorio_e_rotulos():
@@ -1028,20 +1015,22 @@ def monitorar_issues():
                     print("   clássico: escopo 'repo'). A Issue NÃO foi processada. Corrija o token e reinicie o monitor.")
                     continue
 
+                req_mapeado = {}
+                hoje_str = datetime.now().strftime('%Y%m%d')
+                req_id = f"REQ-{hoje_str}-ISSUE{numero_issue:04d}"
+                pipeline_ok = False
                 try:
                     req_mapeado = parse_issue_body(corpo)
 
-                    hoje_str = datetime.now().strftime('%Y%m%d')
-                    req_id = f"REQ-{hoje_str}-ISSUE{numero_issue:04d}"
-
                     caminho_relatorio, resultado_json = run_pipeline(req_mapeado, req_id)
+                    pipeline_ok = True
                     atualizar_vitrine_html(req_mapeado, req_id, resultado_json)
                     publicar_no_github(req_id)
 
                     email_usuario = req_mapeado.get('Email', '')
                     enviar_email_notificacao(email_usuario, req_id)
 
-                    fechou = atualizar_status_issue(numero_issue, req_id)
+                    fechou = atualizar_status_issue(numero_issue, req_id, numero_analise)
 
                     if fechou:
                         print(f"✨ Issue #{numero_issue} finalizada com sucesso! Aguardando próximas...")
@@ -1050,13 +1039,20 @@ def monitorar_issues():
                 except Exception as e:
                     print(f"\n🔥 ERRO ao processar a Issue #{numero_issue}: {e}")
                     traceback.print_exc()
+                    if not pipeline_ok:
+                        # evita que a pasta pela metade entre no próximo "git add docs/"
+                        shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'reports', req_id), ignore_errors=True)
+                    if isinstance(e, notificacoes.PedidoInvalido):
+                        comentario = notificacoes.comentario_pedido_invalido(numero_analise, e.problemas)
+                    else:
+                        comentario = notificacoes.comentario_erro_interno(numero_analise)
                     try:
-                        requests.post(
-                            f"{url_issue}/comments", headers=HEADERS, timeout=30,
-                            json={"body": "❌ A análise desta Issue falhou no servidor. O laboratório foi avisado e vai verificar."}
-                        )
+                        requests.post(f"{url_issue}/comments", headers=HEADERS, timeout=30, json={"body": comentario})
+                        requests.patch(url_issue, headers=HEADERS, timeout=30,
+                                       json={"state": "closed", "labels": ["analise-com-erro"]})
                     except Exception:
                         pass
+                    notificacoes.notificar_falha(req_mapeado.get('Email', ''), req_id, e, req_mapeado, "issue")
 
             time.sleep(15)
 

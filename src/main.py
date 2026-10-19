@@ -11,6 +11,7 @@ import csv
 import sys
 from Bio import Entrez
 import taxonomia_local
+import notificacoes
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -156,26 +157,8 @@ def validate_primer(seq):
     return True
 
 def enviar_email_notificacao(email_destino, req_id):
-    print("📧 Preparando disparo de e-mail...")
-    if not email_destino or "@" not in email_destino: 
-        print(f"   ⏩ E-mail ignorado: Destinatário ausente ou inválido ({email_destino}).")
-        return
     link_pages = f"https://{GITHUB_REPO_OWNER}.github.io/{GITHUB_REPO_NAME}/reports/{req_id}/"
-    msg = MIMEMultipart()
-    msg['From'] = EMAIL_REMETENTE
-    msg['To'] = email_destino
-    msg['Subject'] = f"🧬 Análise in silico Concluída ({req_id})"
-    corpo = f"Olá,\n\nSua simulação de PCR foi concluída com sucesso!\nID: {req_id}\n\nAcesse o relatório: {link_pages}\n\n⚠️ Aviso Importante: O servidor web leva de 1 a 2 minutos para realizar a publicação dos arquivos. Se você acessar o link e esbarrar em um 'Erro 404' (Página não encontrada), não se preocupe! Aguarde alguns instantes e atualize a página (Ctrl + F5).\n\nAtt,\\Equipe de Bioinformática"
-    msg.attach(MIMEText(corpo, 'plain', 'utf-8'))
-    try:
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
-        server.starttls()
-        server.login(EMAIL_REMETENTE, EMAIL_SENHA)
-        server.sendmail(EMAIL_REMETENTE, email_destino, msg.as_string())
-        server.quit()
-        print(f"   ✅ E-mail enviado com sucesso para: {email_destino}")
-    except Exception as e:
-        print(f"   ⚠️ Erro ao enviar e-mail: {e}")
+    notificacoes.enviar_email_sucesso(email_destino, req_id, link_pages)
 
 def descobrir_rank(taxa, profundidade, tamanho_total):
     t = taxa.lower()
@@ -527,6 +510,12 @@ def atualizar_vitrine_html(req, req_id, resultado_json=None):
 
 
 def run_pipeline(req, req_id):
+    # Confere o pedido antes de qualquer BLAST: o que o usuário pode corrigir
+    # (primer inválido, número fora do formato...) volta pra ele com a lista.
+    problemas = notificacoes.validar_pedido(req)
+    if problemas:
+        raise notificacoes.PedidoInvalido(problemas)
+
     raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     pasta_resultado = os.path.join(raiz_projeto, f"docs/reports/{req_id}")
     os.makedirs(pasta_resultado, exist_ok=True)
@@ -1074,7 +1063,19 @@ def monitorar_planilha():
                         req_id = f"{req_id_base}-{sufixo}"
                         sufixo += 1
 
-                    caminho_relatorio, resultado_json = run_pipeline(req, req_id)
+                    try:
+                        caminho_relatorio, resultado_json = run_pipeline(req, req_id)
+                    except Exception as e:
+                        # Antes o erro só aparecia no terminal e a linha ficava "running"
+                        # pra sempre, sem o usuário saber. Agora: planilha, e-mail ao
+                        # usuário (o que corrigir) e, em erro interno, e-mail à equipe.
+                        print(f"\n🔥 ERRO ao processar a linha {linha_planilha} ({req_id}): {e}")
+                        traceback.print_exc()
+                        shutil.rmtree(os.path.join(raiz_projeto_loop, "docs", "reports", req_id), ignore_errors=True)
+                        planilha.update_cell(linha_planilha, COL_STATUS, 'error')
+                        planilha.update_cell(linha_planilha, COL_LINK, "ERRO: " + notificacoes.resumo_do_erro(e))
+                        notificacoes.notificar_falha(str(req.get('Email', '')).strip(), req_id, e, req, "planilha")
+                        continue
 
                     atualizar_vitrine_html(req, req_id, resultado_json)
                 
