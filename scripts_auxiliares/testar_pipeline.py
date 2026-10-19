@@ -80,6 +80,19 @@ def campos_do_formulario_issue():
     return [(i, r.strip().strip('"').strip("'")) for i, r in pares]
 
 
+def opcoes_dropdown(id_campo):
+    """Opções de um menu do formulário da Issue, lidas do .yml."""
+    texto = open(YML_ISSUE, encoding="utf-8").read()
+    i = texto.index(f"id: {id_campo}")
+    bloco = texto[i:texto.index("validations:", i)]
+    return re.findall(r'^\s*-\s*"([^"]+)"', bloco, re.M)
+
+
+def sem_descricao(valor):
+    """Mesma regra do parse_issue_body: tira a descrição entre parênteses."""
+    return re.sub(r"\s*\(.*\)\s*$", "", valor).strip()
+
+
 def corpo_da_issue(args):
     """Corpo no formato que o GitHub gera para um formulário de Issue."""
     valores = {
@@ -88,8 +101,9 @@ def corpo_da_issue(args):
         "primer_pair_name": "TESTE_V4_Balzano_F/D9_2593R",
         "primer_fwd": args.fwd,
         "primer_rev": args.rev,
-        "regiao_alvo": "18S",
-        "banco_dados": args.banco.capitalize(),
+        "regiao_alvo": "18S-ITS-28S",
+        # a opção completa do menu (com a descrição), como o GitHub entrega
+        "banco_dados": next((o for o in opcoes_dropdown("banco_dados") if sem_descricao(o).lower() == args.banco.lower()), args.banco.capitalize()),
         "tipo_organismo": "Eukaryota",
         "max_mismatches": "3",
         "amp_min": "2000",
@@ -118,7 +132,7 @@ def conferir_parser(m, args):
         "Primer reverse": args.rev,
         "Nome do Par de Primers": valores["primer_pair_name"],
         "Região alvo": valores["regiao_alvo"],
-        "Banco de Dados": valores["banco_dados"],
+        "Banco de Dados": sem_descricao(valores["banco_dados"]),
         "Tipo de organismo": valores["tipo_organismo"],
         "Máximo de Mismatches na extremidade 3": valores["max_mismatches"],
         "Tamanho do amplicon: MIN": valores["amp_min"],
@@ -136,6 +150,33 @@ def conferir_parser(m, args):
         else:
             erros += falha(f"{chave}: esperado {valor!r}, o parser entregou {req.get(chave)!r}")
     return req, erros
+
+
+def conferir_opcoes_do_formulario(m):
+    """Toda opção dos menus do formulário precisa virar um banco/tipo válido no código."""
+    print("\n🔎 Conferindo as opções dos menus do formulário × código ...")
+    erros = 0
+    fonte = open(os.path.join(RAIZ, "src", "main_issues.py"), encoding="utf-8").read()
+    bloco = fonte[fonte.index("BANCOS_DISPONIVEIS = {"):fonte.index("BANCOS_GRUPOS = {")]
+    chaves = set(re.findall(r'^\s*"(\w+)":\s*\(', bloco, re.M))
+    oferecidos = set()
+    for opcao in opcoes_dropdown("banco_dados"):
+        req = m.parse_issue_body(f"### Banco de Dados\n\n{opcao}")
+        nome = req["Banco de Dados"].lower()
+        oferecidos.add(nome)
+        if nome not in chaves:
+            erros += falha(f"banco '{opcao}' do formulário não existe no código (cairia no refseqsoil sem avisar)")
+    if not erros:
+        ok(f"as {len(oferecidos)} opções de banco do formulário existem no código")
+    fora = sorted(chaves - oferecidos - {"isoptera"})  # isoptera = alias de cupins
+    if fora:
+        print(f"   ℹ️ bancos do código que o formulário não oferece: {fora}")
+    for opcao in opcoes_dropdown("tipo_organismo"):
+        req = m.parse_issue_body(f"### Tipo de organismo\n\n{opcao}")
+        if not req["Tipo de organismo"]:
+            erros += falha(f"tipo de organismo '{opcao}' virou vazio")
+    ok("tipos de organismo: " + ", ".join(sem_descricao(o) for o in opcoes_dropdown("tipo_organismo")))
+    return erros
 
 
 def conferir_resultado(req_id, req, pasta):
@@ -219,6 +260,7 @@ def main():
 
     if args.entrada == "issue":
         req, erros = conferir_parser(m, args)
+        erros += conferir_opcoes_do_formulario(m)
         if erros:
             print(f"\n❌ O parser da Issue perdeu {erros} campo(s). Corrija antes de testar com uma Issue real.")
             sys.exit(1)

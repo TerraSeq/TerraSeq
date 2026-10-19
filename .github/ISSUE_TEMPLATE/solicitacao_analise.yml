@@ -66,15 +66,12 @@ body:
         ---
         ### 🎯 Alvo da Análise
 
-  - type: dropdown
+  - type: input
     id: regiao_alvo
     attributes:
       label: Região Alvo
-      options:
-        - "16S"
-        - "18S"
-        - "ITS"
-        - "Outra"
+      description: "Região do genoma que o par de primers amplifica. Escreva livremente (ex.: 18S, 16S, ITS, 18S-ITS-28S, COI)."
+      placeholder: "Ex.: 18S-ITS-28S"
     validations:
       required: true
 
@@ -82,16 +79,23 @@ body:
     id: banco_dados
     attributes:
       label: Banco de Dados
-      description: "Selecione contra qual banco genômico o BLAST será rodado (Sar = Stramenopila/Alveolata/Rhizaria; Eucariotos = Refseqsoil sem Bacteria/Archaea, útil pra marcadores como 18S/ITS/28S que não existem em procariontes)"
+      description: "Selecione contra qual banco genômico o BLAST será rodado. Refseqsoil é o banco completo (todos os grupos); Eucariotos é o Refseqsoil sem Bacteria/Archaea, útil pra marcadores como 18S/ITS/28S que não existem em procariontes; Sar = Stramenopila/Alveolata/Rhizaria."
       options:
+        - "Refseqsoil (banco completo: todos os grupos, inclui bactérias e arqueias)"
+        - "Eucariotos (todos os eucariotos, sem bactérias e arqueias)"
+        - "Protozoa (Amoebozoa + Sar + Discoba + Metamonada)"
+        - "Fungi (todos os filos de fungos)"
+        - "Minhocas (Oligochaeta + Enchytraeidae)"
         - "Amoebozoa"
         - "Sar"
         - "Discoba"
         - "Metamonada"
-        - "Refseqsoil"
-        - "Eucariotos"
-        - "Protozoa"
-        - "Fungi"
+        - "Basidiomycota"
+        - "Ascomycota"
+        - "Mucoromycota"
+        - "Chytridiomycota"
+        - "Zoopagomycota"
+        - "Glomeromycota"
         - "Bacteria"
         - "Archaea"
         - "Nematoda"
@@ -99,12 +103,12 @@ body:
         - "Rotifera"
         - "Acari"
         - "Collembola"
-        - "Minhocas"
         - "Formigas"
         - "Cupins"
         - "Isopodes"
         - "Miriapodes"
         - "Platelmintos"
+        - "Enchytraeidae"
     validations:
       required: true
 
@@ -113,6 +117,7 @@ body:
     attributes:
       label: Tipo de organismo
       options:
+        - "Geral (todos os reinos)"
         - "Eukaryota"
         - "Bactérias"
         - "Arqueias"
