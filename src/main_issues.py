@@ -856,6 +856,52 @@ def atualizar_status_issue(numero_issue, req_id):
     }
     requests.patch(url_issue, headers=HEADERS, json=modificacoes)
 
+# Rótulos que o fluxo usa: o formulário da Issue aplica "analise-pendente" (só se
+# o rótulo já existir no repositório!), o monitor troca por "running" durante a
+# análise e por "analise-concluida" no fim.
+ROTULOS_DO_FLUXO = {
+    "analise-pendente": ("fbca04", "Aguardando processamento pelo pipeline"),
+    "running": ("0e8a16", "Em processamento pelo pipeline"),
+    "analise-concluida": ("1d76db", "Análise concluída"),
+}
+
+def verificar_repositorio_e_rotulos():
+    """Mostra qual repositório está sendo vigiado, confere o token e cria os
+    rótulos do fluxo que ainda não existirem. Nunca derruba o monitor."""
+    base = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}"
+    print(f"\n🔎 Repositório vigiado: {REPO_OWNER}/{REPO_NAME}")
+    try:
+        resp = requests.get(base, headers=HEADERS, timeout=30)
+    except Exception as e:
+        print(f"⚠️ Não consegui falar com o GitHub: {e}")
+        return
+    if resp.status_code != 200:
+        print(f"⚠️ O GitHub respondeu {resp.status_code} ao acessar {REPO_OWNER}/{REPO_NAME}: {resp.text[:200]}")
+        print("   Confira GITHUB_TOKEN (permissão de Issues), GITHUB_REPO_OWNER e GITHUB_REPO_NAME no .env.")
+        return
+    dados = resp.json()
+    nome_real = dados.get("full_name", "")
+    if nome_real.lower() != f"{REPO_OWNER}/{REPO_NAME}".lower():
+        print(f"⚠️ O repositório foi renomeado/transferido: o GitHub redirecionou para '{nome_real}'.")
+        print(f"   Ajuste GITHUB_REPO_OWNER/GITHUB_REPO_NAME no .env para '{nome_real}' (senão comentar e fechar a Issue falha).")
+    if not dados.get("has_issues", True):
+        print("⚠️ As Issues estão DESABILITADAS neste repositório (Settings → Features → Issues).")
+    print(f"   ✅ Acesso ao repositório OK ({nome_real or REPO_NAME}).")
+
+    for nome, (cor, descricao) in ROTULOS_DO_FLUXO.items():
+        try:
+            r = requests.post(f"{base}/labels", headers=HEADERS, timeout=30,
+                              json={"name": nome, "color": cor, "description": descricao})
+        except Exception as e:
+            print(f"   ⚠️ Rótulo '{nome}': erro de conexão ({e})")
+            continue
+        if r.status_code == 201:
+            print(f"   ➕ Rótulo '{nome}' criado.")
+        elif r.status_code == 422:
+            print(f"   ✔️ Rótulo '{nome}' já existe.")
+        else:
+            print(f"   ⚠️ Rótulo '{nome}': não consegui criar ({r.status_code}) -- crie à mão em Issues → Labels.")
+
 def parse_issue_body(body):
     sections = re.split(r'###\s+', body)
     data = {}
@@ -901,7 +947,8 @@ def parse_issue_body(body):
 # run_pipeline/parse_issue_body (ex: scripts_auxiliares/testar_pipeline.py) sem
 # iniciar o monitoramento das Issues.
 def monitorar_issues():
-    print("\n✅ SCRIPT HÍBRIDO ONLINE - Monitorando GitHub Issues...")
+    verificar_repositorio_e_rotulos()
+    print("\n✅ SCRIPT HÍBRIDO ONLINE - Monitorando GitHub Issues (rótulo 'analise-pendente')...")
 
     while True:
         try:
