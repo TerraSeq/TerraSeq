@@ -887,6 +887,11 @@ def parse_issue_body(body):
         'Cobertura mínima': data.get('Cobertura mínima (%)', '70'),
         'Limite de hits': data.get('Limite de hits', '500')
     }
+    # Os menus do formulário trazem uma descrição entre parênteses
+    # ("Refseqsoil (banco completo: ...)", "Geral (todos os reinos)"); o
+    # pipeline só quer o nome ("Refseqsoil", "Geral").
+    for campo in ('Banco de Dados', 'Tipo de organismo'):
+        req[campo] = re.sub(r'\s*\(.*\)\s*$', '', req[campo]).strip()
     return req
 
 # ==========================================
