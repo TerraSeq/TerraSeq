@@ -248,6 +248,7 @@ reais. Variáveis usadas:
 | `ENTREZ_EMAIL` | ✅ sim | main.py, main_issues.py | E-mail exigido pela API Entrez do NCBI (fallback quando o manifesto local não tem a sequência) |
 | `EMAIL_REMETENTE` | ✅ sim | main.py, main_issues.py | Conta de e-mail que envia a notificação de "relatório pronto" |
 | `EMAIL_SENHA` | ✅ sim | main.py, main_issues.py | Senha/senha de app da conta acima |
+| `EMAIL_ADMIN` | não (default = `EMAIL_REMETENTE`) | main.py, main_issues.py | E-mail da equipe que recebe o detalhe técnico quando uma análise falha por erro interno (o usuário recebe só um aviso genérico) |
 | `GITHUB_TOKEN` | ✅ sim (só p/ main_issues.py) | main_issues.py | Token com permissão de leitura/escrita em Issues do repositório |
 | `SMTP_SERVER` | não (default `smtp.gmail.com`) | ambos | Servidor SMTP de envio |
 | `SMTP_PORT` | não (default `587`) | ambos | Porta SMTP |
