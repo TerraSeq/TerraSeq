@@ -847,14 +847,24 @@ def atualizar_status_issue(numero_issue, req_id):
     corpo_comentario = {
         "body": f"✅ **Análise in silico concluída com sucesso!**\n\nO pipeline do laboratório processou seus primers. O relatório interativo com a árvore taxonômica e a cobertura já está disponível.\n\n👉 **[Acessar Relatório Completo]({link_pages})**\n\n> ⚠️ **Aviso Importante:** O servidor do GitHub Pages leva de 1 a 2 minutos para concluir o deploy. Se você clicar no link agora e ver uma tela de **Erro 404** (Page not found) ou a página em branco, aguarde alguns instantes e force a atualização da página (`F5` ou `Ctrl + F5`)."
     }
-    requests.post(url_comments, headers=HEADERS, json=corpo_comentario)
+    ok = True
+    r = requests.post(url_comments, headers=HEADERS, json=corpo_comentario, timeout=30)
+    if r.status_code != 201:
+        ok = False
+        print(f"⚠️ Não consegui comentar na Issue #{numero_issue} ({r.status_code}): {r.text[:150]}")
 
     url_issue = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues/{numero_issue}"
     modificacoes = {
         "state": "closed",
         "labels": ["analise-concluida"]
     }
-    requests.patch(url_issue, headers=HEADERS, json=modificacoes)
+    r = requests.patch(url_issue, headers=HEADERS, json=modificacoes, timeout=30)
+    if r.status_code != 200:
+        ok = False
+        print(f"⚠️ Não consegui fechar a Issue #{numero_issue} ({r.status_code}): {r.text[:150]}")
+    if not ok:
+        print("   O token do GITHUB_TOKEN precisa de permissão de ESCRITA em Issues (Issues: Read and write / escopo 'repo').")
+    return ok
 
 # Rótulos que o fluxo usa: o formulário da Issue aplica "analise-pendente" (só se
 # o rótulo já existir no repositório!), o monitor troca por "running" durante a
@@ -950,36 +960,65 @@ def monitorar_issues():
     verificar_repositorio_e_rotulos()
     print("\n✅ SCRIPT HÍBRIDO ONLINE - Monitorando GitHub Issues (rótulo 'analise-pendente')...")
 
+    # Issues já tentadas nesta execução do monitor. Cada Issue é processada no
+    # máximo UMA vez: se o GitHub não deixar marcar/fechar (token sem escrita) ou
+    # a análise falhar, repetir a cada 15s reprocessaria tudo sem parar (BLAST,
+    # linha duplicada na vitrine, push e e-mail a cada rodada). Para tentar de
+    # novo uma Issue que falhou, corrija o problema e reinicie o monitor.
+    tentadas = set()
+
     while True:
         try:
             issues = buscar_requisicoes_github()
             for issue in issues:
                 numero_issue = issue['number']
+                if numero_issue in tentadas:
+                    continue
+                tentadas.add(numero_issue)
                 corpo = issue['body']
-            
-                print(f"\n🔔 Nova requisição encontrada na Issue #{numero_issue}!")
-            
-                url_issue = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues/{numero_issue}"
-                requests.patch(url_issue, headers=HEADERS, json={"labels": ["running"]})
 
-                req_mapeado = parse_issue_body(corpo)
-            
-                hoje_str = datetime.now().strftime('%Y%m%d')
-                req_id = f"REQ-{hoje_str}-ISSUE{numero_issue:04d}"
-            
-                caminho_relatorio, resultado_json = run_pipeline(req_mapeado, req_id)
-                atualizar_vitrine_html(req_mapeado, req_id, resultado_json)
-                publicar_no_github(req_id)
-            
-                email_usuario = req_mapeado.get('Email', '')
-                enviar_email_notificacao(email_usuario, req_id)
-            
-                atualizar_status_issue(numero_issue, req_id)
-            
-                print(f"✨ Issue #{numero_issue} finalizada com sucesso! Aguardando próximas...")
-            
+                print(f"\n🔔 Nova requisição encontrada na Issue #{numero_issue}!")
+
+                url_issue = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues/{numero_issue}"
+                r = requests.patch(url_issue, headers=HEADERS, json={"labels": ["running"]}, timeout=30)
+                if r.status_code != 200:
+                    print(f"🛑 Não consegui marcar a Issue #{numero_issue} como 'running' ({r.status_code}): {r.text[:150]}")
+                    print("   O GITHUB_TOKEN precisa de permissão de ESCRITA em Issues (fine-grained: Issues → Read and write;")
+                    print("   clássico: escopo 'repo'). A Issue NÃO foi processada. Corrija o token e reinicie o monitor.")
+                    continue
+
+                try:
+                    req_mapeado = parse_issue_body(corpo)
+
+                    hoje_str = datetime.now().strftime('%Y%m%d')
+                    req_id = f"REQ-{hoje_str}-ISSUE{numero_issue:04d}"
+
+                    caminho_relatorio, resultado_json = run_pipeline(req_mapeado, req_id)
+                    atualizar_vitrine_html(req_mapeado, req_id, resultado_json)
+                    publicar_no_github(req_id)
+
+                    email_usuario = req_mapeado.get('Email', '')
+                    enviar_email_notificacao(email_usuario, req_id)
+
+                    fechou = atualizar_status_issue(numero_issue, req_id)
+
+                    if fechou:
+                        print(f"✨ Issue #{numero_issue} finalizada com sucesso! Aguardando próximas...")
+                    else:
+                        print(f"⚠️ Issue #{numero_issue}: relatório publicado, mas não consegui comentar/fechar a Issue (veja acima). Aguardando próximas...")
+                except Exception as e:
+                    print(f"\n🔥 ERRO ao processar a Issue #{numero_issue}: {e}")
+                    traceback.print_exc()
+                    try:
+                        requests.post(
+                            f"{url_issue}/comments", headers=HEADERS, timeout=30,
+                            json={"body": "❌ A análise desta Issue falhou no servidor. O laboratório foi avisado e vai verificar."}
+                        )
+                    except Exception:
+                        pass
+
             time.sleep(15)
-        
+
         except Exception as e:
             print(f"\n🔥 ERRO NA VARREDURA DE ISSUES: {e}")
             time.sleep(15)
