@@ -490,14 +490,14 @@ def atualizar_vitrine_html(req, req_id, resultado_json=None):
                         <td>{data_hoje_br}</td>
                         <td>
                             <span class="status-badge">
-                                Concluído
+                                Completed
                             </span>
                         </td>
                         <td>
                             <a href="reports/{req_id}/"
                                class="btn btn-primary"
                                style="padding: 6px 12px; font-size: 0.85em;">
-                               Ver Relatório
+                               View Report
                             </a>
                         </td>
                     </tr>
