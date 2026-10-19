@@ -956,6 +956,42 @@ def parse_issue_body(body):
 # TERRASEQ_SEM_ISSUES=1 permite importar este módulo só pra reaproveitar
 # run_pipeline/parse_issue_body (ex: scripts_auxiliares/testar_pipeline.py) sem
 # iniciar o monitoramento das Issues.
+def numero_da_analise(numero_issue):
+    """Posição desta Issue entre as Issues de análise (1, 2, 3...).
+
+    O número da Issue no GitHub não serve pra isso: Issues e PRs dividem a mesma
+    sequência (a primeira Issue do repositório pode ser a #14). Aqui contamos só
+    as Issues que carregam algum rótulo do fluxo (analise-pendente / running /
+    analise-concluida), abertas ou fechadas, pela ordem de criação -- sem guardar
+    estado local, então sobrevive a reinício do monitor. Devolve None se o GitHub
+    não responder (o chamador cai no número da própria Issue)."""
+    base = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues"
+    numeros = {numero_issue}
+    for rotulo in ROTULOS_DO_FLUXO:
+        pagina = 1
+        while True:
+            try:
+                r = requests.get(base, headers=HEADERS, timeout=30,
+                                 params={"state": "all", "labels": rotulo, "per_page": 100, "page": pagina})
+            except Exception:
+                return None
+            if r.status_code != 200:
+                return None
+            itens = r.json()
+            numeros.update(i["number"] for i in itens if "pull_request" not in i)
+            if len(itens) < 100:
+                break
+            pagina += 1
+    return sorted(numeros).index(numero_issue) + 1
+
+
+def titulo_com_numero(titulo_atual, numero_analise, nome_par):
+    """"[Análise] - texto" -> "[Análise #3] - texto". Se o título veio vazio
+    (só o prefixo do formulário), usa o nome do par de primers."""
+    resto = re.sub(r'^\s*\[[^\]]*\]\s*-?\s*', '', titulo_atual or '').strip()
+    return f"[Análise #{numero_analise}] - {resto or nome_par or 'sem nome'}"
+
+
 def monitorar_issues():
     verificar_repositorio_e_rotulos()
     print("\n✅ SCRIPT HÍBRIDO ONLINE - Monitorando GitHub Issues (rótulo 'analise-pendente')...")
@@ -980,7 +1016,12 @@ def monitorar_issues():
                 print(f"\n🔔 Nova requisição encontrada na Issue #{numero_issue}!")
 
                 url_issue = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues/{numero_issue}"
-                r = requests.patch(url_issue, headers=HEADERS, json={"labels": ["running"]}, timeout=30)
+                # Numera a Issue ("[Análise #1] - ...") junto com a marcação 'running'.
+                numero_analise = numero_da_analise(numero_issue) or numero_issue
+                nome_par = parse_issue_body(corpo).get('Nome do Par de Primers', '')
+                titulo = titulo_com_numero(issue.get('title', ''), numero_analise, nome_par)
+                print(f"   🏷️ Análise #{numero_analise}: {titulo}")
+                r = requests.patch(url_issue, headers=HEADERS, json={"labels": ["running"], "title": titulo}, timeout=30)
                 if r.status_code != 200:
                     print(f"🛑 Não consegui marcar a Issue #{numero_issue} como 'running' ({r.status_code}): {r.text[:150]}")
                     print("   O GITHUB_TOKEN precisa de permissão de ESCRITA em Issues (fine-grained: Issues → Read and write;")
