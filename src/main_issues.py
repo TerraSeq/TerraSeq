@@ -14,7 +14,24 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import traceback
+import resource
 from dotenv import load_dotenv
+
+# Eleva o limite de arquivos abertos do processo (ulimit -n). O banco
+# "eucariotos" combina dezenas de bancos BLAST numa busca só, e os maiores
+# (bacteria, ascomycota, sar...) são divididos em vários volumes -- a soma
+# de arquivos que o blastn precisa abrir ao mesmo tempo passa do padrão do
+# Linux (1024) e causa "BLAST Database error: Cannot memory map ... Number
+# of files opened: 1020". Mesmo ajuste do main.py.
+try:
+    limite_atual, limite_maximo = resource.getrlimit(resource.RLIMIT_NOFILE)
+    novo_limite = 65536 if limite_maximo == resource.RLIM_INFINITY else min(65536, limite_maximo)
+    if limite_atual < novo_limite:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (novo_limite, limite_maximo))
+        print(f"🔧 Limite de arquivos abertos elevado de {limite_atual} para {novo_limite}.")
+except (ValueError, OSError) as e:
+    print(f"⚠️ Não foi possível elevar o limite de arquivos abertos automaticamente ({e}).")
+    print("   Se o erro 'Cannot memory map ... .nhr' persistir, rode antes: ulimit -n 65536")
 
 # ==========================================
 # CONFIGURAÇÕES INICIAIS E API
@@ -625,7 +642,12 @@ def run_pipeline(req, req_id):
         "-e", e_value, "--min_size", min_size, "--max_size", max_size,
         "-m", tm_min, "--max_3prime_mismatches", str(mismatches),
         "--qcov_hsp_perc", cobertura, "--max_target_seqs", max_hits,
-        "-t", "8",
+        # -num_threads=1 é proposital (ver comentário completo em main.py): com
+        # >1 thread e um banco combinado com bancos "split" em múltiplos
+        # volumes (bacteria, ascomycota, sar, platyhelminthes...), o blastn
+        # trava com um NULL pointer ao buscar as sequências do amplicon -- bug
+        # conhecido do próprio NCBI BLAST+ nessa combinação.
+        "-t", "1",
         "--amp_seq"
     ]
     
