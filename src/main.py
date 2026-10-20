@@ -1018,6 +1018,37 @@ def run_pipeline(req, req_id):
     shutil.copy(os.path.join(raiz_projeto, "docs/template.html"), os.path.join(pasta_resultado, "index.html"))
     return f"docs/reports/{req_id}", resultado_json
 
+def ler_registros(planilha):
+    """Lê as linhas da planilha como dicionários {cabeçalho: valor}.
+
+    Substitui planilha.get_all_records(), que levanta GSpreadException e derruba
+    o monitor inteiro quando a linha de cabeçalho tem colunas repetidas -- o
+    que acontece sozinho na planilha ligada ao Google Forms (ex: duas colunas
+    "Column 17" quando alguém edita o formulário). Aqui colunas sem cabeçalho
+    são ignoradas e, se um cabeçalho se repete, vale a primeira coluna.
+    Mantém uma entrada por linha da planilha (inclusive vazias), então
+    "linha_planilha = índice + 2" continua certo."""
+    valores = planilha.get_all_values()
+    if not valores:
+        return []
+    colunas = []
+    vistos = set()
+    for i, cabecalho in enumerate(valores[0]):
+        nome = str(cabecalho).strip()
+        if nome and nome not in vistos:
+            vistos.add(nome)
+            colunas.append((i, nome))
+    repetidos = [str(c).strip() for c in valores[0] if str(c).strip() and valores[0].count(c) > 1]
+    if repetidos and not getattr(ler_registros, "_avisou", False):
+        ler_registros._avisou = True
+        print(f"⚠️ A planilha tem cabeçalhos repetidos {sorted(set(repetidos))}: uso só a primeira coluna de cada. "
+              "Vale apagar/renomear as colunas repetidas na planilha.")
+    return [
+        {nome: (linha[i] if i < len(linha) else "") for i, nome in colunas}
+        for linha in valores[1:]
+    ]
+
+
 def monitorar_planilha():
     print("\n✅ SCRIPT ONLINE - Monitorando Planilha...")
     try:
@@ -1030,7 +1061,7 @@ def monitorar_planilha():
 
     while True:
         try:
-            registros = planilha.get_all_records()
+            registros = ler_registros(planilha)
             for index, req in enumerate(registros):
                 linha_planilha = index + 2 
             
