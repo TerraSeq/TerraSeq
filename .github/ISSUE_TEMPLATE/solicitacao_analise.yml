@@ -108,6 +108,12 @@ body:
         - "Isopodes"
         - "Miriapodes"
         - "Platelmintos"
+        - "Coleoptera (besouros)"
+        - "Gastropoda (caracóis e lesmas)"
+        - "Apoidea (abelhas)"
+        - "Araneae (aranhas)"
+        - "Scorpiones (escorpiões)"
+        - "Pseudoscorpiones (pseudoescorpiões)"
         - "Enchytraeidae"
     validations:
       required: true
