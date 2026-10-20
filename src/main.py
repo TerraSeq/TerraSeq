@@ -635,6 +635,8 @@ def run_pipeline(req, req_id):
         "formicidae": 213, "isopoda": 14, "myriapoda": 68, "enchytraeidae": 8,
         "isoptera": 50, "platyhelminthes": 103, "amoebozoa": 51, "sar": 599,
         "discoba": 111, "metamonada": 23,
+        "coleoptera": 612, "gastropoda": 301, "apoidea": 244, "araneae": 111,
+        "scorpiones": 9, "pseudoscorpiones": 1,
     }
 
     def _contagem_real(grupo_taxid):
@@ -667,6 +669,12 @@ def run_pipeline(req, req_id):
         "isoptera": (os.path.join(DIRETORIO_BLAST, "isoptera"), _contagem_real("isoptera")),
         "cupins": (os.path.join(DIRETORIO_BLAST, "isoptera"), _contagem_real("isoptera")),  # alias -- dropdown do Issue usa "Cupins", não "Isoptera"
         "platelmintos": (os.path.join(DIRETORIO_BLAST, "platyhelminthes"), _contagem_real("platyhelminthes")),
+        "coleoptera": (os.path.join(DIRETORIO_BLAST, "coleoptera"), _contagem_real("coleoptera")),
+        "gastropoda": (os.path.join(DIRETORIO_BLAST, "gastropoda"), _contagem_real("gastropoda")),
+        "apoidea": (os.path.join(DIRETORIO_BLAST, "apoidea"), _contagem_real("apoidea")),
+        "araneae": (os.path.join(DIRETORIO_BLAST, "araneae"), _contagem_real("araneae")),
+        "scorpiones": (os.path.join(DIRETORIO_BLAST, "scorpiones"), _contagem_real("scorpiones")),
+        "pseudoscorpiones": (os.path.join(DIRETORIO_BLAST, "pseudoscorpiones"), _contagem_real("pseudoscorpiones")),
         "amoebozoa": (os.path.join(DIRETORIO_BLAST, "amoebozoa"), _contagem_real("amoebozoa")),
         "sar": (os.path.join(DIRETORIO_BLAST, "sar"), _contagem_real("sar")),
         "discoba": (os.path.join(DIRETORIO_BLAST, "discoba"), _contagem_real("discoba")),
@@ -703,6 +711,12 @@ def run_pipeline(req, req_id):
         "isoptera": {"isoptera"},
         "cupins": {"isoptera"},
         "platelmintos": {"platyhelminthes"},
+        "coleoptera": {"coleoptera"},
+        "gastropoda": {"gastropoda"},
+        "apoidea": {"apoidea"},
+        "araneae": {"araneae"},
+        "scorpiones": {"scorpiones"},
+        "pseudoscorpiones": {"pseudoscorpiones"},
         "amoebozoa": {"amoebozoa"},
         "sar": {"sar"},
         "discoba": {"discoba"},
