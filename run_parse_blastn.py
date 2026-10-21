@@ -151,6 +151,58 @@ def _call_makeblastdb(fasta, log_file):
 # genoma tipico (1 Gb) como referencia.
 DBSIZE_REFERENCIA = 1_000_000_000
 
+# Limite de variantes explicitas por primer ao expandir degenerescencias.
+MAX_VARIANTES_PRIMER = 256
+
+def _expandir_degenerado(seq, limite=MAX_VARIANTES_PRIMER):
+    """
+    Expande um primer com codigos IUPAC em todas as sequencias explicitas
+    (ex: 'AR' -> ['AA', 'AG']). Devolve [seq] se nao ha degenerescencia ou se
+    o numero de variantes passaria de `limite`.
+
+    Motivo: o blastn trata cada codigo IUPAC da query como uma base de baixo
+    escore, e certas combinacoes (ex: Y+H+R no V6-V8_new_F AATTYGAHTCAACRCGGG)
+    fazem o alinhamento sumir por completo -- 0 hits em qualquer e-value ou
+    word_size, mesmo com o sitio exato presente no genoma. Com as variantes
+    explicitas o mesmo sitio e encontrado normalmente.
+    """
+    seq = seq.upper()
+    opcoes = [_IUPAC_AMBIGUOUS.get(b, b) for b in seq]
+    total = 1
+    for o in opcoes:
+        total *= len(o)
+    if total == 1 or total > limite:
+        return [seq]
+    variantes = [""]
+    for o in opcoes:
+        variantes = [v + b for v in variantes for b in o]
+    return variantes
+
+def _escrever_query_expandida(query, destino):
+    """Reescreve o FASTA de primers com cada degenerado expandido em variantes
+    explicitas (mesmo qseqid). Devolve True se algum primer foi expandido."""
+    registros, nome, partes = [], None, []
+    with open(query, "r") as f:
+        for linha in f:
+            linha = linha.strip()
+            if linha.startswith(">"):
+                if nome is not None:
+                    registros.append((nome, "".join(partes)))
+                nome, partes = linha, []
+            elif linha:
+                partes.append(linha)
+    if nome is not None:
+        registros.append((nome, "".join(partes)))
+    expandiu = False
+    with open(destino, "w") as out:
+        for nome, seq in registros:
+            variantes = _expandir_degenerado(seq)
+            if len(variantes) > 1:
+                expandiu = True
+            for v in variantes:
+                out.write(f"{nome}\n{v}\n")
+    return expandiu
+
 def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, out_file):
     # -task blastn-short: sem isso, o blastn usa "megablast" por padrao (task
     # feito pra sequencias LONGAS e quase identicas, ex: genoma x genoma), que
@@ -186,6 +238,12 @@ def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, ou
     bancos = db.strip().strip('"').split()
 
     open(out_file, "w").close()  # zera/cria -- cada banco abaixo faz append
+
+    # Primers degenerados vao pro blastn como variantes explicitas (ver
+    # _expandir_degenerado). O primer_dict original nao muda.
+    query_expandida = f"{query}.expandido.fa"
+    if _escrever_query_expandida(query, query_expandida):
+        query = query_expandida
 
     with open(log_file, "a") as log:
         for banco in bancos:
@@ -248,7 +306,17 @@ def _blast_to_dict(file):
 
             # Adiciona o hit, indexado pela sequência-alvo (sseqid)
             hit_data = {x: y for x, y in zip(hit_keys, spl[1:])}
-            hit_dict[assay_key][dir].setdefault(hit_data["sseqid"], []).append(hit_data)
+            lista = hit_dict[assay_key][dir].setdefault(hit_data["sseqid"], [])
+            # Primers degenerados chegam como varias variantes explicitas; o
+            # mesmo sitio pode ser alinhado por mais de uma. Fica so a de menor
+            # e-value por posicao.
+            for i, ja in enumerate(lista):
+                if ja["sstart"] == hit_data["sstart"] and ja["send"] == hit_data["send"] and ja["sstrand"] == hit_data["sstrand"]:
+                    if float(hit_data["evalue"]) < float(ja["evalue"]):
+                        lista[i] = hit_data
+                    break
+            else:
+                lista.append(hit_data)
 
             line = ifile.readline()
     return hit_dict
