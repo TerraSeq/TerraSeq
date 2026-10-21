@@ -162,7 +162,9 @@ def main_cli():
                        f"cobertura {antes.get('estimated_coverage')} -> {depois.get('estimated_coverage')}")
             print(f"   ✅ {detalhe}")
             if not args.sem_push:
-                main.publicar_no_github(req_id)
+                import bloqueios
+                with bloqueios.bloqueio("publicacao", "⏳ Aguardando outra publicação terminar..."):
+                    main.publicar_no_github(req_id)
             resumo.append((req_id, "ok", detalhe))
         except Exception:
             traceback.print_exc()

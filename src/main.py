@@ -12,6 +12,7 @@ import sys
 from Bio import Entrez
 import taxonomia_local
 import notificacoes
+import bloqueios
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -379,7 +380,9 @@ def publicar_no_github(req_id):
     raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     try:
-        subprocess.run(["git", "add", "docs/"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
+        # Só o índice da vitrine e a pasta DESTE relatório: um "git add docs/" levaria
+        # junto a pasta pela metade de outra análise que está rodando ao mesmo tempo.
+        subprocess.run(["git", "add", "docs/index.html", f"docs/reports/{req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
         subprocess.run(["git", "commit", "-m", f"Report {req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as e:
         print(f"   ⚠️ Erro ao commitar as mudanças: {e}")
@@ -780,13 +783,16 @@ def run_pipeline(req, req_id):
         print(f"Coluna: '{chave}' | Valor recebido: '{valor}'")
     print("⚙️ Rodando programa...")
     
-    # 1. Inicia o cronômetro
-    inicio_blast = time.time() 
-    
-    subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
-    
-    # 2. Para o cronômetro e calcula a diferença
-    fim_blast = time.time() 
+    # Banco grande = uma busca por vez em todo o servidor (formulário e Issues
+    # juntos); a espera fica FORA do cronômetro.
+    with bloqueios.bloqueio_se(total_sequencias_banco >= bloqueios.LIMITE_BANCO_PESADO, "blast-pesado", "⏳ Outra análise com banco grande está rodando; aguardando a vez para não estourar a memória do servidor..."):
+        # 1. Inicia o cronômetro
+        inicio_blast = time.time()
+
+        subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
+
+        # 2. Para o cronômetro e calcula a diferença
+        fim_blast = time.time()
     tempo_total_segundos = fim_blast - inicio_blast
     
     # 3. Formata o tempo para ficar bonito no log (ex: 1m 45s)
@@ -1166,9 +1172,11 @@ def monitorar_planilha():
                         notificacoes.notificar_falha(str(req.get('Email', '')).strip(), req_id, e, req, "planilha")
                         continue
 
-                    atualizar_vitrine_html(req, req_id, resultado_json)
-
-                    publicar_no_github(req_id)
+                    # Vitrine + git: um processo por vez (formulário e Issues podem
+                    # terminar juntos).
+                    with bloqueios.bloqueio("publicacao", "⏳ Aguardando outra publicação terminar..."):
+                        atualizar_vitrine_html(req, req_id, resultado_json)
+                        publicar_no_github(req_id)
 
                     email_usuario = str(req.get('Email', '')).strip()
                     enviar_email_notificacao(email_usuario, req_id)
