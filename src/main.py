@@ -1018,6 +1018,58 @@ def run_pipeline(req, req_id):
     shutil.copy(os.path.join(raiz_projeto, "docs/template.html"), os.path.join(pasta_resultado, "index.html"))
     return f"docs/reports/{req_id}", resultado_json
 
+def _erro_de_rede(e):
+    """Falha transitória de conexão/servidor (vale tentar de novo), não um bug."""
+    if isinstance(e, (ConnectionError, TimeoutError)):  # inclui ConnectionResetError, BrokenPipeError
+        return True
+    modulo = type(e).__module__ or ""
+    if modulo.startswith(("requests.", "urllib3.", "google.auth.exceptions", "http.client", "ssl", "socket")):
+        return True
+    codigo = getattr(getattr(e, "response", None), "status_code", None)  # gspread.APIError
+    return codigo in (429, 500, 502, 503, 504)
+
+
+def reconectar_planilha():
+    """Abre uma conexão nova com o Google Sheets. Terminal parado a noite toda
+    deixa a conexão antiga morrer ("Connection reset by peer"); repetir com ela
+    não adianta."""
+    global credentials, client, planilha
+    credentials = Credentials.from_service_account_file(caminho_credenciais, scopes=scopes)
+    client = gspread.authorize(credentials)
+    planilha = client.open(NOME_DA_PLANILHA).sheet1
+
+
+def ler_registros(planilha):
+    """Lê as linhas da planilha como dicionários {cabeçalho: valor}.
+
+    Substitui planilha.get_all_records(), que levanta GSpreadException e derruba
+    o monitor inteiro quando a linha de cabeçalho tem colunas repetidas -- o
+    que acontece sozinho na planilha ligada ao Google Forms (ex: duas colunas
+    "Column 17" quando alguém edita o formulário). Aqui colunas sem cabeçalho
+    são ignoradas e, se um cabeçalho se repete, vale a primeira coluna.
+    Mantém uma entrada por linha da planilha (inclusive vazias), então
+    "linha_planilha = índice + 2" continua certo."""
+    valores = planilha.get_all_values()
+    if not valores:
+        return []
+    colunas = []
+    vistos = set()
+    for i, cabecalho in enumerate(valores[0]):
+        nome = str(cabecalho).strip()
+        if nome and nome not in vistos:
+            vistos.add(nome)
+            colunas.append((i, nome))
+    repetidos = [str(c).strip() for c in valores[0] if str(c).strip() and valores[0].count(c) > 1]
+    if repetidos and not getattr(ler_registros, "_avisou", False):
+        ler_registros._avisou = True
+        print(f"⚠️ A planilha tem cabeçalhos repetidos {sorted(set(repetidos))}: uso só a primeira coluna de cada. "
+              "Vale apagar/renomear as colunas repetidas na planilha.")
+    return [
+        {nome: (linha[i] if i < len(linha) else "") for i, nome in colunas}
+        for linha in valores[1:]
+    ]
+
+
 def monitorar_planilha():
     print("\n✅ SCRIPT ONLINE - Monitorando Planilha...")
     try:
@@ -1028,9 +1080,30 @@ def monitorar_planilha():
         print("❌ Erro fatal: Colunas Status ou Result_path não encontradas.")
         sys.exit()
 
+    def celula(linha, coluna, valor):
+        """update_cell com 4 tentativas (reconectando) se a rede cair na hora."""
+        ultima = None
+        for tentativa, espera in enumerate((0, 3, 10, 30), 1):
+            if espera:
+                time.sleep(espera)
+            try:
+                planilha.update_cell(linha, coluna, valor)
+                return
+            except Exception as e:
+                if not _erro_de_rede(e):
+                    raise
+                ultima = e
+                print(f"   ⚠️ Falha de rede ao atualizar a planilha ({type(e).__name__}); tentativa {tentativa}/4")
+                try:
+                    reconectar_planilha()
+                except Exception:
+                    pass
+        raise ultima
+
+    falhas_rede = 0
     while True:
         try:
-            registros = planilha.get_all_records()
+            registros = ler_registros(planilha)
             for index, req in enumerate(registros):
                 linha_planilha = index + 2 
             
@@ -1044,7 +1117,7 @@ def monitorar_planilha():
                 if status_atual == '' or status_atual == 'pending':
                     print(f"\n🔔 Nova requisição encontrada na linha {linha_planilha}!")
                     # ... resto do código continua igualzinho
-                    planilha.update_cell(linha_planilha, COL_STATUS, 'running') 
+                    celula(linha_planilha, COL_STATUS, 'running') 
                 
                     # O ID do relatório precisa ser único por SUBMISSÃO, não por
                     # linha da planilha -- número de linha do Google Sheets NÃO É
@@ -1088,25 +1161,39 @@ def monitorar_planilha():
                         print(f"\n🔥 ERRO ao processar a linha {linha_planilha} ({req_id}): {e}")
                         traceback.print_exc()
                         shutil.rmtree(os.path.join(raiz_projeto_loop, "docs", "reports", req_id), ignore_errors=True)
-                        planilha.update_cell(linha_planilha, COL_STATUS, 'error')
-                        planilha.update_cell(linha_planilha, COL_LINK, "ERRO: " + notificacoes.resumo_do_erro(e))
+                        celula(linha_planilha, COL_STATUS, 'error')
+                        celula(linha_planilha, COL_LINK, "ERRO: " + notificacoes.resumo_do_erro(e))
                         notificacoes.notificar_falha(str(req.get('Email', '')).strip(), req_id, e, req, "planilha")
                         continue
 
                     atualizar_vitrine_html(req, req_id, resultado_json)
-                
-                    planilha.update_cell(linha_planilha, COL_LINK, caminho_relatorio) 
-                    planilha.update_cell(linha_planilha, COL_STATUS, 'completed')
-                
+
                     publicar_no_github(req_id)
-                
+
                     email_usuario = str(req.get('Email', '')).strip()
                     enviar_email_notificacao(email_usuario, req_id)
-                
+
+                    # A planilha (só contabilidade) por último: se a rede cair aqui, o
+                    # relatório já foi publicado e o usuário já foi avisado.
+                    celula(linha_planilha, COL_LINK, caminho_relatorio)
+                    celula(linha_planilha, COL_STATUS, 'completed')
+
                     print("✨ Processamento da linha concluído com sucesso. Aguardando próximas...")
                     
+            falhas_rede = 0
             time.sleep(10)
         except Exception as e:
+            if _erro_de_rede(e):
+                falhas_rede += 1
+                espera = min(10 * 2 ** (falhas_rede - 1), 120)
+                print(f"\n⚠️ Falha de rede com o Google Sheets ({type(e).__name__}); nova tentativa em {espera}s (falha nº {falhas_rede}).")
+                time.sleep(espera)
+                try:
+                    reconectar_planilha()
+                    print("   🔌 Reconectado ao Google Sheets.")
+                except Exception as e2:
+                    print(f"   ⚠️ Ainda sem conexão ({type(e2).__name__}).")
+                continue
             print(f"\n🔥 ERRO FATAL DETECTADO NA EXECUÇÃO PRINCIPAL:")
             traceback.print_exc()
             if isinstance(e, subprocess.CalledProcessError):
