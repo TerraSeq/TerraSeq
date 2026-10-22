@@ -178,9 +178,10 @@ def _expandir_degenerado(seq, limite=MAX_VARIANTES_PRIMER):
         variantes = [v + b for v in variantes for b in o]
     return variantes
 
-def _escrever_query_expandida(query, destino):
-    """Reescreve o FASTA de primers com cada degenerado expandido em variantes
-    explicitas (mesmo qseqid). Devolve True se algum primer foi expandido."""
+def _escrever_query_expandida(query, destino, apenas=None):
+    """Escreve um FASTA so com os primers DEGENERADOS (de `apenas`, se dado:
+    conjunto de qseqid sem o '>'), cada um expandido em variantes explicitas
+    com o mesmo qseqid. Devolve True se algum primer foi expandido."""
     registros, nome, partes = [], None, []
     with open(query, "r") as f:
         for linha in f:
@@ -196,9 +197,12 @@ def _escrever_query_expandida(query, destino):
     expandiu = False
     with open(destino, "w") as out:
         for nome, seq in registros:
+            if apenas is not None and nome[1:].split()[0] not in apenas:
+                continue
             variantes = _expandir_degenerado(seq)
-            if len(variantes) > 1:
-                expandiu = True
+            if len(variantes) <= 1:
+                continue
+            expandiu = True
             for v in variantes:
                 out.write(f"{nome}\n{v}\n")
     return expandiu
@@ -239,23 +243,41 @@ def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, ou
 
     open(out_file, "w").close()  # zera/cria -- cada banco abaixo faz append
 
-    # Primers degenerados vao pro blastn como variantes explicitas (ver
-    # _expandir_degenerado). O primer_dict original nao muda.
-    query_expandida = f"{query}.expandido.fa"
-    if _escrever_query_expandida(query, query_expandida):
-        query = query_expandida
+    def rodar(arquivo_query):
+        with open(log_file, "a") as log:
+            for banco in bancos:
+                cmd = F"{blastn_bin} -task blastn-short -query {arquivo_query} -db \"{banco}\" -num_threads {nt} -word_size 7 -evalue {ev} -dbsize {DBSIZE_REFERENCIA} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
 
-    with open(log_file, "a") as log:
-        for banco in bancos:
-            cmd = F"{blastn_bin} -task blastn-short -query {query} -db \"{banco}\" -num_threads {nt} -word_size 7 -evalue {ev} -dbsize {DBSIZE_REFERENCIA} -outfmt \"6 qseqid sseqid qstart qend sstart send evalue pident qcovs qseq sseq sstrand\" -max_target_seqs {max_target_seqs}"
+                if qcov_hsp_perc > 0:
+                    cmd += F" -qcov_hsp_perc {qcov_hsp_perc}"
 
-            if qcov_hsp_perc > 0:
-                cmd += F" -qcov_hsp_perc {qcov_hsp_perc}"
+                cmd += F" >> {out_file}"
 
-            cmd += F" >> {out_file}"
+                subprocess.run(cmd, check=True, shell=True, stderr=log)
+                print(cmd)
 
-            subprocess.run(cmd, check=True, shell=True, stderr=log)
-            print(cmd)
+    rodar(query)
+
+    # Fallback p/ primers degenerados: certas combinacoes IUPAC (ex: Y+H+R)
+    # fazem o blastn nao achar NADA (ver _expandir_degenerado). So os primers
+    # que ficaram sem nenhum hit sao refeitos, como variantes explicitas --
+    # os que ja funcionam seguem na busca original, sem custo extra de tempo.
+    com_hit = set()
+    with open(out_file, "r") as f:
+        for linha in f:
+            com_hit.add(linha.split("\t", 1)[0])
+    sem_hit = set()
+    with open(query, "r") as f:
+        for linha in f:
+            if linha.startswith(">"):
+                qid = linha[1:].split()[0]
+                if qid not in com_hit:
+                    sem_hit.add(qid)
+    if sem_hit:
+        query_expandida = f"{query}.expandido.fa"
+        if _escrever_query_expandida(query, query_expandida, apenas=sem_hit):
+            print(f"Primers sem hits na busca original; refazendo expandidos: {sorted(sem_hit)}")
+            rodar(query_expandida)
 
 
 def _blast_to_dict(file):
