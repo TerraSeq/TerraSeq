@@ -92,8 +92,10 @@ def criar(args):
 
     if not args.gff:
         print(f"📤 Extraindo sequencias de {args.banco} ...")
-        subprocess.run(f'blastdbcmd -db "{args.banco}" -entry all -outfmt ">%a %t\\n%s" -out "{fasta}"',
+        subprocess.run(f'blastdbcmd -db "{args.banco}" -entry all -outfmt %f -out "{fasta}"',
                        shell=True, check=True)
+        if os.path.getsize(fasta) == 0:
+            sys.exit(f"❌ blastdbcmd nao devolveu sequencias de {args.banco}.")
         if not shutil.which("barrnap"):
             sys.exit("❌ barrnap nao encontrado (conda install -c bioconda barrnap).")
         print("🧬 Rodando barrnap (eucariotos) ...")
