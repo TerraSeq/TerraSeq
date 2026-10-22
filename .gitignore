@@ -23,3 +23,6 @@ src/credentialsTiago.json
 
 # relatórios de teste (scripts_auxiliares/testar_pipeline.py) nunca vão pro Git
 docs/reports/TESTE-*/
+
+# travas entre processos (src/bloqueios.py)
+data/locks/

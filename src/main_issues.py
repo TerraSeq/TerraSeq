@@ -11,6 +11,7 @@ import requests
 from Bio import Entrez
 import taxonomia_local
 import notificacoes
+import bloqueios
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -313,7 +314,8 @@ def publicar_no_github(req_id):
     raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     try:
-        subprocess.run(["git", "add", "docs/"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
+        # Só o índice da vitrine e a pasta DESTE relatório (ver main.py).
+        subprocess.run(["git", "add", "docs/index.html", f"docs/reports/{req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
         subprocess.run(["git", "commit", "-m", f"Report {req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as e:
         print(f"   ⚠️ Erro ao commitar as mudanças: {e}")
@@ -665,9 +667,12 @@ def run_pipeline(req, req_id):
         print(f"Coluna: '{chave}' | Valor recebido: '{valor}'")
     print("⚙️ Rodando programa...")
 
-    inicio_blast = time.time()
-    subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
-    fim_blast = time.time()
+    # Banco grande = uma busca por vez em todo o servidor (formulário e Issues
+    # juntos); a espera fica FORA do cronômetro.
+    with bloqueios.bloqueio_se(total_sequencias_banco >= bloqueios.LIMITE_BANCO_PESADO, "blast-pesado", "⏳ Outra análise com banco grande está rodando; aguardando a vez para não estourar a memória do servidor..."):
+        inicio_blast = time.time()
+        subprocess.run(cmd_blast, cwd=raiz_projeto, check=True, capture_output=True, text=True)
+        fim_blast = time.time()
 
     tempo_total_segundos = fim_blast - inicio_blast
     minutos = int(tempo_total_segundos // 60)
@@ -1040,8 +1045,9 @@ def monitorar_issues():
 
                     caminho_relatorio, resultado_json = run_pipeline(req_mapeado, req_id)
                     pipeline_ok = True
-                    atualizar_vitrine_html(req_mapeado, req_id, resultado_json)
-                    publicar_no_github(req_id)
+                    with bloqueios.bloqueio("publicacao", "⏳ Aguardando outra publicação terminar..."):
+                        atualizar_vitrine_html(req_mapeado, req_id, resultado_json)
+                        publicar_no_github(req_id)
 
                     email_usuario = req_mapeado.get('Email', '')
                     enviar_email_notificacao(email_usuario, req_id)
