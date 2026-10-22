@@ -278,6 +278,8 @@ def _call_blastn(query, db, nt, ev, max_target_seqs, qcov_hsp_perc, log_file, ou
         if _escrever_query_expandida(query, query_expandida, apenas=sem_hit):
             print(f"Primers sem hits na busca original; refazendo expandidos: {sorted(sem_hit)}")
             rodar(query_expandida)
+        if os.path.exists(query_expandida):
+            os.remove(query_expandida)  # arquivo temporario; nao deve ir pro relatorio publicado
 
 
 def _blast_to_dict(file):
