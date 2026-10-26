@@ -6,7 +6,7 @@ linha na vitrine (docs/index.html), commit/push no GitHub e e-mail de
 "relatorio pronto". Se um pedido falhar, segue para o proximo e mostra o
 resumo no fim.
 
-Edite a lista PEDIDOS logo abaixo (ja vem com os 2 pares do professor) e rode,
+Edite a lista PEDIDOS logo abaixo (ja vem com o ITS1/ITS4 em fungos) e rode,
 no servidor, na raiz do projeto, na branch main:
 
     nohup python3 scripts_auxiliares/rodar_pedidos.py > pedidos.log 2>&1 &
@@ -34,7 +34,7 @@ RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 NOME = "Tiago M Gabriel"
 EMAIL = "tiago.gabriel@edu.ufes.br"   # recebe o aviso de cada relatorio
 
-# Parametros iguais aos dos pedidos que deram 0 genomas (REQ-20261021-123059 / ISSUE0021).
+# Parametros-base (iguais aos dos pedidos anteriores); cada pedido pode sobrescrever.
 BASE = {
     "Nome completo": NOME,
     "Email": EMAIL,
@@ -51,12 +51,13 @@ BASE = {
 }
 
 PEDIDOS = [
-    dict(BASE, **{"Nome do Par de Primers": "V6-V8_new_F/D11_3143R",
-                  "Primer forward": "AATTYGAHTCAACRCGGG",
-                  "Primer reverse": "RCCACAAGCYARTTATCC"}),
-    dict(BASE, **{"Nome do Par de Primers": "V6-V8_new_F/D9_2593R",
-                  "Primer forward": "AATTYGAHTCAACRCGGG",
-                  "Primer reverse": "GAGAGTCATAGTTACBYC"}),
+    # ITS1/ITS4 amplifica so o ITS (~500-800 pb): amplicon 100-1500, nao 2000-8000.
+    dict(BASE, **{"Nome do Par de Primers": "ITS1/ITS4",
+                  "Banco de Dados": "Fungi",
+                  "Tamanho do amplicon: MIN": 100,
+                  "Tamanho do amplicon: MAX": 1500,
+                  "Primer forward": "TCCGTAGGTGAACCTGCGG",
+                  "Primer reverse": "TCCTCCGCTTATTGATATGC"}),
 ]
 
 
