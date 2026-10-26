@@ -79,10 +79,11 @@ body:
     id: banco_dados
     attributes:
       label: Banco de Dados
-      description: "Selecione contra qual banco genômico o BLAST será rodado. Refseqsoil é o banco completo (todos os grupos); Eucariotos é o Refseqsoil sem Bacteria/Archaea, útil pra marcadores como 18S/ITS/28S que não existem em procariontes; Sar = Stramenopila/Alveolata/Rhizaria."
+      description: "Selecione contra qual banco genômico o BLAST será rodado. Refseqsoil é o banco completo (todos os grupos); Eucariotos é o Refseqsoil sem Bacteria/Archaea, útil pra marcadores como 18S/ITS/28S que não existem em procariontes; Procariotos é Bacteria + Archaea, para marcadores como 16S; Sar = Stramenopila/Alveolata/Rhizaria."
       options:
         - "Refseqsoil (banco completo: todos os grupos, inclui bactérias e arqueias)"
         - "Eucariotos (todos os eucariotos, sem bactérias e arqueias)"
+        - "Procariotos (Bacteria + Archaea, para 16S)"
         - "Protozoa (Amoebozoa + Sar + Discoba + Metamonada)"
         - "Fungi (todos os filos de fungos)"
         - "Minhocas (Oligochaeta + Enchytraeidae)"
