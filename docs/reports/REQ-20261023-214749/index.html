@@ -1521,7 +1521,13 @@
                         // Unidade: GENOMAS (mesma do topo do relatório) quando o
                         // relatório tem o dado; senão, nomes de espécie.
                         const catalogado = temGenomas ? (b.genomas || orgs.length) : orgs.length;
+                        // Linha do grupo: TODOS os capturados dele (uma espécie que está em
+                        // dois grupos aparece nos dois, ex: Enchytraeidae dentro de
+                        // Oligochaeta). Só o total do painel usa a contagem sem duplicar.
                         const capturado = temGenomas
+                            ? Math.min(catalogado, capturados.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0))
+                            : capturados.length;
+                        const capturadoUnico = temGenomas
                             ? Math.min(catalogado, capturadosNovos.reduce((s, n) => s + (leafMetadata[n].genomas_capturados || 0), 0))
                             : capturadosNovos.length;
                         return {
@@ -1529,6 +1535,7 @@
                             nome: b.nome || b.id,
                             catalogado: catalogado,
                             capturado: capturado,
+                            capturadoUnico: capturadoUnico,
                             naoCapturado: catalogado - capturado,
                             cobertura: catalogado ? (100 * capturado / catalogado) : 0,
                             listaCapturados: capturados,
@@ -1567,7 +1574,7 @@
                 window._gruposCoberturaAtual = grupos;
 
                 const totalCat = grupos.reduce((s, g) => s + g.catalogado, 0);
-                const totalCap = grupos.reduce((s, g) => s + g.capturado, 0);
+                const totalCap = grupos.reduce((s, g) => s + (g.capturadoUnico !== undefined ? g.capturadoUnico : g.capturado), 0);
                 // Catalogado − capturado (não a soma das linhas): as espécies da linha
                 // "sem grupo no acervo" foram capturadas mas não têm catálogo.
                 const totalNao = Math.max(0, totalCat - totalCap);
