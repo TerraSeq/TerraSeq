@@ -6,7 +6,7 @@ linha na vitrine (docs/index.html), commit/push no GitHub e e-mail de
 "relatorio pronto". Se um pedido falhar, segue para o proximo e mostra o
 resumo no fim.
 
-Edite a lista PEDIDOS logo abaixo (ja vem com o Arch21F/Arch1492R contra o banco archaea) e rode,
+Edite a lista PEDIDOS logo abaixo (ja vem com o LR0R/LR7 em eucariotos, amplicon 1000-4000) e rode,
 no servidor, na raiz do projeto, na branch main:
 
     nohup python3 scripts_auxiliares/rodar_pedidos.py > pedidos.log 2>&1 &
@@ -51,13 +51,14 @@ BASE = {
 }
 
 PEDIDOS = [
-    # Arch21F/Arch1492R so contra arqueias (cobertura dentro do grupo que o par mira).
-    dict(BASE, **{"Nome do Par de Primers": "Arch21F/Arch1492R",
-                  "Região alvo": "16S", "Tipo de organismo": "Arqueias",
-                  "Banco de Dados": "archaea",
-                  "Tamanho do amplicon: MIN": 1000, "Tamanho do amplicon: MAX": 2000,
-                  "Primer forward": "TTCCGGTTGATCCTGCCGGA",
-                  "Primer reverse": "TACGGWTACCTTGTTACGACTT"}),
+    # LR0R/LR7 (LSU) com limite de cima maior (4000): o relatorio com 1000-2500
+    # tinha cauda ate 2500, entao pode haver amplicons mais longos descartados.
+    dict(BASE, **{"Nome do Par de Primers": "LR0R/LR7",
+                  "Região alvo": "LSU", "Tipo de organismo": "Eukaryota",
+                  "Banco de Dados": "eucariotos",
+                  "Tamanho do amplicon: MIN": 1000, "Tamanho do amplicon: MAX": 4000,
+                  "Primer forward": "ACCCGCTGAACTTAAGC",
+                  "Primer reverse": "TACTACCACCAAGATCT"}),
 ]
 
 
