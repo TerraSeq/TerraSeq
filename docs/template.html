@@ -1387,6 +1387,9 @@
             if (bancoSelecionado === 'eucariotos') {
                 return todosGruposDoAcervo.filter(g => g !== 'bacteria' && g !== 'archaea');
             }
+            if (bancoSelecionado === 'procariotos') {
+                return todosGruposDoAcervo.filter(g => g === 'bacteria' || g === 'archaea');
+            }
             if (bancoSelecionado === 'refseqsoil') {
                 return todosGruposDoAcervo.slice();
             }

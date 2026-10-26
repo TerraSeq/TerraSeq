@@ -544,11 +544,17 @@ def run_pipeline(req, req_id):
     total_refseqsoil = sum(_contagem_real(g) for g in bancos_locais_unicos)
     total_eucariotos = sum(_contagem_real(g) for g in bancos_eucariotos)
 
+    # Banco "procariotos": bacteria + archaea (marcadores 16S).
+    tags_procariotos = ["bacteria", "archaea"]
+    string_procariotos_completo = " ".join(os.path.join(DIRETORIO_BLAST, b) for b in tags_procariotos)
+    total_procariotos = sum(_contagem_real(g) for g in tags_procariotos)
+
     # Dicionário: "nome_no_forms/issue": ("arquivo_fasta", "total_real_de_organismos")
     BANCOS_DISPONIVEIS = {
         "fungi": (string_fungos_completo, total_fungos),
         "protozoa": (string_protozoa_completo, total_protozoa),
         "eucariotos": (string_eucariotos_completo, total_eucariotos),
+        "procariotos": (string_procariotos_completo, total_procariotos),
         "bacteria": (os.path.join(DIRETORIO_BLAST, "bacteria"), _contagem_real("bacteria")),
         "archaea": (os.path.join(DIRETORIO_BLAST, "archaea"), _contagem_real("archaea")),
         "nematoda": (os.path.join(DIRETORIO_BLAST, "nematoda"), _contagem_real("nematoda")),
@@ -588,6 +594,7 @@ def run_pipeline(req, req_id):
         "fungi": set(tags_fungos),
         "protozoa": set(tags_protozoarios),
         "eucariotos": set(bancos_eucariotos),
+        "procariotos": set(tags_procariotos),
         "bacteria": {"bacteria"},
         "archaea": {"archaea"},
         "nematoda": {"nematoda"},
