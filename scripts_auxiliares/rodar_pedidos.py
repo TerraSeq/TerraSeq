@@ -6,7 +6,7 @@ linha na vitrine (docs/index.html), commit/push no GitHub e e-mail de
 "relatorio pronto". Se um pedido falhar, segue para o proximo e mostra o
 resumo no fim.
 
-Edite a lista PEDIDOS logo abaixo (ja vem com 27F/1492R, Arch21F/Arch1492R e LR0R/LR7) e rode,
+Edite a lista PEDIDOS logo abaixo (ja vem com o Arch21F/Arch1492R contra o banco archaea) e rode,
 no servidor, na raiz do projeto, na branch main:
 
     nohup python3 scripts_auxiliares/rodar_pedidos.py > pedidos.log 2>&1 &
@@ -51,25 +51,13 @@ BASE = {
 }
 
 PEDIDOS = [
-    # 16S bacteria/arqueia: amplicon ~1,4-1,5 kb. LSU de fungos (LR0R/LR7): ~1,4 kb.
-    dict(BASE, **{"Nome do Par de Primers": "27F/1492R",
-                  "Região alvo": "16S", "Tipo de organismo": "Bactérias",
-                  "Banco de Dados": "procariotos",
-                  "Tamanho do amplicon: MIN": 1000, "Tamanho do amplicon: MAX": 2000,
-                  "Primer forward": "AGAGTTTGATCMTGGCTCAG",
-                  "Primer reverse": "CGGTTACCTTGTTACGACTT"}),
+    # Arch21F/Arch1492R so contra arqueias (cobertura dentro do grupo que o par mira).
     dict(BASE, **{"Nome do Par de Primers": "Arch21F/Arch1492R",
                   "Região alvo": "16S", "Tipo de organismo": "Arqueias",
-                  "Banco de Dados": "procariotos",
+                  "Banco de Dados": "archaea",
                   "Tamanho do amplicon: MIN": 1000, "Tamanho do amplicon: MAX": 2000,
                   "Primer forward": "TTCCGGTTGATCCTGCCGGA",
                   "Primer reverse": "TACGGWTACCTTGTTACGACTT"}),
-    dict(BASE, **{"Nome do Par de Primers": "LR0R/LR7",
-                  "Região alvo": "LSU", "Tipo de organismo": "Eukaryota",
-                  "Banco de Dados": "eucariotos",
-                  "Tamanho do amplicon: MIN": 1000, "Tamanho do amplicon: MAX": 2500,
-                  "Primer forward": "ACCCGCTGAACTTAAGC",
-                  "Primer reverse": "TACTACCACCAAGATCT"}),
 ]
 
 
