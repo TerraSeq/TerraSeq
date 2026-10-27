@@ -6,7 +6,7 @@ linha na vitrine (docs/index.html), commit/push no GitHub e e-mail de
 "relatorio pronto". Se um pedido falhar, segue para o proximo e mostra o
 resumo no fim.
 
-Edite a lista PEDIDOS logo abaixo (ja vem com o LR0R/LR7 em eucariotos, amplicon 1000-4000) e rode,
+Edite a lista PEDIDOS logo abaixo (ja vem com o LR0R/LR7 em fungos, amplicon 1000-4000) e rode,
 no servidor, na raiz do projeto, na branch main:
 
     nohup python3 scripts_auxiliares/rodar_pedidos.py > pedidos.log 2>&1 &
@@ -51,11 +51,10 @@ BASE = {
 }
 
 PEDIDOS = [
-    # LR0R/LR7 (LSU) com limite de cima maior (4000): o relatorio com 1000-2500
-    # tinha cauda ate 2500, entao pode haver amplicons mais longos descartados.
+    # LR0R/LR7 (LSU) so contra fungos, mesmo amplicon do relatorio contra eucariotos (1000-4000).
     dict(BASE, **{"Nome do Par de Primers": "LR0R/LR7",
                   "Região alvo": "LSU", "Tipo de organismo": "Eukaryota",
-                  "Banco de Dados": "eucariotos",
+                  "Banco de Dados": "Fungi",
                   "Tamanho do amplicon: MIN": 1000, "Tamanho do amplicon: MAX": 4000,
                   "Primer forward": "ACCCGCTGAACTTAAGC",
                   "Primer reverse": "TACTACCACCAAGATCT"}),
