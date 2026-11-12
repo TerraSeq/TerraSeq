@@ -114,9 +114,11 @@
         .taxon-name { color: var(--text-main); }
         .stat-rel { color: var(--text-light); margin-right: 5px; font-size: 0.8rem; }
         .stat-glob { color: var(--success); font-weight: 700; font-size: 0.8rem;}
-        .nota-evalue { font-size: 0.75rem; color: var(--text-light); line-height: 1.4; margin: 8px 0 0 0; }
-        .legenda-arvore { font-size: 0.8rem; color: var(--text-light); line-height: 1.5; margin-top: 10px; padding: 10px 12px; background: var(--bg-color); border-radius: 6px; }
-        .legenda-arvore .stat-rel, .legenda-arvore .stat-glob { font-size: 0.8rem; }
+        .legenda-arvore { margin-top: 12px; padding: 12px 14px; background: #f4f5f7; border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; color: var(--text-main); }
+        .legenda-arvore .leg-titulo { font-weight: 700; margin-bottom: 8px; }
+        .legenda-arvore .leg-item { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+        .legenda-arvore .leg-amostra { min-width: 62px; text-align: right; font-size: 0.8rem; }
+        .legenda-arvore .leg-vazio { color: var(--text-light); opacity: 0.5; }
 
         /* Card de Metadados da Espécie (Dentro da árvore) */
         .meta-card { display: none; background: #fffcf2; border: 1px solid #fde68a; border-radius: 6px; margin-top: 15px; padding: 20px; border-left: 4px solid var(--warning);}
@@ -307,9 +309,6 @@
                             <div class="data-row"><span class="data-label" data-i18n="side.hits">Hits (Limit)</span><span class="data-value" id="param-hits">-</span></div>
                         </div>
                         <div class="data-row" style="margin-top: 10px;"><span class="data-label" data-i18n="side.janela">Amplicon Window</span><span class="data-value" id="param-tamanho">-</span></div>
-                        <div class="data-row"><span class="data-label" data-i18n="side.algoritmo">Algorithm</span><span class="data-value" id="param-algoritmo">-</span></div>
-                        <div class="data-row"><span class="data-label" data-i18n="side.dbsize">Database size for E-value</span><span class="data-value" id="param-dbsize">-</span></div>
-                        <p class="nota-evalue" data-i18n="side.evalueNota">The E-value is the number of hits this good expected by chance. It is computed for a fixed reference database size (above), not for the real size of the searched database, so the same alignment gets the same E-value in any database.</p>
                     </div>
 
                 </div>
@@ -432,9 +431,6 @@
         </div>
     </div>
 
-    <div class="footer-logo-banner">
-        <img src="../../imagens/footer.png" alt="TerraSeq" class="footer-logo-item" title="In silico primer optimization for Earth biodiversity assessment">
-    </div>
 
     <footer>
         <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
@@ -477,8 +473,8 @@
                 "side.dataSim": "Data da Simulação",
                 "side.pesquisador": "Pesquisador",
                 "side.marcadores": "Marcadores (5' → 3')",
-                "legenda.taxa": "<strong>Como ler os percentuais:</strong> <span class='stat-rel'>cinza</span> = parte dos acertos do grupo acima (coluna à esquerda); <span class='stat-glob'>(verde)</span> = parte de todos os acertos desta análise. Acertos são os amplicons encontrados na busca, contados por sequência, e não genomas do banco: para a cobertura em relação ao banco, veja “Cobertura por Grupo Taxonômico”. Itens apagados não tiveram acertos.",
-                "legenda.func": "<strong>Como ler os percentuais:</strong> na primeira coluna, <span class='stat-glob'>(verde)</span> = parte de todos os acertos desta análise; nas colunas seguintes, <span class='stat-glob'>(verde)</span> = parte dos acertos do item selecionado à esquerda (por isso um único grupo dentro de uma categoria aparece com 100%). Acertos são os amplicons encontrados na busca, e não genomas do banco: para a cobertura em relação ao banco, veja “Cobertura por Grupo Taxonômico”.",
+                "legenda.taxa": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-amostra'><span class='stat-rel'>12.5%</span></span><span>Percentual dos acertos do grupo selecionado na coluna à esquerda</span></div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(3.1%)</span></span><span>Percentual de todos os acertos desta análise</span></div><div class='leg-item'><span class='leg-amostra'>🦠</span><span>Espécie (último nível da árvore)</span></div><div class='leg-item'><span class='leg-amostra'><span class='leg-vazio'>0.0%</span></span><span>Táxon sem acertos</span></div><div style='margin-top:8px; color:var(--text-light);'>Acertos = amplicons encontrados na busca (não genomas do banco).</div>",
+                "legenda.func": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(47.0%)</span></span><span>Primeira coluna: percentual de todos os acertos desta análise</span></div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(100.0%)</span></span><span>Demais colunas: percentual dos acertos do item selecionado à esquerda</span></div><div style='margin-top:8px; color:var(--text-light);'>Acertos = amplicons encontrados na busca (não genomas do banco).</div>",
                 "side.parNome": "Par de Primers",
                 "side.fwd": "Primer Forward",
                 "side.rev": "Primer Reverse",
@@ -486,9 +482,6 @@
                 "side.bancoAlvo": "Banco Alvo",
                 "side.mismatch": "Mismatch (3')",
                 "side.evalue": "E-value Max",
-                "side.algoritmo": "Algoritmo",
-                "side.dbsize": "Tamanho do banco p/ E-value",
-                "side.evalueNota": "O E-value é o número de acertos tão bons quanto este esperados por acaso. Ele é calculado para um tamanho de banco de referência fixo (acima), e não para o tamanho real do banco pesquisado; assim, o mesmo alinhamento tem o mesmo E-value em qualquer banco.",
                 "side.tm": "Tm Mínima",
                 "side.cobMin": "Cob. Mínima",
                 "side.hits": "Hits (Limite)",
@@ -585,8 +578,8 @@
                 "side.dataSim": "Simulation Date",
                 "side.pesquisador": "Researcher",
                 "side.marcadores": "Markers (5' → 3')",
-                "legenda.taxa": "<strong>How to read the percentages:</strong> <span class='stat-rel'>gray</span> = share of the hits of the group above it (the column to the left); <span class='stat-glob'>(green)</span> = share of all hits in this analysis. Hits are the amplicons found by the search, counted per sequence, not genomes in the database: for coverage relative to the database, see “Coverage by Taxonomic Group”. Faded items had no hits.",
-                "legenda.func": "<strong>How to read the percentages:</strong> in the first column, <span class='stat-glob'>(green)</span> = share of all hits in this analysis; in the next columns, <span class='stat-glob'>(green)</span> = share of the hits of the item selected on the left (so a single group inside a category shows 100%). Hits are the amplicons found by the search, not genomes in the database: for coverage relative to the database, see “Coverage by Taxonomic Group”.",
+                "legenda.taxa": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-amostra'><span class='stat-rel'>12.5%</span></span><span>Share of the hits of the group selected in the column to the left</span></div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(3.1%)</span></span><span>Share of all hits in this analysis</span></div><div class='leg-item'><span class='leg-amostra'>🦠</span><span>Species (last level of the tree)</span></div><div class='leg-item'><span class='leg-amostra'><span class='leg-vazio'>0.0%</span></span><span>Taxon with no hits</span></div><div style='margin-top:8px; color:var(--text-light);'>Hits = amplicons found by the search (not genomes in the database).</div>",
+                "legenda.func": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(47.0%)</span></span><span>First column: share of all hits in this analysis</span></div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(100.0%)</span></span><span>Other columns: share of the hits of the item selected on the left</span></div><div style='margin-top:8px; color:var(--text-light);'>Hits = amplicons found by the search (not genomes in the database).</div>",
                 "side.parNome": "Primer Pair",
                 "side.fwd": "Forward Primer",
                 "side.rev": "Reverse Primer",
@@ -594,9 +587,6 @@
                 "side.bancoAlvo": "Target Database",
                 "side.mismatch": "Mismatch (3')",
                 "side.evalue": "Max E-value",
-                "side.algoritmo": "Algorithm",
-                "side.dbsize": "Database size for E-value",
-                "side.evalueNota": "The E-value is the number of hits this good expected by chance. It is computed for a fixed reference database size (above), not for the real size of the searched database, so the same alignment gets the same E-value in any database.",
                 "side.tm": "Min Tm",
                 "side.cobMin": "Min. Coverage",
                 "side.hits": "Hits (Limit)",
@@ -1696,15 +1686,7 @@
                 document.getElementById('param-tm').textContent = (data.metadata.min_tm !== undefined ? data.metadata.min_tm : "-") + " °C";
                 document.getElementById('param-tamanho').textContent = `${data.metadata.amplicon_min || 0} - ${data.metadata.amplicon_max || 9999} bp`;
                 document.getElementById('param-cobertura').textContent = (data.metadata.min_coverage !== undefined ? data.metadata.min_coverage : "-") + "%";
-                document.getElementById('param-hits').textContent = data.metadata.max_hits !== undefined ? data.metadata.max_hits : "-";
-                // Relatorios antigos nao gravavam estes campos; os valores fixos sao os
-                // de run_parse_blastn._call_blastn desde 29/09/2026.
-                const task = data.metadata.blast_task || 'blastn-short';
-                const word = data.metadata.word_size || 7;
-                const dbsize = data.metadata.dbsize || 1e9;
-                document.getElementById('param-algoritmo').textContent = `${task} (word size ${word})`;
-                document.getElementById('param-dbsize').textContent = `${(dbsize / 1e9).toLocaleString()} Gb (${Number(dbsize).toExponential(0).replace('e+', ' × 10^')} bp)`;
-            }
+                document.getElementById('param-hits').textContent = data.metadata.max_hits !== undefined ? data.metadata.max_hits : "-";            }
 
             extractAllTaxa(fullData, 0);
             allTaxaList.sort((a, b) => b.matches - a.matches || a.depth - b.depth);
