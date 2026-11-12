@@ -853,6 +853,16 @@
             document.getElementById('group-illustration-box').style.display = 'block';
         }
 
+        // Notacao cientifica com sobrescrito: 10 -> "1 × 10¹", 0.001 -> "1 × 10⁻³", 2.5e-5 -> "2.5 × 10⁻⁵".
+        function formatarCientifico(valor) {
+            const v = Number(valor);
+            if (!isFinite(v) || v <= 0) return String(valor);
+            const [mantissa, expoente] = v.toExponential().split('e');
+            const sobrescrito = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+            const exp = String(parseInt(expoente, 10)).split('').map(c => sobrescrito[c]).join('');
+            return `${parseFloat(Number(mantissa).toPrecision(6))} × 10${exp}`;
+        }
+
         function formatPercent(value) {
             let p = value * 100;
             if (p > 0 && p < 0.1) return "< 0.1%";
@@ -1681,7 +1691,7 @@
             atualizarTextosKpi();
 
             if(data.metadata) {
-                document.getElementById('param-evalue').textContent = data.metadata.e_value !== undefined ? data.metadata.e_value : "-";
+                document.getElementById('param-evalue').textContent = data.metadata.e_value !== undefined ? formatarCientifico(data.metadata.e_value) : "-";
                 document.getElementById('param-mismatches').textContent = data.metadata.max_mismatches !== undefined ? data.metadata.max_mismatches : "-";
                 document.getElementById('param-tm').textContent = (data.metadata.min_tm !== undefined ? data.metadata.min_tm : "-") + " °C";
                 document.getElementById('param-tamanho').textContent = `${data.metadata.amplicon_min || 0} - ${data.metadata.amplicon_max || 9999} bp`;
