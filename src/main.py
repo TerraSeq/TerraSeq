@@ -1056,6 +1056,53 @@ def reconectar_planilha():
     planilha = client.open(NOME_DA_PLANILHA).sheet1
 
 
+# Formulario em ingles: titulos das perguntas (cabecalhos da planilha) e opcoes de
+# banco em ingles viram as chaves em portugues que o resto do pipeline usa. Os
+# titulos/opcoes em portugues continuam funcionando (linhas antigas da planilha).
+CABECALHOS_EN_PT = {
+    "full name": "Nome completo",
+    "institution": "Instituição",
+    "forward primer": "Primer forward",
+    "reverse primer": "Primer reverse",
+    "primer pair name": "Nome do Par de Primers",
+    "target region": "Região alvo",
+    "database": "Banco de Dados",
+    "organism type": "Tipo de organismo",
+    "maximum 3' end mismatches": "Máximo de Mismatches na extremidade 3",
+    "amplicon size: min": "Tamanho do amplicon: MIN",
+    "amplicon size: max": "Tamanho do amplicon: MAX",
+    "minimum melting temperature (tm)": "Temperatura de Melting mínima (Tm)",
+    "maximum e-value": "E-value máximo",
+    "minimum coverage": "Cobertura mínima",
+    "hit limit": "Limite de hits",
+}
+BANCOS_EN_PT = {
+    "eukaryotes": "eucariotos",
+    "prokaryotes": "procariotos",
+    "earthworms": "minhocas",
+    "ants": "formigas",
+    "isopods": "isopodes",
+    "myriapods": "miriapodes",
+    "flatworms": "platelmintos",
+    "termites": "isoptera",
+}
+
+
+def traduzir_registro(registro):
+    """Troca cabecalhos e opcao de banco em ingles pelos equivalentes em portugues."""
+    traduzido = {}
+    for nome, valor in registro.items():
+        chave = CABECALHOS_EN_PT.get(" ".join(nome.split()).lower(), nome)
+        # Se a planilha tiver as duas colunas (antiga em PT e nova em EN), vale a preenchida.
+        if chave in traduzido and not str(valor).strip():
+            continue
+        traduzido[chave] = valor
+    banco = str(traduzido.get("Banco de Dados", "")).strip()
+    if banco.lower() in BANCOS_EN_PT:
+        traduzido["Banco de Dados"] = BANCOS_EN_PT[banco.lower()]
+    return traduzido
+
+
 def ler_registros(planilha):
     """Lê as linhas da planilha como dicionários {cabeçalho: valor}.
 
@@ -1082,7 +1129,7 @@ def ler_registros(planilha):
         print(f"⚠️ A planilha tem cabeçalhos repetidos {sorted(set(repetidos))}: uso só a primeira coluna de cada. "
               "Vale apagar/renomear as colunas repetidas na planilha.")
     return [
-        {nome: (linha[i] if i < len(linha) else "") for i, nome in colunas}
+        traduzir_registro({nome: (linha[i] if i < len(linha) else "") for i, nome in colunas})
         for linha in valores[1:]
     ]
 
