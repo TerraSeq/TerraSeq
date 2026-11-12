@@ -941,27 +941,33 @@ def parse_issue_body(body):
         if value == "_No response_": value = ""
         data[key] = value
     
+    def campo(rotulo_en, rotulo_pt, padrao):
+        """Valor do campo pelo rotulo em ingles (formulario atual) ou em portugues
+        (Issues abertas antes da traducao)."""
+        return data.get(rotulo_en) or data.get(rotulo_pt) or padrao
+
     req = {
-        'Nome completo': data.get('Nome do Pesquisador', 'Pesquisador'),
-        'Email': data.get('E-mail para Notificação', ''),
-        'Nome do Par de Primers': data.get('Nome do Par de Primers', ''),
-        'Primer forward': data.get("Primer Forward (5' -> 3')", ''),
-        'Primer reverse': data.get("Primer Reverse (5' -> 3')", ''),
-        'Região alvo': data.get('Região Alvo', '18S'),
-        'Banco de Dados': data.get('Banco de Dados', 'Protozoa'),
-        'Tipo de organismo': data.get('Tipo de organismo', 'Eukaryota'),
-        'Máximo de Mismatches na extremidade 3': data.get("Máximo de Mismatches (Extremidade 3')", '3'),
-        'Tamanho do amplicon: MIN': data.get('Tamanho Mínimo do Amplicon (bp)', '3000'),
-        'Tamanho do amplicon: MAX': data.get('Tamanho Máximo do Amplicon (bp)', '8000'),
-        'Temperatura de Melting mínima (Tm)': data.get('Temperatura de Melting mínima (Tm)', '0'),
-        'E-value máximo': data.get('E-value Máximo', '10'),
-        'Cobertura mínima': data.get('Cobertura mínima (%)', '70'),
+        'Nome completo': campo('Researcher Name', 'Nome do Pesquisador', 'Pesquisador'),
+        'Email': campo('Notification E-mail', 'E-mail para Notificação', ''),
+        'Nome do Par de Primers': campo('Primer Pair Name', 'Nome do Par de Primers', ''),
+        'Primer forward': campo("Forward Primer (5' -> 3')", "Primer Forward (5' -> 3')", ''),
+        'Primer reverse': campo("Reverse Primer (5' -> 3')", "Primer Reverse (5' -> 3')", ''),
+        'Região alvo': campo('Target Region', 'Região Alvo', '18S'),
+        'Banco de Dados': campo('Database', 'Banco de Dados', 'Protozoa'),
+        'Tipo de organismo': campo('Organism Type', 'Tipo de organismo', 'Eukaryota'),
+        'Máximo de Mismatches na extremidade 3': campo("Maximum 3' End Mismatches", "Máximo de Mismatches (Extremidade 3')", '3'),
+        'Tamanho do amplicon: MIN': campo('Minimum Amplicon Size (bp)', 'Tamanho Mínimo do Amplicon (bp)', '3000'),
+        'Tamanho do amplicon: MAX': campo('Maximum Amplicon Size (bp)', 'Tamanho Máximo do Amplicon (bp)', '8000'),
+        'Temperatura de Melting mínima (Tm)': campo('Minimum Melting Temperature (Tm)', 'Temperatura de Melting mínima (Tm)', '0'),
+        'E-value máximo': campo('Maximum E-value', 'E-value Máximo', '10'),
+        'Cobertura mínima': campo('Minimum Coverage (%)', 'Cobertura mínima (%)', '70'),
     }
     # Os menus do formulário trazem uma descrição entre parênteses
     # ("Refseqsoil (banco completo: ...)", "Geral (todos os reinos)"); o
     # pipeline só quer o nome ("Refseqsoil", "Geral").
-    for campo in ('Banco de Dados', 'Tipo de organismo'):
-        req[campo] = re.sub(r'\s*\(.*\)\s*$', '', req[campo]).strip()
+    for chave in ('Banco de Dados', 'Tipo de organismo'):
+        req[chave] = re.sub(r'\s*\(.*\)\s*$', '', req[chave]).strip()
+    req['Banco de Dados'] = notificacoes.banco_em_portugues(req['Banco de Dados'])
     return req
 
 # ==========================================
@@ -1000,10 +1006,10 @@ def numero_da_analise(numero_issue):
 
 
 def titulo_com_numero(titulo_atual, numero_analise, nome_par):
-    """"[Análise] - texto" -> "[Análise #3] - texto". Se o título veio vazio
+    """"[Analysis] - texto" -> "[Analysis #3] - texto". Se o título veio vazio
     (só o prefixo do formulário), usa o nome do par de primers."""
     resto = re.sub(r'^\s*\[[^\]]*\]\s*-?\s*', '', titulo_atual or '').strip()
-    return f"[Análise #{numero_analise}] - {resto or nome_par or 'sem nome'}"
+    return f"[Analysis #{numero_analise}] - {resto or nome_par or 'unnamed'}"
 
 
 def monitorar_issues():
@@ -1030,7 +1036,7 @@ def monitorar_issues():
                 print(f"\n🔔 Nova requisição encontrada na Issue #{numero_issue}!")
 
                 url_issue = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues/{numero_issue}"
-                # Numera a Issue ("[Análise #1] - ...") junto com a marcação 'running'.
+                # Numera a Issue ("[Analysis #1] - ...") junto com a marcação 'running'.
                 numero_analise = numero_da_analise(numero_issue) or numero_issue
                 nome_par = parse_issue_body(corpo).get('Nome do Par de Primers', '')
                 titulo = titulo_com_numero(issue.get('title', ''), numero_analise, nome_par)

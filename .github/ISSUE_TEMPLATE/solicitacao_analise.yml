@@ -1,31 +1,31 @@
-name: 🧬 Nova Análise de Primers
-description: Submeta seus primers para validação in silico no pipeline
-title: "[Análise] - "
+name: 🧬 New Primer Analysis
+description: Submit your primers for in silico validation in the pipeline
+title: "[Analysis] - "
 labels: ["analise-pendente"]
 body:
   - type: markdown
     attributes:
       value: |
-        ## 🧬 Pipeline de Validação de Primers
-        Preencha os campos abaixo com os parâmetros da sua simulação de PCR.
-        O relatório será gerado automaticamente e um link será enviado por e-mail.
+        ## 🧬 Primer Validation Pipeline
+        Fill in the fields below with the parameters of your *in silico* PCR simulation.
+        The report will be generated automatically and a link will be sent by e-mail.
 
         ---
-        ### 👤 Identificação
+        ### 👤 Identification
 
   - type: input
     id: nome
     attributes:
-      label: Nome do Pesquisador
-      placeholder: "Ex: Maria Silva"
+      label: Researcher Name
+      placeholder: "e.g. Maria Silva"
     validations:
       required: true
 
   - type: input
     id: email
     attributes:
-      label: E-mail para Notificação
-      placeholder: "Ex: email@exemplo.com"
+      label: Notification E-mail
+      placeholder: "e.g. email@example.com"
     validations:
       required: true
 
@@ -33,30 +33,30 @@ body:
     attributes:
       value: |
         ---
-        ### 🧪 Sequências dos Primers
+        ### 🧪 Primer Sequences
 
   - type: input
     id: primer_pair_name
     attributes:
-      label: Nome do Par de Primers
-      description: "Um nome/apelido para identificar este par de primers nos resultados (Ex: 18S_Euk_1391F-1510R)"
-      placeholder: "Ex: 18S_Euk_1391F-1510R"
+      label: Primer Pair Name
+      description: "A name to identify this primer pair in the results (e.g. 18S_Euk_1391F-1510R)"
+      placeholder: "e.g. 18S_Euk_1391F-1510R"
     validations:
       required: false
 
   - type: input
     id: primer_fwd
     attributes:
-      label: "Primer Forward (5' → 3')"
-      placeholder: "Ex: CCAGCASCYGCGGTAATTCC"
+      label: "Forward Primer (5' → 3')"
+      placeholder: "e.g. CCAGCASCYGCGGTAATTCC"
     validations:
       required: true
 
   - type: input
     id: primer_rev
     attributes:
-      label: "Primer Reverse (5' → 3')"
-      placeholder: "Ex: RCCACAAGCYARTTATCC"
+      label: "Reverse Primer (5' → 3')"
+      placeholder: "e.g. RCCACAAGCYARTTATCC"
     validations:
       required: true
 
@@ -64,29 +64,29 @@ body:
     attributes:
       value: |
         ---
-        ### 🎯 Alvo da Análise
+        ### 🎯 Analysis Target
 
   - type: input
     id: regiao_alvo
     attributes:
-      label: Região Alvo
-      description: "Região do genoma que o par de primers amplifica. Escreva livremente (ex.: 18S, 16S, ITS, 18S-ITS-28S, COI)."
-      placeholder: "Ex.: 18S-ITS-28S"
+      label: Target Region
+      description: "Genome region amplified by the primer pair. Free text (e.g. 18S, 16S, ITS, 18S-ITS-28S, COI)."
+      placeholder: "e.g. 18S-ITS-28S"
     validations:
       required: true
 
   - type: dropdown
     id: banco_dados
     attributes:
-      label: Banco de Dados
-      description: "Selecione contra qual banco genômico o BLAST será rodado. Refseqsoil é o banco completo (todos os grupos); Eucariotos é o Refseqsoil sem Bacteria/Archaea, útil pra marcadores como 18S/ITS/28S que não existem em procariontes; Procariotos é Bacteria + Archaea, para marcadores como 16S; Sar = Stramenopila/Alveolata/Rhizaria."
+      label: Database
+      description: "Select the genome database BLAST will search. Refseqsoil is the complete database (all groups); Eukaryotes is Refseqsoil without Bacteria/Archaea, useful for markers such as 18S/ITS/28S that prokaryotes lack; Prokaryotes is Bacteria + Archaea, for markers such as 16S; Sar = Stramenopila/Alveolata/Rhizaria."
       options:
-        - "Refseqsoil (banco completo: todos os grupos, inclui bactérias e arqueias)"
-        - "Eucariotos (todos os eucariotos, sem bactérias e arqueias)"
-        - "Procariotos (Bacteria + Archaea, para 16S)"
+        - "Refseqsoil (complete database: all groups, including bacteria and archaea)"
+        - "Eukaryotes (all eukaryotes, without bacteria and archaea)"
+        - "Prokaryotes (Bacteria + Archaea, for 16S)"
         - "Protozoa (Amoebozoa + Sar + Discoba + Metamonada)"
-        - "Fungi (todos os filos de fungos)"
-        - "Minhocas (Oligochaeta + Enchytraeidae)"
+        - "Fungi (all fungal phyla)"
+        - "Earthworms (Oligochaeta + Enchytraeidae)"
         - "Amoebozoa"
         - "Sar"
         - "Discoba"
@@ -104,17 +104,17 @@ body:
         - "Rotifera"
         - "Acari"
         - "Collembola"
-        - "Formigas"
-        - "Cupins"
-        - "Isopodes"
-        - "Miriapodes"
-        - "Platelmintos"
-        - "Coleoptera (besouros)"
-        - "Gastropoda (caracóis e lesmas)"
-        - "Apoidea (abelhas)"
-        - "Araneae (aranhas)"
-        - "Scorpiones (escorpiões)"
-        - "Pseudoscorpiones (pseudoescorpiões)"
+        - "Ants"
+        - "Termites"
+        - "Isopods"
+        - "Myriapods"
+        - "Flatworms"
+        - "Coleoptera (beetles)"
+        - "Gastropoda (snails and slugs)"
+        - "Apoidea (bees)"
+        - "Araneae (spiders)"
+        - "Scorpiones (scorpions)"
+        - "Pseudoscorpiones (pseudoscorpions)"
         - "Enchytraeidae"
     validations:
       required: true
@@ -122,12 +122,12 @@ body:
   - type: dropdown
     id: tipo_organismo
     attributes:
-      label: Tipo de organismo
+      label: Organism Type
       options:
-        - "Geral (todos os reinos)"
+        - "General (all kingdoms)"
         - "Eukaryota"
-        - "Bactérias"
-        - "Arqueias"
+        - "Bacteria"
+        - "Archaea"
     validations:
       required: true
 
@@ -135,34 +135,34 @@ body:
     attributes:
       value: |
         ---
-        ### ⚙️ Parâmetros do BLAST
+        ### ⚙️ BLAST Parameters
 
   - type: input
     id: max_mismatches
     attributes:
-      label: "Máximo de Mismatches (Extremidade 3')"
-      placeholder: "Valores de 0 a 5"
+      label: "Maximum 3' End Mismatches"
+      placeholder: "Values from 0 to 5"
     validations:
       required: true
 
   - type: input
     id: amp_min
     attributes:
-      label: Tamanho Mínimo do Amplicon (bp)
+      label: Minimum Amplicon Size (bp)
     validations:
       required: true
 
   - type: input
     id: amp_max
     attributes:
-      label: Tamanho Máximo do Amplicon (bp)
+      label: Maximum Amplicon Size (bp)
     validations:
       required: true
 
   - type: input
     id: tm_min
     attributes:
-      label: Temperatura de Melting mínima (Tm)
+      label: Minimum Melting Temperature (Tm)
       value: "0"
     validations:
       required: true
@@ -170,15 +170,14 @@ body:
   - type: input
     id: evalue
     attributes:
-      label: E-value Máximo
+      label: Maximum E-value
     validations:
       required: true
 
   - type: input
     id: cobertura
     attributes:
-      label: Cobertura mínima (%)
-      placeholder: "De 0 a 100"
+      label: Minimum Coverage (%)
+      placeholder: "From 0 to 100"
     validations:
       required: true
-

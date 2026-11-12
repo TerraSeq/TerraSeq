@@ -42,6 +42,26 @@ def _inteiro(valor):
     return int(s) if re.fullmatch(r"\d+", s) else None
 
 
+# Opcoes de banco dos formularios em ingles (Google Forms e Issues) -> chave usada
+# no codigo (BANCOS_DISPONIVEIS). Opcoes em portugues continuam valendo.
+BANCOS_EN_PT = {
+    "eukaryotes": "eucariotos",
+    "prokaryotes": "procariotos",
+    "earthworms": "minhocas",
+    "ants": "formigas",
+    "termites": "isoptera",
+    "isopods": "isopodes",
+    "myriapods": "miriapodes",
+    "flatworms": "platelmintos",
+}
+
+
+def banco_em_portugues(nome):
+    """'Eukaryotes' -> 'eucariotos'; nomes que ja sao do codigo voltam iguais."""
+    nome = str(nome).strip()
+    return BANCOS_EN_PT.get(nome.lower(), nome)
+
+
 def _decimal(valor):
     """float a partir de número ou string com PONTO decimal; senão None."""
     if isinstance(valor, bool):
