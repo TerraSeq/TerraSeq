@@ -460,11 +460,8 @@ def run_pipeline(req, req_id):
     # ~114GB de RAM/87%, sem OOM, testado manualmente contra o banco
     # "eucariotos" com ~8.400 genomas).
     LIMITE_MAXIMO_HITS = 30000
-    max_hits_solicitado = int(req.get('Limite de hits', LIMITE_MAXIMO_HITS) or LIMITE_MAXIMO_HITS)
-    if max_hits_solicitado > LIMITE_MAXIMO_HITS:
-        print(f"⚠️ 'Limite de hits' pedido ({max_hits_solicitado}) acima do teto de segurança "
-              f"({LIMITE_MAXIMO_HITS}) -- usando o teto pra evitar estourar a memória do servidor.")
-    max_hits = str(min(max_hits_solicitado, LIMITE_MAXIMO_HITS))
+    # Sempre o maximo: o pesquisador nao escolhe mais o limite de hits (campo tirado do formulario).
+    max_hits = str(LIMITE_MAXIMO_HITS)
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
     # ==========================================
@@ -959,7 +956,6 @@ def parse_issue_body(body):
         'Temperatura de Melting mínima (Tm)': data.get('Temperatura de Melting mínima (Tm)', '0'),
         'E-value máximo': data.get('E-value Máximo', '10'),
         'Cobertura mínima': data.get('Cobertura mínima (%)', '70'),
-        'Limite de hits': data.get('Limite de hits', '500')
     }
     # Os menus do formulário trazem uma descrição entre parênteses
     # ("Refseqsoil (banco completo: ...)", "Geral (todos os reinos)"); o

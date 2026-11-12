@@ -182,9 +182,3 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: max_hits
-    attributes:
-      label: Limite de hits
-    validations:
-      required: true
