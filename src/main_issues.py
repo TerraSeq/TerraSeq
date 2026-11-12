@@ -376,7 +376,6 @@ def atualizar_vitrine_html(req, req_id, resultado_json=None):
 
     nova_linha = f"""
                     <tr data-amplicon="{amplicon_int}" data-date="{data_hoje_iso}">
-                        <td><strong>{req_id}</strong></td>
                         <td>{nome_par}</td>
                         <td>{alvo}</td>
                         <td>{banco}</td>
@@ -398,6 +397,7 @@ def atualizar_vitrine_html(req, req_id, resultado_json=None):
                                View Report
                             </a>
                         </td>
+                        <td><strong>{req_id}</strong></td>
                     </tr>
                     """
 
@@ -803,6 +803,9 @@ def run_pipeline(req, req_id):
             "amplicon_min": int(min_size),
             "amplicon_max": int(max_size),
             "e_value": float(e_value),
+            "blast_task": "blastn-short",
+            "word_size": 7,
+            "dbsize": 1_000_000_000,  # DBSIZE_REFERENCIA de run_parse_blastn.py
             "min_coverage": int(cobertura),
             "max_hits": int(max_hits),
             "min_tm": float(tm_min),

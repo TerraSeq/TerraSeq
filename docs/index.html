@@ -434,7 +434,8 @@
             width: 128px;
             height: 128px;
             border-radius: 50%;
-            background: white;
+            /* Imagem do grupo (docs/imagens/grupos/<id>.jpg) clareada por cima, so como fundo. */
+            background: linear-gradient(rgba(255,255,255,0.80), rgba(255,255,255,0.80)), var(--fundo, none) center / cover no-repeat, white;
             border: 2px solid #e3e7ea;
             box-shadow: 0 10px 20px rgba(15,76,117,0.07);
             display: flex;
@@ -574,7 +575,7 @@
     </nav>
 
     <header class="hero" id="inicio">
-        <h1 data-i18n="hero.titulo">In Silico Primer Validation</h1>
+        <h1 data-i18n="hero.titulo"><em>In Silico</em> Primer Validation</h1>
         <p data-i18n="hero.sub">An automated platform for taxonomic coverage assessment and PCR simulation against complete genomes.</p>
     </header>
 
@@ -602,7 +603,7 @@
     <section class="container" id="acervo-genomas">
         <div class="center-text">
             <h2 class="section-title" data-i18n="acervo.titulo">Genome Archive</h2>
-            <p data-i18n="acervo.intro">The curated reference databases behind every in silico search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.</p>
+            <p data-i18n="acervo.intro">The curated reference databases behind every <em>in silico</em> search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.</p>
         </div>
         <p class="stat-line" id="acervo-stat-line" data-i18n="acervo.carregando">Loading archive...</p>
 
@@ -656,7 +657,6 @@
         <div style="overflow-x: auto;">
             <table class="results-table">
                 <colgroup>
-                    <col style="width:150px">
                     <col style="width:190px">
                     <col style="width:110px">
                     <col style="width:110px">
@@ -665,10 +665,10 @@
                     <col style="width:80px">
                     <col style="width:80px">
                     <col style="width:130px">
+                    <col style="width:150px">
                 </colgroup>
                 <thead>
                     <tr>
-                        <th class="sortable" data-sort-key="id" data-sort-type="text"><span data-i18n="tabela.id">Request ID</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
                         <th class="sortable" data-sort-key="primername" data-sort-type="text"><span data-i18n="tabela.nome">Primer Pair Name</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
                         <th class="sortable" data-sort-key="alvo" data-sort-type="text"><span data-i18n="tabela.alvo">Target</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
                         <th class="sortable" data-sort-key="banco" data-sort-type="text"><span data-i18n="tabela.banco">Database</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
@@ -676,14 +676,14 @@
                         <th class="sortable" data-sort-key="amplicon" data-sort-type="number"><span data-i18n="tabela.amplicon">Amplicon Size</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
                         <th class="sortable" data-sort-key="date" data-sort-type="text"><span data-i18n="tabela.data">Date</span><span class="sort-arrow"></span><span class="col-resizer"></span></th>
                         <th><span data-i18n="tabela.status">Status</span><span class="col-resizer"></span></th>
-                        <th data-i18n="tabela.acao">Action</th>
+                        <th data-i18n="tabela.acao">Action<span class="col-resizer"></span></th>
+                        <th class="sortable" data-sort-key="id" data-sort-type="text"><span data-i18n="tabela.id">Request ID</span><span class="sort-arrow"></span></th>
                     </tr>
                 </thead>
                 <tbody id="results-body">
 
 
                     <tr data-amplicon="5104" data-date="2026-09-21">
-                        <td><strong>REQ-20260921-0079</strong></td>
                         <td>V4_Brate_F/D9_2741R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -705,10 +705,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260921-0079</strong></td>
                     </tr>
                     
                     <tr data-amplicon="5015" data-date="2026-09-21">
-                        <td><strong>REQ-20260921-0076</strong></td>
                         <td>V4_Brate_F/D9_2593R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -730,10 +730,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260921-0076</strong></td>
                     </tr>
                     
                     <tr data-amplicon="5077" data-date="2026-09-21">
-                        <td><strong>REQ-20260921-0072</strong></td>
                         <td>V4_Balzano_F/D9_2742R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -755,10 +755,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260921-0072</strong></td>
                     </tr>
                     
                     <tr data-amplicon="4990" data-date="2026-09-21">
-                        <td><strong>REQ-20260921-0075</strong></td>
                         <td>V4_Balzano_F/D9_2593R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -780,10 +780,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260921-0075</strong></td>
                     </tr>
                     
                     <tr data-amplicon="5039" data-date="2026-09-21">
-                        <td><strong>REQ-20260921-0078</strong></td>
                         <td>V4_Balzano_F/22R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -805,10 +805,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260921-0078</strong></td>
                     </tr>
                     
                     <tr data-amplicon="4886" data-date="2026-09-21">
-                        <td><strong>REQ-20260921-0073</strong></td>
                         <td>V4_Balzano_F/21R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -830,10 +830,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260921-0073</strong></td>
                     </tr>
                     
                     <tr data-amplicon="4898" data-date="2026-09-21">
-                        <td><strong>REQ-20260921-0081</strong></td>
                         <td>3NDf/21R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -855,10 +855,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260921-0081</strong></td>
                     </tr>
                     
                     <tr data-amplicon="5455" data-date="2026-09-22">
-                        <td><strong>REQ-20260922-0085</strong></td>
                         <td>V4_Hugerth_F/D11_3143R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -880,10 +880,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260922-0085</strong></td>
                     </tr>
                     
                     <tr data-amplicon="5459" data-date="2026-09-22">
-                        <td><strong>REQ-20260922-0082</strong></td>
                         <td>V4_Brate_F/D11_3143R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -905,10 +905,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260922-0082</strong></td>
                     </tr>
                     
                     <tr data-amplicon="5059" data-date="2026-09-22">
-                        <td><strong>REQ-20260922-0083</strong></td>
                         <td>V4_Brate_F/22R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -930,10 +930,10 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260922-0083</strong></td>
                     </tr>
                     
                     <tr data-amplicon="5450" data-date="2026-09-24">
-                        <td><strong>REQ-20260921-114311</strong></td>
                         <td>V4_Balzano_F/D11_3143R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -955,6 +955,7 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20260921-114311</strong></td>
                     </tr>
                     
 
@@ -965,7 +966,6 @@
                     
 
                     <tr data-amplicon="4957" data-date="2026-10-23">
-                        <td><strong>REQ-20261023-210435</strong></td>
                         <td>V6-V8_new_F/D11_3143R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -987,11 +987,11 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20261023-210435</strong></td>
                     </tr>
                     
 
                     <tr data-amplicon="4449" data-date="2026-10-23">
-                        <td><strong>REQ-20261023-214749</strong></td>
                         <td>V6-V8_new_F/D9_2593R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
@@ -1013,12 +1013,12 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20261023-214749</strong></td>
                     </tr>
                     
 
 
                     <tr data-amplicon="628" data-date="2026-10-26">
-                        <td><strong>REQ-20261026-104830</strong></td>
                         <td>ITS1/ITS4</td>
                         <td>18S-ITS-28S</td>
                         <td>Fungi</td>
@@ -1040,11 +1040,11 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20261026-104830</strong></td>
                     </tr>
                     
 
                     <tr data-amplicon="1481" data-date="2026-10-26">
-                        <td><strong>REQ-20261026-182546</strong></td>
                         <td>27F/1492R</td>
                         <td>16S</td>
                         <td>procariotos</td>
@@ -1066,11 +1066,11 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20261026-182546</strong></td>
                     </tr>
                     
 
                     <tr data-amplicon="1449" data-date="2026-10-26">
-                        <td><strong>REQ-20261026-182711</strong></td>
                         <td>Arch21F/Arch1492R</td>
                         <td>16S</td>
                         <td>procariotos</td>
@@ -1092,11 +1092,11 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20261026-182711</strong></td>
                     </tr>
                     
 
                     <tr data-amplicon="1449" data-date="2026-10-26">
-                        <td><strong>REQ-20261026-191323</strong></td>
                         <td>Arch21F/Arch1492R</td>
                         <td>16S</td>
                         <td>archaea</td>
@@ -1118,11 +1118,11 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20261026-191323</strong></td>
                     </tr>
                     
 
                     <tr data-amplicon="1478" data-date="2026-10-26">
-                        <td><strong>REQ-20261026-193550</strong></td>
                         <td>LR0R/LR7</td>
                         <td>LSU</td>
                         <td>eucariotos</td>
@@ -1144,11 +1144,11 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20261026-193550</strong></td>
                     </tr>
                     
 
                     <tr data-amplicon="1449" data-date="2026-10-26">
-                        <td><strong>REQ-20261026-215201</strong></td>
                         <td>LR0R/LR7</td>
                         <td>LSU</td>
                         <td>Fungi</td>
@@ -1170,6 +1170,7 @@
                                View Report
                             </a>
                         </td>
+                        <td><strong>REQ-20261026-215201</strong></td>
                     </tr>
                     
 <!-- NOVAS_LINHAS -->
@@ -1248,6 +1249,20 @@
                 </div>
             </div>
 
+            <div class="equipe-card">
+                <div class="equipe-info">
+                    <h4>Thierry</h4>
+                    <p class="cargo" data-i18n="sobre.cargo.thierry">Collaborator</p>
+                    <a href="#" target="_blank" class="perfil-link" data-i18n="sobre.perfilLink">About ↗</a>
+                </div>
+                <div class="equipe-foto-container">
+                    <div class="no-photo">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span data-i18n="sobre.semFoto">NO PHOTO</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;" data-i18n="sobre.institEnvolvidas">Institutions Involved</h3>
@@ -1255,7 +1270,6 @@
             <div class="inst-box">
                 <h4 data-i18n="sobre.institExecutora">Lead Institution</h4>
                 <p style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">Universidade Federal do Espírito Santo - UFES</p>
-                <img src="https://www.ufes.br/themes/custom/ufes_Varbase/images/marca_ufes.png" alt="Logo UFES" class="inst-logo">
             </div>
 
             <div class="inst-box">
@@ -1264,12 +1278,14 @@
                     
                     <div class="colab-item">
                         <p>Embrapa</p>
-                        <img src="data:image/png;base64,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" alt="Logo Embrapa" class="inst-logo">
                     </div>
 
                     <div class="colab-item">
                         <p>Universidade de Coimbra</p>
-                        <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Logo Univ. de Coimbra" class="inst-logo">
+                    </div>
+
+                    <div class="colab-item">
+                        <p>Universidade de São Paulo - USP</p>
                     </div>
 
                 </div>
@@ -1285,7 +1301,6 @@
                     <p><strong data-i18n="sobre.coordenador">Coordinator:</strong> Leandro Fonseca de Souza</p>
                     <p><em>Edital CNPq Universal 2024</em></p>
                 </div>
-                <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="Logo CNPq" class="fomento-logo">
             </div>
 
             <div class="fomento-card">
@@ -1295,17 +1310,11 @@
                     <p><strong data-i18n="sobre.coordenadora">Coordinator:</strong> Liana Hilda Golin Mengarda</p>
                     <p><em>Edital FAPES Inovagro 2024</em></p>
                 </div>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="Logo FAPES" class="fomento-logo">
             </div>
         </div>
     </section>
 
     <div class="footer-logo-banner">
-        <img src="https://www.ufes.br/themes/custom/ufes_Varbase/images/marca_ufes.png" alt="Logo UFES" alt="UFES" class="footer-logo-item" title="Universidade Federal do Espírito Santo">
-        <img src="data:image/png;base64,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" alt="Embrapa" class="footer-logo-item" title="Empresa Brasileira de Pesquisa Agropecuária">
-        <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Universidade de Coimbra" class="footer-logo-item" title="Faculty of Sciences and Technology of the University of Coimbra">
-        <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="CNPq" class="footer-logo-item" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="FAPES" class="footer-logo-item" title="Fundação de Amparo à Pesquisa e Inovação do Espírito Santo">
         <img src="imagens/footer.png" alt="TerraSeq" class="footer-logo-item" title="In silico primer optimization for Earth biodiversity assessment">
     </div>
 
@@ -1313,7 +1322,7 @@
         <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
             <img src="imagens/Logo3.png" alt="TerraSeq" style="height:22px; width:auto; display:block; opacity:0.95;">
             <span><strong>TerraSeq</strong></span>
-            <span style="margin-left:2px;">- In silico primer optimization for Earth biodiversity assessment</span>
+            <span style="margin-left:2px;">- <em>In silico</em> primer optimization for Earth biodiversity assessment</span>
         </div>
         <small>© 2026 Developed by the TerraSeq Team</small>
     </footer>
@@ -1339,7 +1348,7 @@
                 "nav.acervo": "Acervo de Genomas",
                 "nav.resultados": "Resultados",
                 "nav.sobre": "Equipe & Sobre",
-                "hero.titulo": "Validação in silico de Primers",
+                "hero.titulo": "Validação <em>in silico</em> de Primers",
                 "hero.sub": "Uma plataforma automatizada para avaliação de cobertura taxonômica e simulação de PCR contra genomas completos.",
                 "submeter.titulo": "Escolha sua via de Submissão",
                 "submeter.intro": "O nosso pipeline suporta duas arquiteturas diferentes para recebimento e processamento de ensaios.",
@@ -1348,7 +1357,7 @@
                 "submeter.issues.texto": "Submeta seus parâmetros via Issues e acompanhe o log de execução público.",
                 "submeter.issues.btn": "Abrir Nova Issue",
                 "acervo.titulo": "Acervo de Genomas",
-                "acervo.intro": "Os bancos de referência curados que sustentam cada busca in silico da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.",
+                "acervo.intro": "Os bancos de referência curados que sustentam cada busca <em>in silico</em> da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.",
                 "acervo.carregando": "Carregando acervo...",
                 "acervo.indisponivel": "Acervo em atualização — volte em breve.",
                 "acervo.hint": "Passe o mouse pra pausar · clique num banco pra ver os organismos catalogados",
@@ -1387,6 +1396,7 @@
                 "sobre.cargo.leandro": "Pesquisador / Orientador",
                 "sobre.cargo.liana": "Pesquisadora / Coordenadora",
                 "sobre.cargo.eliezer": "Pesquisador Colaborador",
+                "sobre.cargo.thierry": "Colaborador",
                 "sobre.institEnvolvidas": "Instituições Envolvidas",
                 "sobre.institExecutora": "Instituição Executora",
                 "sobre.institColaboradoras": "Instituições Colaboradoras",
@@ -1402,7 +1412,7 @@
                 "nav.acervo": "Genome Archive",
                 "nav.resultados": "Results",
                 "nav.sobre": "Team & About",
-                "hero.titulo": "In Silico Primer Validation",
+                "hero.titulo": "<em>In Silico</em> Primer Validation",
                 "hero.sub": "An automated platform for taxonomic coverage assessment and PCR simulation against complete genomes.",
                 "submeter.titulo": "Choose Your Submission Method",
                 "submeter.intro": "Our pipeline supports two different architectures for receiving and processing assays.",
@@ -1411,7 +1421,7 @@
                 "submeter.issues.texto": "Submit your parameters via Issues and follow the public execution log.",
                 "submeter.issues.btn": "Open New Issue",
                 "acervo.titulo": "Genome Archive",
-                "acervo.intro": "The curated reference databases behind every in silico search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.",
+                "acervo.intro": "The curated reference databases behind every <em>in silico</em> search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.",
                 "acervo.carregando": "Loading archive...",
                 "acervo.indisponivel": "Archive being updated — check back soon.",
                 "acervo.hint": "Hover to pause · click a database to see its catalogued organisms",
@@ -1450,6 +1460,7 @@
                 "sobre.cargo.leandro": "Researcher / Advisor",
                 "sobre.cargo.liana": "Researcher / Coordinator",
                 "sobre.cargo.eliezer": "Collaborating Researcher",
+                "sobre.cargo.thierry": "Collaborator",
                 "sobre.institEnvolvidas": "Institutions Involved",
                 "sobre.institExecutora": "Lead Institution",
                 "sobre.institColaboradoras": "Collaborating Institutions",
@@ -1546,7 +1557,7 @@
             let sortDir = "desc";
 
             // Índice da coluna (0-based) correspondente a cada chave ordenável
-            const COLUMN_INDEX = { id: 0, primername: 1, alvo: 2, banco: 3, date: 6 };
+            const COLUMN_INDEX = { primername: 0, alvo: 1, banco: 2, date: 5, id: 8 };
 
             function getSortValue(row, key, type) {
                 if (key === "amplicon") {
@@ -1922,6 +1933,11 @@
                         <span class="genomas-label">${t("acervo.genomasLabel")}</span>
                         <span class="rotulo">${banco.nome}</span>
                     `;
+                    // Fundo opcional: so aplica se a imagem existir (evita circulo quebrado).
+                    const src = `imagens/grupos/${banco.id}.jpg`;
+                    const img = new Image();
+                    img.onload = () => el.style.setProperty("--fundo", `url("${src}")`);
+                    img.src = src;
                     el.addEventListener("click", () => abrirPainel(banco));
                     return el;
                 }
