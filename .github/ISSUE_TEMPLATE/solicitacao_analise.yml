@@ -8,7 +8,7 @@ body:
       value: |
         ## 🧬 Primer Validation Pipeline
         Fill in the fields below with the parameters of your *in silico* PCR simulation.
-        The report will be generated automatically and a link will be sent by e-mail.
+        Once processing is complete, you will receive the results of your analysis by e-mail, and your primer pair will be automatically added to the collection of evaluated primers on the TerraSeq home page.
 
         ---
         ### 👤 Identification
