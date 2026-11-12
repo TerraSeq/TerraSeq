@@ -117,8 +117,9 @@
         .legenda-arvore { margin-top: 12px; padding: 12px 14px; background: #f4f5f7; border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; color: var(--text-main); }
         .legenda-arvore .leg-titulo { font-weight: 700; margin-bottom: 8px; }
         .legenda-arvore .leg-item { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
-        .legenda-arvore .leg-amostra { min-width: 62px; text-align: right; font-size: 0.8rem; }
-        .legenda-arvore .leg-vazio { color: var(--text-light); opacity: 0.5; }
+        .legenda-arvore .leg-cor { width: 14px; height: 14px; border-radius: 3px; flex: 0 0 14px; }
+        .legenda-arvore .leg-cor.cinza { background: var(--text-light); }
+        .legenda-arvore .leg-cor.verde { background: var(--success); }
 
         /* Card de Metadados da Espécie (Dentro da árvore) */
         .meta-card { display: none; background: #fffcf2; border: 1px solid #fde68a; border-radius: 6px; margin-top: 15px; padding: 20px; border-left: 4px solid var(--warning);}
@@ -473,8 +474,8 @@
                 "side.dataSim": "Data da Simulação",
                 "side.pesquisador": "Pesquisador",
                 "side.marcadores": "Marcadores (5' → 3')",
-                "legenda.taxa": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-amostra'><span class='stat-rel'>12.5%</span></span><span>Percentual dos acertos do grupo selecionado na coluna à esquerda</span></div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(3.1%)</span></span><span>Percentual de todos os acertos desta análise</span></div><div class='leg-item'><span class='leg-amostra'>🦠</span><span>Espécie (último nível da árvore)</span></div><div class='leg-item'><span class='leg-amostra'><span class='leg-vazio'>0.0%</span></span><span>Táxon sem acertos</span></div><div style='margin-top:8px; color:var(--text-light);'>Acertos = amplicons encontrados na busca (não genomas do banco).</div>",
-                "legenda.func": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(47.0%)</span></span><span>Primeira coluna: percentual de todos os acertos desta análise</span></div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(100.0%)</span></span><span>Demais colunas: percentual dos acertos do item selecionado à esquerda</span></div><div style='margin-top:8px; color:var(--text-light);'>Acertos = amplicons encontrados na busca (não genomas do banco).</div>",
+                "legenda.taxa": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-cor cinza'></span><span>Percentual dos acertos do grupo selecionado na coluna à esquerda</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Percentual de todos os acertos desta análise</span></div>",
+                "legenda.func": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-cor verde'></span><span>Primeira coluna: percentual de todos os acertos desta análise</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Demais colunas: percentual dos acertos do item selecionado à esquerda</span></div>",
                 "side.parNome": "Par de Primers",
                 "side.fwd": "Primer Forward",
                 "side.rev": "Primer Reverse",
@@ -578,8 +579,8 @@
                 "side.dataSim": "Simulation Date",
                 "side.pesquisador": "Researcher",
                 "side.marcadores": "Markers (5' → 3')",
-                "legenda.taxa": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-amostra'><span class='stat-rel'>12.5%</span></span><span>Share of the hits of the group selected in the column to the left</span></div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(3.1%)</span></span><span>Share of all hits in this analysis</span></div><div class='leg-item'><span class='leg-amostra'>🦠</span><span>Species (last level of the tree)</span></div><div class='leg-item'><span class='leg-amostra'><span class='leg-vazio'>0.0%</span></span><span>Taxon with no hits</span></div><div style='margin-top:8px; color:var(--text-light);'>Hits = amplicons found by the search (not genomes in the database).</div>",
-                "legenda.func": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(47.0%)</span></span><span>First column: share of all hits in this analysis</span></div><div class='leg-item'><span class='leg-amostra'><span class='stat-glob'>(100.0%)</span></span><span>Other columns: share of the hits of the item selected on the left</span></div><div style='margin-top:8px; color:var(--text-light);'>Hits = amplicons found by the search (not genomes in the database).</div>",
+                "legenda.taxa": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-cor cinza'></span><span>Share of the hits of the group selected in the column to the left</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Share of all hits in this analysis</span></div>",
+                "legenda.func": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-cor verde'></span><span>First column: share of all hits in this analysis</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Other columns: share of the hits of the item selected on the left</span></div>",
                 "side.parNome": "Primer Pair",
                 "side.fwd": "Forward Primer",
                 "side.rev": "Reverse Primer",
