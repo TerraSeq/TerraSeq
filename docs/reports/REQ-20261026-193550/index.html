@@ -114,6 +114,9 @@
         .taxon-name { color: var(--text-main); }
         .stat-rel { color: var(--text-light); margin-right: 5px; font-size: 0.8rem; }
         .stat-glob { color: var(--success); font-weight: 700; font-size: 0.8rem;}
+        .nota-evalue { font-size: 0.75rem; color: var(--text-light); line-height: 1.4; margin: 8px 0 0 0; }
+        .legenda-arvore { font-size: 0.8rem; color: var(--text-light); line-height: 1.5; margin-top: 10px; padding: 10px 12px; background: var(--bg-color); border-radius: 6px; }
+        .legenda-arvore .stat-rel, .legenda-arvore .stat-glob { font-size: 0.8rem; }
 
         /* Card de Metadados da Espécie (Dentro da árvore) */
         .meta-card { display: none; background: #fffcf2; border: 1px solid #fde68a; border-radius: 6px; margin-top: 15px; padding: 20px; border-left: 4px solid var(--warning);}
@@ -234,7 +237,7 @@
         
         <div class="report-header">
             <div>
-                <h1 data-i18n="rel.titulo">In Silico PCR Report</h1>
+                <h1 data-i18n="rel.titulo"><em>In Silico</em> PCR Report</h1>
                 <p data-i18n="rel.sub">Taxonomic coverage audit and marker validation</p>
             </div>
             <div>
@@ -279,6 +282,10 @@
                     <div class="data-group">
                         <div class="data-group-title" data-i18n="side.marcadores">Markers (5' → 3')</div>
                         <div class="data-row">
+                            <span class="data-label" data-i18n="side.parNome">Primer Pair</span>
+                            <span class="data-value" style="font-weight: 700;" id="pair-name">-</span>
+                        </div>
+                        <div class="data-row">
                             <span class="data-label" data-i18n="side.fwd">Forward Primer</span>
                             <span class="data-value mono" id="fwd">-</span>
                         </div>
@@ -300,6 +307,9 @@
                             <div class="data-row"><span class="data-label" data-i18n="side.hits">Hits (Limit)</span><span class="data-value" id="param-hits">-</span></div>
                         </div>
                         <div class="data-row" style="margin-top: 10px;"><span class="data-label" data-i18n="side.janela">Amplicon Window</span><span class="data-value" id="param-tamanho">-</span></div>
+                        <div class="data-row"><span class="data-label" data-i18n="side.algoritmo">Algorithm</span><span class="data-value" id="param-algoritmo">-</span></div>
+                        <div class="data-row"><span class="data-label" data-i18n="side.dbsize">Database size for E-value</span><span class="data-value" id="param-dbsize">-</span></div>
+                        <p class="nota-evalue" data-i18n="side.evalueNota">The E-value is the number of hits this good expected by chance. It is computed for a fixed reference database size (above), not for the real size of the searched database, so the same alignment gets the same E-value in any database.</p>
                     </div>
 
                 </div>
@@ -325,6 +335,7 @@
 
                     <div class="silva-browser" id="silva-browser"></div>
                     <div class="silva-browser" id="functional-browser" style="display: none;"></div>
+                    <div class="legenda-arvore" id="legenda-arvore" data-i18n="legenda.taxa"></div>
                     
                     <div id="species-card" class="meta-card">
                         <div class="meta-header">🦠 <span id="meta-title"></span></div>
@@ -365,7 +376,7 @@
 
                 <div class="panel" id="painel-cobertura-grupos">
                     <h2 class="panel-title" data-i18n="cob.titulo">Coverage by Taxonomic Group</h2>
-                    <p data-i18n="cob.intro" style="color: var(--text-light); font-size: 0.9rem; margin-top: -10px; margin-bottom: 15px;">For each taxonomic group catalogued in the searched database(s): how many organisms this primer pair <strong>captured</strong> and how many it did <strong>not</strong> amplify in this analysis. For the non-captured ones, the result supports no claim (not even that they are absent from the real sample, only that they were not detected in this in silico search with the parameters used). Sorted from the group with the worst coverage to the best.</p>
+                    <p data-i18n="cob.intro" style="color: var(--text-light); font-size: 0.9rem; margin-top: -10px; margin-bottom: 15px;">For each taxonomic group catalogued in the searched database(s): how many organisms this primer pair <strong>captured</strong> and how many it did <strong>not</strong> amplify in this analysis. For the non-captured ones, the result supports no claim (not even that they are absent from the real sample, only that they were not detected in this <em>in silico</em> search with the parameters used). Sorted from the group with the worst coverage to the best.</p>
                     <p id="cobertura-grupos-indisponivel" style="display: none; color: var(--text-light); font-style: italic;"></p>
                     <div id="cobertura-grupos-conteudo" style="display: none;">
                         <div class="kpi-row-grupos" id="kpi-row-grupos"></div>
@@ -395,7 +406,7 @@
         <div class="report-content">
             <span class="close-report" onclick="closeFullReport()">&times;</span>
             <div class="report-header-blue">
-                <span data-i18n="ov.titulo">📋 IN SILICO SIMULATION DETAILS</span>
+                <span data-i18n="ov.titulo">📋 <em>IN SILICO</em> SIMULATION DETAILS</span>
                 <button class="btn-download-fasta" id="btn-download-genome" data-i18n="ov.baixarGenoma">📥 Download Genome (.fasta)</button>
             </div>
             
@@ -422,11 +433,6 @@
     </div>
 
     <div class="footer-logo-banner">
-        <img src="https://www.ufes.br/themes/custom/ufes_Varbase/images/marca_ufes.png" alt="UFES" class="footer-logo-item" title="Universidade Federal do Espírito Santo">
-        <img src="data:image/png;base64,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" alt="Embrapa" class="footer-logo-item" title="Empresa Brasileira de Pesquisa Agropecuária">
-        <img src="https://www.uc.pt/site/templates/assets/minerva1290.png" alt="Universidade de Coimbra" class="footer-logo-item" title="Faculty of Sciences and Technology of the University of Coimbra">
-        <img src="https://ufba.br/sites/portal.ufba.br/files/noticias/cnpq-conselho-nacional-de-desenvolvimento-cientifico-e-tecnologico.png" alt="CNPq" class="footer-logo-item" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmzktMj2IWupxVzqcJ3XEiUNQuT3m6ClFJvFNIary_Np93DM4SbYqpCM3F&s=10" alt="FAPES" class="footer-logo-item" title="Fundação de Amparo à Pesquisa e Inovação do Espírito Santo">
         <img src="../../imagens/footer.png" alt="TerraSeq" class="footer-logo-item" title="In silico primer optimization for Earth biodiversity assessment">
     </div>
 
@@ -434,7 +440,7 @@
         <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
             <img src="../../imagens/Logo3.png" alt="TerraSeq" style="height:22px; width:auto; display:block; opacity:0.95;">
             <span><strong>TerraSeq</strong></span>
-            <span style="margin-left:2px;">- In silico primer optimization for Earth biodiversity assessment</span>
+            <span style="margin-left:2px;">- <em>In silico</em> primer optimization for Earth biodiversity assessment</span>
         </div>
         <small>© 2026 Developed by the TerraSeq Team</small>
     </footer>
@@ -458,7 +464,7 @@
             pt: {
                 "pagina.titulo": "eDNA SoilCheck | Relatório In Silico",
                 "nav.voltar": "⬅ Voltar ao Sistema",
-                "rel.titulo": "Relatório In Silico PCR",
+                "rel.titulo": "Relatório <em>In Silico</em> PCR",
                 "rel.sub": "Auditoria de cobertura taxonômica e validação de marcadores",
                 "rel.concluida": "✔ Análise Concluída",
                 "kpi.organismos": "Organismos Únicos",
@@ -471,12 +477,18 @@
                 "side.dataSim": "Data da Simulação",
                 "side.pesquisador": "Pesquisador",
                 "side.marcadores": "Marcadores (5' → 3')",
+                "legenda.taxa": "<strong>Como ler os percentuais:</strong> <span class='stat-rel'>cinza</span> = parte dos acertos do grupo acima (coluna à esquerda); <span class='stat-glob'>(verde)</span> = parte de todos os acertos desta análise. Acertos são os amplicons encontrados na busca, contados por sequência, e não genomas do banco: para a cobertura em relação ao banco, veja “Cobertura por Grupo Taxonômico”. Itens apagados não tiveram acertos.",
+                "legenda.func": "<strong>Como ler os percentuais:</strong> na primeira coluna, <span class='stat-glob'>(verde)</span> = parte de todos os acertos desta análise; nas colunas seguintes, <span class='stat-glob'>(verde)</span> = parte dos acertos do item selecionado à esquerda (por isso um único grupo dentro de uma categoria aparece com 100%). Acertos são os amplicons encontrados na busca, e não genomas do banco: para a cobertura em relação ao banco, veja “Cobertura por Grupo Taxonômico”.",
+                "side.parNome": "Par de Primers",
                 "side.fwd": "Primer Forward",
                 "side.rev": "Primer Reverse",
                 "side.blast": "Parâmetros BLAST",
                 "side.bancoAlvo": "Banco Alvo",
                 "side.mismatch": "Mismatch (3')",
                 "side.evalue": "E-value Max",
+                "side.algoritmo": "Algoritmo",
+                "side.dbsize": "Tamanho do banco p/ E-value",
+                "side.evalueNota": "O E-value é o número de acertos tão bons quanto este esperados por acaso. Ele é calculado para um tamanho de banco de referência fixo (acima), e não para o tamanho real do banco pesquisado; assim, o mesmo alinhamento tem o mesmo E-value em qualquer banco.",
                 "side.tm": "Tm Mínima",
                 "side.cobMin": "Cob. Mínima",
                 "side.hits": "Hits (Limite)",
@@ -496,14 +508,14 @@
                 "inv.matches": "Qtd. Matches",
                 "inv.repres": "Representação",
                 "cob.titulo": "Cobertura por Grupo Taxonômico",
-                "cob.intro": "Para cada grupo taxonômico catalogado no(s) banco(s) pesquisado(s): quantos organismos este par de primers <strong>capturou</strong> e quantos <strong>não</strong> amplificou nesta análise. Sobre os não capturados, o resultado não permite nenhuma afirmação (nem que estão ausentes na amostra real, só que não foram detectados nesta busca in silico com os parâmetros usados). Ordenado do grupo com pior cobertura para o melhor.",
+                "cob.intro": "Para cada grupo taxonômico catalogado no(s) banco(s) pesquisado(s): quantos organismos este par de primers <strong>capturou</strong> e quantos <strong>não</strong> amplificou nesta análise. Sobre os não capturados, o resultado não permite nenhuma afirmação (nem que estão ausentes na amostra real, só que não foram detectados nesta busca <em>in silico</em> com os parâmetros usados). Ordenado do grupo com pior cobertura para o melhor.",
                 "cob.buscarGrupo": "Buscar grupo taxonômico...",
                 "cob.thGrupo": "Grupo",
                 "cob.thCatalogado": "Catalogado",
                 "cob.thCapturado": "Capturado",
                 "cob.thNaoCapturado": "Não capturado",
                 "cob.thCobertura": "Cobertura",
-                "ov.titulo": "📋 DETALHES DA SIMULAÇÃO IN SILICO",
+                "ov.titulo": "📋 DETALHES DA SIMULAÇÃO <em>IN SILICO</em>",
                 "ov.baixarGenoma": "📥 Baixar Genoma (.fasta)",
                 "ov.organismoAlvo": "Organismo Alvo",
                 "ov.tipoGrupo": "Tipo/Grupo",
@@ -560,7 +572,7 @@
             en: {
                 "pagina.titulo": "eDNA SoilCheck | In Silico Report",
                 "nav.voltar": "⬅ Back to Home",
-                "rel.titulo": "In Silico PCR Report",
+                "rel.titulo": "<em>In Silico</em> PCR Report",
                 "rel.sub": "Taxonomic coverage audit and marker validation",
                 "rel.concluida": "✔ Analysis Completed",
                 "kpi.organismos": "Unique Organisms",
@@ -573,12 +585,18 @@
                 "side.dataSim": "Simulation Date",
                 "side.pesquisador": "Researcher",
                 "side.marcadores": "Markers (5' → 3')",
+                "legenda.taxa": "<strong>How to read the percentages:</strong> <span class='stat-rel'>gray</span> = share of the hits of the group above it (the column to the left); <span class='stat-glob'>(green)</span> = share of all hits in this analysis. Hits are the amplicons found by the search, counted per sequence, not genomes in the database: for coverage relative to the database, see “Coverage by Taxonomic Group”. Faded items had no hits.",
+                "legenda.func": "<strong>How to read the percentages:</strong> in the first column, <span class='stat-glob'>(green)</span> = share of all hits in this analysis; in the next columns, <span class='stat-glob'>(green)</span> = share of the hits of the item selected on the left (so a single group inside a category shows 100%). Hits are the amplicons found by the search, not genomes in the database: for coverage relative to the database, see “Coverage by Taxonomic Group”.",
+                "side.parNome": "Primer Pair",
                 "side.fwd": "Forward Primer",
                 "side.rev": "Reverse Primer",
                 "side.blast": "BLAST Parameters",
                 "side.bancoAlvo": "Target Database",
                 "side.mismatch": "Mismatch (3')",
                 "side.evalue": "Max E-value",
+                "side.algoritmo": "Algorithm",
+                "side.dbsize": "Database size for E-value",
+                "side.evalueNota": "The E-value is the number of hits this good expected by chance. It is computed for a fixed reference database size (above), not for the real size of the searched database, so the same alignment gets the same E-value in any database.",
                 "side.tm": "Min Tm",
                 "side.cobMin": "Min. Coverage",
                 "side.hits": "Hits (Limit)",
@@ -598,14 +616,14 @@
                 "inv.matches": "Match Count",
                 "inv.repres": "Representation",
                 "cob.titulo": "Coverage by Taxonomic Group",
-                "cob.intro": "For each taxonomic group catalogued in the searched database(s): how many organisms this primer pair <strong>captured</strong> and how many it did <strong>not</strong> amplify in this analysis. For the non-captured ones, the result supports no claim (not even that they are absent from the real sample, only that they were not detected in this in silico search with the parameters used). Sorted from the group with the worst coverage to the best.",
+                "cob.intro": "For each taxonomic group catalogued in the searched database(s): how many organisms this primer pair <strong>captured</strong> and how many it did <strong>not</strong> amplify in this analysis. For the non-captured ones, the result supports no claim (not even that they are absent from the real sample, only that they were not detected in this <em>in silico</em> search with the parameters used). Sorted from the group with the worst coverage to the best.",
                 "cob.buscarGrupo": "Search taxonomic group...",
                 "cob.thGrupo": "Group",
                 "cob.thCatalogado": "Catalogued",
                 "cob.thCapturado": "Captured",
                 "cob.thNaoCapturado": "Not captured",
                 "cob.thCobertura": "Coverage",
-                "ov.titulo": "📋 IN SILICO SIMULATION DETAILS",
+                "ov.titulo": "📋 <em>IN SILICO</em> SIMULATION DETAILS",
                 "ov.baixarGenoma": "📥 Download Genome (.fasta)",
                 "ov.organismoAlvo": "Target Organism",
                 "ov.tipoGrupo": "Type/Group",
@@ -1024,6 +1042,7 @@
                 browserFunc.style.display = 'none';
                 viewToggles.style.display = 'none';
                 document.getElementById('chart-title').innerHTML = t('js.composicaoTax');
+                definirLegendaArvore('legenda.taxa');
                 updateChart(fullData); 
             } else {
                 btnFunc.classList.add('active');
@@ -1032,8 +1051,15 @@
                 browserFunc.style.display = 'flex';
                 viewToggles.style.display = 'flex';            
                 document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? t('js.papeisEcologicos') : t('js.gruposBiologicos');
+                definirLegendaArvore('legenda.func');
                 renderFunctionalBrowser(); 
             }
+        }
+
+        function definirLegendaArvore(chave) {
+            const el = document.getElementById('legenda-arvore');
+            el.setAttribute('data-i18n', chave);
+            el.innerHTML = t(chave);
         }
 
         function renderBrowser() {
@@ -1653,6 +1679,7 @@
             document.getElementById('req-id').textContent = data.request_id;
             document.getElementById('sub-date').textContent = data.metadata.submitted_at;
             document.getElementById('sub-by').textContent = data.metadata.submitted_by;
+            document.getElementById('pair-name').textContent = data.primers.pair_name || '-';
             document.getElementById('fwd').textContent = data.primers.forward;
             document.getElementById('rev').textContent = data.primers.reverse;
             document.getElementById('est-cov').textContent = formatPercent(data.summary.estimated_coverage);
@@ -1670,6 +1697,13 @@
                 document.getElementById('param-tamanho').textContent = `${data.metadata.amplicon_min || 0} - ${data.metadata.amplicon_max || 9999} bp`;
                 document.getElementById('param-cobertura').textContent = (data.metadata.min_coverage !== undefined ? data.metadata.min_coverage : "-") + "%";
                 document.getElementById('param-hits').textContent = data.metadata.max_hits !== undefined ? data.metadata.max_hits : "-";
+                // Relatorios antigos nao gravavam estes campos; os valores fixos sao os
+                // de run_parse_blastn._call_blastn desde 29/09/2026.
+                const task = data.metadata.blast_task || 'blastn-short';
+                const word = data.metadata.word_size || 7;
+                const dbsize = data.metadata.dbsize || 1e9;
+                document.getElementById('param-algoritmo').textContent = `${task} (word size ${word})`;
+                document.getElementById('param-dbsize').textContent = `${(dbsize / 1e9).toLocaleString()} Gb (${Number(dbsize).toExponential(0).replace('e+', ' × 10^')} bp)`;
             }
 
             extractAllTaxa(fullData, 0);
