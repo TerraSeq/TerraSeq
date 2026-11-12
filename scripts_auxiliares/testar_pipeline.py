@@ -111,7 +111,6 @@ def corpo_da_issue(args):
         "tm_min": "0",
         "evalue": "10",
         "cobertura": "70",
-        "max_hits": "30000",
     }
     campos = campos_do_formulario_issue()
     faltando = [i for i, _ in campos if i not in valores]
@@ -140,7 +139,6 @@ def conferir_parser(m, args):
         "Temperatura de Melting mínima (Tm)": valores["tm_min"],
         "E-value máximo": valores["evalue"],
         "Cobertura mínima": valores["cobertura"],
-        "Limite de hits": valores["max_hits"],
         "Email": valores["email"],
         "Nome completo": valores["nome"],
     }

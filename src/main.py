@@ -565,11 +565,8 @@ def run_pipeline(req, req_id):
     # roda e termina ANTES da extração de amplicon começar (memória liberada
     # entre as etapas, não acumula), 30000 é aceito como novo teto.
     LIMITE_MAXIMO_HITS = 30000
-    max_hits_solicitado = int(req.get('Limite de hits', LIMITE_MAXIMO_HITS) or LIMITE_MAXIMO_HITS)
-    if max_hits_solicitado > LIMITE_MAXIMO_HITS:
-        print(f"⚠️ 'Limite de hits' pedido ({max_hits_solicitado}) acima do teto de segurança "
-              f"({LIMITE_MAXIMO_HITS}) -- usando o teto pra evitar estourar a memória do servidor.")
-    max_hits = str(min(max_hits_solicitado, LIMITE_MAXIMO_HITS))
+    # Sempre o maximo: o pesquisador nao escolhe mais o limite de hits (campo tirado do formulario).
+    max_hits = str(LIMITE_MAXIMO_HITS)
     tm_min = str(req.get('Temperatura de Melting mínima (Tm)', 0) or 0)
 
     # ==========================================

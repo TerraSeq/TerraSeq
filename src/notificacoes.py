@@ -126,11 +126,6 @@ def validar_pedido(req, bancos_validos=None):
         problemas.append(("Temperatura de melting mínima (Tm) deve ser um número, 0 ou maior, com ponto decimal (ex.: 50.5).",
                           "Minimum melting temperature (Tm) must be a number, 0 or greater, with a decimal point (e.g. 50.5)."))
 
-    hits = _inteiro(campo("Limite de hits", 30000))
-    if hits is None or hits < 1:
-        problemas.append(("Limite de hits deve ser um número inteiro maior que zero (ex.: 30000).",
-                          "Hit limit must be a whole number greater than zero (e.g. 30000)."))
-
     if bancos_validos is not None:
         banco = str(req.get("Banco de Dados", "")).strip().lower()
         if not banco:
