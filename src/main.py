@@ -1073,16 +1073,6 @@ CABECALHOS_EN_PT = {
     "minimum coverage": "Cobertura mínima",
     "hit limit": "Limite de hits",
 }
-BANCOS_EN_PT = {
-    "eukaryotes": "eucariotos",
-    "prokaryotes": "procariotos",
-    "earthworms": "minhocas",
-    "ants": "formigas",
-    "isopods": "isopodes",
-    "myriapods": "miriapodes",
-    "flatworms": "platelmintos",
-    "termites": "isoptera",
-}
 
 
 def traduzir_registro(registro):
@@ -1094,9 +1084,8 @@ def traduzir_registro(registro):
         if chave in traduzido and not str(valor).strip():
             continue
         traduzido[chave] = valor
-    banco = str(traduzido.get("Banco de Dados", "")).strip()
-    if banco.lower() in BANCOS_EN_PT:
-        traduzido["Banco de Dados"] = BANCOS_EN_PT[banco.lower()]
+    if "Banco de Dados" in traduzido:
+        traduzido["Banco de Dados"] = notificacoes.banco_em_portugues(traduzido["Banco de Dados"])
     return traduzido
 
 

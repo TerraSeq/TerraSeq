@@ -88,6 +88,12 @@ def opcoes_dropdown(id_campo):
     return re.findall(r'^\s*-\s*"([^"]+)"', bloco, re.M)
 
 
+def banco_em_portugues(nome):
+    sys.path.insert(0, os.path.join(RAIZ, "src"))
+    import notificacoes
+    return notificacoes.banco_em_portugues(nome)
+
+
 def sem_descricao(valor):
     """Mesma regra do parse_issue_body: tira a descrição entre parênteses."""
     return re.sub(r"\s*\(.*\)\s*$", "", valor).strip()
@@ -103,7 +109,7 @@ def corpo_da_issue(args):
         "primer_rev": args.rev,
         "regiao_alvo": "18S-ITS-28S",
         # a opção completa do menu (com a descrição), como o GitHub entrega
-        "banco_dados": next((o for o in opcoes_dropdown("banco_dados") if sem_descricao(o).lower() == args.banco.lower()), args.banco.capitalize()),
+        "banco_dados": next((o for o in opcoes_dropdown("banco_dados") if banco_em_portugues(sem_descricao(o)).lower() == args.banco.lower()), args.banco.capitalize()),
         "tipo_organismo": "Eukaryota",
         "max_mismatches": "3",
         "amp_min": "2000",
@@ -131,7 +137,7 @@ def conferir_parser(m, args):
         "Primer reverse": args.rev,
         "Nome do Par de Primers": valores["primer_pair_name"],
         "Região alvo": valores["regiao_alvo"],
-        "Banco de Dados": sem_descricao(valores["banco_dados"]),
+        "Banco de Dados": banco_em_portugues(sem_descricao(valores["banco_dados"])),
         "Tipo de organismo": valores["tipo_organismo"],
         "Máximo de Mismatches na extremidade 3": valores["max_mismatches"],
         "Tamanho do amplicon: MIN": valores["amp_min"],
@@ -159,7 +165,7 @@ def conferir_opcoes_do_formulario(m):
     chaves = set(re.findall(r'^\s*"(\w+)":\s*\(', bloco, re.M))
     oferecidos = set()
     for opcao in opcoes_dropdown("banco_dados"):
-        req = m.parse_issue_body(f"### Banco de Dados\n\n{opcao}")
+        req = m.parse_issue_body(f"### Database\n\n{opcao}")
         nome = req["Banco de Dados"].lower()
         oferecidos.add(nome)
         if nome not in chaves:
@@ -170,7 +176,7 @@ def conferir_opcoes_do_formulario(m):
     if fora:
         print(f"   ℹ️ bancos do código que o formulário não oferece: {fora}")
     for opcao in opcoes_dropdown("tipo_organismo"):
-        req = m.parse_issue_body(f"### Tipo de organismo\n\n{opcao}")
+        req = m.parse_issue_body(f"### Organism Type\n\n{opcao}")
         if not req["Tipo de organismo"]:
             erros += falha(f"tipo de organismo '{opcao}' virou vazio")
     ok("tipos de organismo: " + ", ".join(sem_descricao(o) for o in opcoes_dropdown("tipo_organismo")))
