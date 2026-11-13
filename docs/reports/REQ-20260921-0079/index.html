@@ -131,6 +131,8 @@
         .illustration-card { display: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; margin-top: 15px; padding: 15px; text-align: center; }
         .illustration-card img { max-width: 100%; max-height: 220px; border-radius: 4px; display: block; margin: 0 auto; }
         .illustration-caption { margin-top: 10px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
+        .illustration-credit { margin-top: 4px; font-size: 0.72rem; color: var(--text-light); line-height: 1.4; }
+        .illustration-card img { width: 100%; max-width: 640px; max-height: none; height: auto; aspect-ratio: 2 / 1; object-fit: cover; }
         .meta-header { display: flex; align-items: center; gap: 10px; color: var(--warning); font-weight: 700; font-size: 1.1em; border-bottom: 1px solid #fde68a; padding-bottom: 10px; margin-bottom: 12px;}
         .meta-row { display: grid; grid-template-columns: 100px 1fr; margin-bottom: 8px; font-size: 0.9rem; }
         .meta-label { color: var(--text-light); font-weight: 600; }
@@ -346,6 +348,7 @@
                     <div id="group-illustration-box" class="illustration-card">
                         <img id="group-illustration-img" src="" alt="Group illustration">
                         <div class="illustration-caption" id="group-illustration-caption"></div>
+                        <div class="illustration-credit" id="group-illustration-credit"></div>
                     </div>
 
                     <div class="chart-container">
@@ -515,6 +518,7 @@
                 "ov.tipoGrupo": "Tipo/Grupo",
                 "ov.primersUsados": "Primers Utilizados (Fwd / Rev)",
                 "ov.amplicons": "Amplicons Gerados",
+                "js.foto": "Foto",
                 "js.ilustracao": "Ilustração em breve",
                 "js.buscandoNcbi": "⏳ Buscando no NCBI...",
                 "js.falhaNcbi": "Não foi possível extrair a sequência completa automaticamente do NCBI. Baixando arquivo estruturado de referência.",
@@ -620,6 +624,7 @@
                 "ov.tipoGrupo": "Type/Group",
                 "ov.primersUsados": "Primers Used (Fwd / Rev)",
                 "ov.amplicons": "Generated Amplicons",
+                "js.foto": "Photo",
                 "js.ilustracao": "Illustration coming soon",
                 "js.buscandoNcbi": "⏳ Fetching from NCBI...",
                 "js.falhaNcbi": "Could not automatically retrieve the full sequence from NCBI. Downloading a structured reference file instead.",
@@ -830,12 +835,55 @@
         function groupIcon(nome) { return GROUP_ICONS[nome] || "📂"; }
         function sizeIcon(nome) { return SIZE_ICONS[nome] || "📏"; }
 
-        // Ilustrações reais dos grupos, extraídas do Atlas Global da
-        // Biodiversidade do Solo (direitos de uso em confirmação). Preencher
-        // aqui, ex: "Minhocas": "../../imagens/ilustracoes/minhocas.png" --
-        // enquanto uma chave estiver vazia/ausente, o placeholder abaixo
-        // (ícone + nome) é usado no lugar, sem quebrar o layout.
-        const GROUP_ILLUSTRATIONS = {};
+        // Fotos dos grupos funcionais (docs/imagens/funcional/), do Global Soil
+        // Biodiversity Atlas (cap. II) -- o Atlas permite o uso citando a obra e o
+        // fotografo (p. 2-3). Grupo sem foto usa o placeholder abaixo (icone + nome).
+        const GROUP_ILLUSTRATIONS = {
+            "Enquitreídeos": "../../imagens/funcional/enquitreideos.jpg",
+            "Formigas": "../../imagens/funcional/formigas.jpg",
+            "Cupins": "../../imagens/funcional/cupins.jpg",
+            "Minhocas": "../../imagens/funcional/minhocas.jpg",
+            "Ácaros": "../../imagens/funcional/acaros.jpg",
+            "Colêmbolos, Proturos e Dipluros": "../../imagens/funcional/colembolos.jpg",
+            "Isópodes": "../../imagens/funcional/isopodes.jpg",
+            "Miriápodes": "../../imagens/funcional/miriapodes.jpg",
+            "Insetos (Adultos e Larvas)": "../../imagens/funcional/insetos.jpg",
+            "Aracnídeos (Aranhas e Escorpiões)": "../../imagens/funcional/aracnideos.jpg",
+            "Platelmintos": "../../imagens/funcional/platelmintos.jpg",
+            "Protistas": "../../imagens/funcional/protistas.jpg",
+            "Nematoides": "../../imagens/funcional/nematoides.jpg",
+            "Tardígrados": "../../imagens/funcional/tardigrados.jpg",
+            "Rotíferos": "../../imagens/funcional/rotiferos.jpg",
+            "Fungos": "../../imagens/funcional/fungos.jpg",
+            "Archaea": "../../imagens/funcional/archaea.jpg",
+            "Bactérias": "../../imagens/funcional/bacterias.jpg",
+            "Moluscos": "../../imagens/funcional/moluscos.jpg",
+            "Plantas (Raízes)": "../../imagens/funcional/plantas.jpg",
+            "Megafauna (Vertebrados)": "../../imagens/funcional/megafauna.jpg"
+        };
+        const GROUP_ILLUSTRATION_CREDITS = {
+            "Enquitreídeos": "R. Schmelz, A. Murray — Global Soil Biodiversity Atlas (2016), p. 48",
+            "Formigas": "R.R. Castro Solar — Global Soil Biodiversity Atlas (2016), p. 54",
+            "Cupins": "M.T. Barra, S. Goryachkin, S. Texturas — Global Soil Biodiversity Atlas (2016), p. 55",
+            "Minhocas": "P. Lavelle, S. James, S. Miller, T. Decaëns — Global Soil Biodiversity Atlas (2016), p. 58",
+            "Ácaros": "K. Makarov — Global Soil Biodiversity Atlas (2016), p. 49",
+            "Colêmbolos, Proturos e Dipluros": "N. Carrera, J. Méndez, S. Justis, M.J.I. Briones — Global Soil Biodiversity Atlas (2016), p. 50",
+            "Isópodes": "A. Quadros, G. Montesanto, D. Thombs, A. Murray — Global Soil Biodiversity Atlas (2016), p. 56",
+            "Miriápodes": "I.H. Tuf, F. Trnka — Global Soil Biodiversity Atlas (2016), p. 57",
+            "Insetos (Adultos e Larvas)": "Y. Awoki, T. Komatsu, M. Nagano — Global Soil Biodiversity Atlas (2016), p. 59",
+            "Aracnídeos (Aranhas e Escorpiões)": "S. McCann, M. Hedin — Global Soil Biodiversity Atlas (2016), p. 61",
+            "Platelmintos": "<a href='https://commons.wikimedia.org/wiki/File:Geoplana_burmeisteri.jpg' target='_blank' rel='noopener'><em>Obama burmeisteri</em></a>, José Grau de Puerto Montt, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, via Wikimedia Commons",
+            "Protistas": "S. Shimano, Y. Eglit — Global Soil Biodiversity Atlas (2016), p. 36",
+            "Nematoides": "H. van Megen, H. Helder, J.G. Baldwin — Global Soil Biodiversity Atlas (2016), p. 46",
+            "Tardígrados": "D. Robson, D. Loarie — Global Soil Biodiversity Atlas (2016), p. 44",
+            "Rotíferos": "R. Moreno, H. Segers, Proyecto Agua — Global Soil Biodiversity Atlas (2016), p. 45",
+            "Fungos": "S. Axford — Global Soil Biodiversity Atlas (2016), p. 38",
+            "Archaea": "Z. Lü, D.B. Nair, D.G. Burns, T.J. Beveridge, E. Saunders — Global Soil Biodiversity Atlas (2016), p. 32",
+            "Bactérias": "Dr. Sahay, L. Stauffer, UCSF Medical Center, G. Lombard — Global Soil Biodiversity Atlas (2016), p. 34",
+            "Moluscos": "B. Lo, S. Jeffery — Global Soil Biodiversity Atlas (2016), p. 61",
+            "Plantas (Raízes)": "Science and Plants for Schools, B. Livingston — Global Soil Biodiversity Atlas (2016), p. 43",
+            "Megafauna (Vertebrados)": "D. Church, M. Knoth — Global Soil Biodiversity Atlas (2016), p. 63"
+        };
 
         function placeholderIllustration(nome, icone) {
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">
@@ -851,6 +899,8 @@
             document.getElementById('species-card').style.display = 'none';
             document.getElementById('group-illustration-img').src = GROUP_ILLUSTRATIONS[nome] || placeholderIllustration(nome, groupIcon(nome));
             document.getElementById('group-illustration-caption').textContent = tr(nome);
+            const credito = GROUP_ILLUSTRATION_CREDITS[nome];
+            document.getElementById('group-illustration-credit').innerHTML = credito ? `📷 ${t('js.foto')}: ${credito}` : '';
             document.getElementById('group-illustration-box').style.display = 'block';
         }
 
