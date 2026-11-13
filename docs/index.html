@@ -616,7 +616,6 @@
             <div class="carousel-track" id="acervo-carousel-track"></div>
         </div>
         <p class="carousel-hint" data-i18n="acervo.hint">Hover to pause · click a database to see its catalogued organisms</p>
-        <p class="carousel-hint" style="font-size:0.75rem; opacity:0.8;" data-i18n="acervo.creditoImagens">Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Discoba: <a href='https://commons.wikimedia.org/wiki/File:Euglena_sp.jpg' target='_blank' rel='noopener'>Euglena sp.</a> by Deuterostome, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, cropped. Platyhelminthes: <a href="https://commons.wikimedia.org/wiki/File:Geoplana_burmeisteri.jpg" target="_blank" rel="noopener"><em>Obama burmeisteri</em></a> by José Grau de Puerto Montt, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>, cropped. Click a circle to see the photographer of each image.</p>
 
         <div id="painel-banco">
             <div class="painel-header">
@@ -1363,7 +1362,7 @@
                 "submeter.issues.btn": "Abrir Nova Issue",
                 "acervo.titulo": "Acervo de Genomas",
                 "acervo.foto": "Foto",
-                "acervo.creditoImagens": "Imagens: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, capítulo II. Comissão Europeia, Serviço das Publicações da União Europeia, Luxemburgo. Discoba: <a href='https://commons.wikimedia.org/wiki/File:Euglena_sp.jpg' target='_blank' rel='noopener'>Euglena sp.</a>, de Deuterostome, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, recortada. Platyhelminthes: <a href='https://commons.wikimedia.org/wiki/File:Geoplana_burmeisteri.jpg' target='_blank' rel='noopener'><em>Obama burmeisteri</em></a>, de José Grau de Puerto Montt, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, recortada. Clique em um círculo para ver o fotógrafo de cada imagem.",
+                "acervo.recortada": "recortada",
                 "acervo.intro": "Os bancos de referência curados que sustentam cada busca <em>in silico</em> da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.",
                 "acervo.carregando": "Carregando acervo...",
                 "acervo.indisponivel": "Acervo em atualização — volte em breve.",
@@ -1429,7 +1428,7 @@
                 "submeter.issues.btn": "Open New Issue",
                 "acervo.titulo": "Genome Archive",
                 "acervo.foto": "Photo",
-                "acervo.creditoImagens": "Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Discoba: <a href='https://commons.wikimedia.org/wiki/File:Euglena_sp.jpg' target='_blank' rel='noopener'>Euglena sp.</a> by Deuterostome, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, cropped. Platyhelminthes: <a href='https://commons.wikimedia.org/wiki/File:Geoplana_burmeisteri.jpg' target='_blank' rel='noopener'><em>Obama burmeisteri</em></a> by José Grau de Puerto Montt, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, cropped. Click a circle to see the photographer of each image.",
+                "acervo.recortada": "cropped",
                 "acervo.intro": "The curated reference databases behind every <em>in silico</em> search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.",
                 "acervo.carregando": "Loading archive...",
                 "acervo.indisponivel": "Archive being updated — check back soon.",
@@ -1928,7 +1927,11 @@
             let organismosAtuais = [];
 
             // Pagina do Global Soil Biodiversity Atlas de onde veio a imagem de cada grupo.
-            const FONTE_EXTRA = { platyhelminthes: "José Grau de Puerto Montt, CC BY-SA 3.0, via Wikimedia Commons (cropped)", discoba: "Deuterostome, CC BY-SA 3.0, via Wikimedia Commons (cropped)" };
+            const LICENCA_CC_BY_SA_3 = "https://creativecommons.org/licenses/by-sa/3.0/";
+            const FONTE_EXTRA = {
+                platyhelminthes: { texto: "José Grau de Puerto Montt, CC BY-SA 3.0, via Wikimedia Commons", especie: "Obama burmeisteri", arquivo: "https://commons.wikimedia.org/wiki/File:Geoplana_burmeisteri.jpg", autor: "José Grau de Puerto Montt" },
+                discoba: { texto: "Deuterostome, CC BY-SA 3.0, via Wikimedia Commons", especie: "Euglena sp.", arquivo: "https://commons.wikimedia.org/wiki/File:Euglena_sp.jpg", autor: "Deuterostome" },
+            };
             // Fotografo(s) de cada imagem, como listado na pagina 3 do Atlas ("Images and graphic
             // credits"). Quando a legenda do Atlas cobre varias fotos, cita o conjunto.
             const FOTOGRAFOS_ATLAS = {
@@ -1963,7 +1966,14 @@
             };
             function creditoImagem(id) {
                 if (PAGINA_ATLAS[id]) return `${FOTOGRAFOS_ATLAS[id]} — Global Soil Biodiversity Atlas (2016), p. ${PAGINA_ATLAS[id]}`;
-                return FONTE_EXTRA[id] || "";
+                return FONTE_EXTRA[id] ? FONTE_EXTRA[id].texto : "";
+            }
+            // Versao com links, para o painel (a CC BY-SA pede link da licenca e aviso de alteracao).
+            function creditoImagemHtml(id) {
+                const f = FONTE_EXTRA[id];
+                if (!f) return creditoImagem(id);
+                return `<a href="${f.arquivo}" target="_blank" rel="noopener"><em>${f.especie}</em></a>, ${f.autor}, ` +
+                       `<a href="${LICENCA_CC_BY_SA_3}" target="_blank" rel="noopener">CC BY-SA 3.0</a>, via Wikimedia Commons (${t('acervo.recortada')})`;
             }
             const PAGINA_ATLAS = { archaea: 32, bacteria: 34, amoebozoa: 36, sar: 36, metamonada: 37, ascomycota: 38, basidiomycota: 38, glomeromycota: 40, mucoromycota: 41, zoopagomycota: 41, chytridiomycota: 41, tardigrada: 44, rotifera: 45, nematoda: 46, enchytraeidae: 48, acari: 49, collembola: 50, pseudoscorpiones: 53, formicidae: 54, isoptera: 55, isopoda: 56, myriapoda: 57, oligochaeta: 58, coleoptera: 59, apoidea: 61, araneae: 61, scorpiones: 61, gastropoda: 61 };
 
@@ -2003,7 +2013,7 @@
                 bancoAberto = banco;
                 painelNome.textContent = banco.nome;
                 const credito = creditoImagem(banco.id);
-                document.getElementById("painel-credito").textContent = credito ? `📷 ${t('acervo.foto')}: ${credito}` : "";
+                document.getElementById("painel-credito").innerHTML = credito ? `📷 ${t('acervo.foto')}: ${creditoImagemHtml(banco.id)}` : "";
                 painelContagem.textContent = `${banco.genomas.toLocaleString(localeAtual())} ${t('acervo.genomasLabel')}`;
                 organismosAtuais = banco.organismos || [];
                 buscaEl.value = "";
