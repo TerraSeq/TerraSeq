@@ -43,7 +43,7 @@ Dica: imagens quadradas, de ~400×400 px e até ~100 KB, carregam rápido.
 
 Recortadas do *Global Soil Biodiversity Atlas* (Orgiazzi et al., 2016, Comissão Europeia), capítulo II. Página de cada uma:
 
-- `archaea.jpg` (Z. Lü, D.B. Nair, D.G. Burns, T.J. Beveridge, E. Saunders): p. 32 (Célula quadrada de Halobacteriales (MEV))
+- `archaea.jpg` (yiftah-s): p. 32 (solo vulcânico de Campi Flegrei, Itália, onde vivem arqueias termófilas)
 - `bacteria.jpg` (Dr. Sahay, L. Stauffer, UCSF Medical Center, G. Lombard): p. 34 (Clostridium (Firmicutes), coloração de Gram)
 - `amoebozoa.jpg` (Y. Eglit): p. 36 (Ameba da família Vannellidae)
 - `sar.jpg` (S. Shimano, Y. Eglit): p. 36 (Ciliado (Alveolata))
