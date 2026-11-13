@@ -8,7 +8,7 @@ O Atlas permite o uso citando a obra e o fotógrafo (p. 2-3); os créditos apare
 |---|---|---|---|
 | `enquitreideos.jpg` | Enquitreídeos | R. Schmelz, A. Murray | 48 |
 | `formigas.jpg` | Formigas | R.R. Castro Solar | 54 |
-| `cupins.jpg` | Cupins | M.T. Barra, S. Goryachkin, S. Texturas | 55 |
+| `cupins.jpg` | Cupins | M. Bertone, R. Constantino | 55 |
 | `minhocas.jpg` | Minhocas | P. Lavelle, S. James, S. Miller, T. Decaëns | 58 |
 | `acaros.jpg` | Ácaros | K. Makarov | 49 |
 | `colembolos.jpg` | Colêmbolos, Proturos e Dipluros | N. Carrera, J. Méndez, S. Justis, M.J.I. Briones | 50 |
