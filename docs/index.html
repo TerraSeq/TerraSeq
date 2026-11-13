@@ -435,7 +435,7 @@
             height: 128px;
             border-radius: 50%;
             /* Imagem do grupo (docs/imagens/grupos/<id>.jpg) clareada por cima, so como fundo. */
-            background: linear-gradient(rgba(255,255,255,0.80), rgba(255,255,255,0.80)), var(--fundo, none) center / cover no-repeat, white;
+            background: linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)), var(--fundo, none) center / cover no-repeat, white;
             border: 2px solid #e3e7ea;
             box-shadow: 0 10px 20px rgba(15,76,117,0.07);
             display: flex;
@@ -611,6 +611,7 @@
             <div class="carousel-track" id="acervo-carousel-track"></div>
         </div>
         <p class="carousel-hint" data-i18n="acervo.hint">Hover to pause · click a database to see its catalogued organisms</p>
+        <p class="carousel-hint" style="font-size:0.75rem; opacity:0.8;" data-i18n="acervo.creditoImagens">Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg.</p>
 
         <div id="painel-banco">
             <div class="painel-header">
@@ -1356,6 +1357,7 @@
                 "submeter.issues.texto": "Submeta seus parâmetros via Issues e acompanhe o log de execução público.",
                 "submeter.issues.btn": "Abrir Nova Issue",
                 "acervo.titulo": "Acervo de Genomas",
+                "acervo.creditoImagens": "Imagens: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, capítulo II. Comissão Europeia, Serviço das Publicações da União Europeia, Luxemburgo.",
                 "acervo.intro": "Os bancos de referência curados que sustentam cada busca <em>in silico</em> da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.",
                 "acervo.carregando": "Carregando acervo...",
                 "acervo.indisponivel": "Acervo em atualização — volte em breve.",
@@ -1420,6 +1422,7 @@
                 "submeter.issues.texto": "Submit your parameters via Issues and follow the public execution log.",
                 "submeter.issues.btn": "Open New Issue",
                 "acervo.titulo": "Genome Archive",
+                "acervo.creditoImagens": "Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg.",
                 "acervo.intro": "The curated reference databases behind every <em>in silico</em> search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.",
                 "acervo.carregando": "Loading archive...",
                 "acervo.indisponivel": "Archive being updated — check back soon.",
@@ -1917,6 +1920,9 @@
             const buscaEl = document.getElementById("busca-organismo");
             let organismosAtuais = [];
 
+            // Pagina do Global Soil Biodiversity Atlas de onde veio a imagem de cada grupo.
+            const PAGINA_ATLAS = { archaea: 32, bacteria: 34, amoebozoa: 36, sar: 36, metamonada: 37, ascomycota: 38, basidiomycota: 38, glomeromycota: 40, mucoromycota: 41, zoopagomycota: 41, chytridiomycota: 41, tardigrada: 44, rotifera: 45, nematoda: 46, enchytraeidae: 48, acari: 49, collembola: 50, pseudoscorpiones: 53, formicidae: 54, isoptera: 55, isopoda: 56, myriapoda: 57, oligochaeta: 58, coleoptera: 59, apoidea: 61, araneae: 61, scorpiones: 61, gastropoda: 61 };
+
             function montarAcervo(dados) {
                 dadosAcervo = dados;
                 const bancos = dados.bancos || [];
@@ -1934,6 +1940,7 @@
                     `;
                     // Fundo opcional: so aplica se a imagem existir (evita circulo quebrado).
                     const src = `imagens/grupos/${banco.id}.jpg`;
+                    if (PAGINA_ATLAS[banco.id]) el.title = `${banco.nome} · Global Soil Biodiversity Atlas (2016), p. ${PAGINA_ATLAS[banco.id]}`;
                     const img = new Image();
                     img.onload = () => el.style.setProperty("--fundo", `url("${src}")`);
                     img.src = src;
