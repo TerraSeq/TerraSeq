@@ -22,7 +22,7 @@ O Atlas permite o uso citando a obra e o fotógrafo (p. 2-3); os créditos apare
 | `tardigrados.jpg` | Tardígrados | D. Robson, D. Loarie | 44 |
 | `rotiferos.jpg` | Rotíferos | R. Moreno, H. Segers, Proyecto Agua | 45 |
 | `fungos.jpg` | Fungos | S. Axford | 38 |
-| `archaea.jpg` | Archaea | Z. Lü, D.B. Nair, D.G. Burns, T.J. Beveridge, E. Saunders | 32 |
+| `archaea.jpg` | Archaea (solo vulcânico de Campi Flegrei, Itália) | yiftah-s | 32 |
 | `bacterias.jpg` | Bactérias | Dr. Sahay, L. Stauffer, UCSF Medical Center, G. Lombard | 34 |
 | `moluscos.jpg` | Moluscos | B. Lo, S. Jeffery | 61 |
 | `plantas.jpg` | Plantas (Raízes) | Science and Plants for Schools, B. Livingston | 43 |
