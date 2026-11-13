@@ -616,11 +616,11 @@
             <div class="carousel-track" id="acervo-carousel-track"></div>
         </div>
         <p class="carousel-hint" data-i18n="acervo.hint">Hover to pause · click a database to see its catalogued organisms</p>
-        <p class="carousel-hint" style="font-size:0.75rem; opacity:0.8;" data-i18n="acervo.creditoImagens">Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Platyhelminthes and Discoba: Wikimedia Commons.</p>
+        <p class="carousel-hint" style="font-size:0.75rem; opacity:0.8;" data-i18n="acervo.creditoImagens">Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Platyhelminthes and Discoba: Wikimedia Commons. Click a circle to see the photographer of each image.</p>
 
         <div id="painel-banco">
             <div class="painel-header">
-                <div><h3 id="painel-nome">—</h3></div>
+                <div><h3 id="painel-nome">—</h3><small id="painel-credito" style="color:#5b6470; font-size:0.75rem;"></small></div>
                 <div style="display:flex; align-items:center; gap:14px;">
                     <span class="contagem-total" id="painel-contagem"></span>
                     <button class="painel-fechar" id="painel-fechar-btn" data-i18n="acervo.fechar">Close ✕</button>
@@ -1362,7 +1362,8 @@
                 "submeter.issues.texto": "Submeta seus parâmetros via Issues e acompanhe o log de execução público.",
                 "submeter.issues.btn": "Abrir Nova Issue",
                 "acervo.titulo": "Acervo de Genomas",
-                "acervo.creditoImagens": "Imagens: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, capítulo II. Comissão Europeia, Serviço das Publicações da União Europeia, Luxemburgo. Platyhelminthes e Discoba: Wikimedia Commons.",
+                "acervo.foto": "Foto",
+                "acervo.creditoImagens": "Imagens: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, capítulo II. Comissão Europeia, Serviço das Publicações da União Europeia, Luxemburgo. Platyhelminthes e Discoba: Wikimedia Commons. Clique em um círculo para ver o fotógrafo de cada imagem.",
                 "acervo.intro": "Os bancos de referência curados que sustentam cada busca <em>in silico</em> da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.",
                 "acervo.carregando": "Carregando acervo...",
                 "acervo.indisponivel": "Acervo em atualização — volte em breve.",
@@ -1427,7 +1428,8 @@
                 "submeter.issues.texto": "Submit your parameters via Issues and follow the public execution log.",
                 "submeter.issues.btn": "Open New Issue",
                 "acervo.titulo": "Genome Archive",
-                "acervo.creditoImagens": "Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Platyhelminthes and Discoba: Wikimedia Commons.",
+                "acervo.foto": "Photo",
+                "acervo.creditoImagens": "Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Platyhelminthes and Discoba: Wikimedia Commons. Click a circle to see the photographer of each image.",
                 "acervo.intro": "The curated reference databases behind every <em>in silico</em> search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.",
                 "acervo.carregando": "Loading archive...",
                 "acervo.indisponivel": "Archive being updated — check back soon.",
@@ -1927,6 +1929,42 @@
 
             // Pagina do Global Soil Biodiversity Atlas de onde veio a imagem de cada grupo.
             const FONTE_EXTRA = { platyhelminthes: "Wikimedia Commons", discoba: "Wikimedia Commons" };
+            // Fotografo(s) de cada imagem, como listado na pagina 3 do Atlas ("Images and graphic
+            // credits"). Quando a legenda do Atlas cobre varias fotos, cita o conjunto.
+            const FOTOGRAFOS_ATLAS = {
+                archaea: "Z. Lü, D.B. Nair, D.G. Burns, T.J. Beveridge, E. Saunders",
+                bacteria: "Dr. Sahay, L. Stauffer, UCSF Medical Center, G. Lombard",
+                amoebozoa: "Y. Eglit",
+                sar: "S. Shimano, Y. Eglit",
+                metamonada: "V. Hampl, I. Cepicka",
+                ascomycota: "S. Darbey, F. Folini, S. Axford, A. Vizzini",
+                basidiomycota: "S. Axford",
+                glomeromycota: "S.L. Stürmer, K. Kemmelmeier",
+                mucoromycota: "R. Klips",
+                zoopagomycota: "G. Barron, H. Krisp, C. Simmons",
+                chytridiomycota: "S. Kaynas, mm, S. Porter",
+                tardigrada: "D. Robson, D. Loarie",
+                rotifera: "R. Moreno, H. Segers, Proyecto Agua",
+                nematoda: "H. van Megen, H. Helder, J.G. Baldwin",
+                enchytraeidae: "R. Schmelz, A. Murray",
+                acari: "K. Makarov",
+                collembola: "N. Carrera, J. Méndez, S. Justis, M.J.I. Briones",
+                pseudoscorpiones: "A. Murray",
+                formicidae: "R.R. Castro Solar",
+                isoptera: "M.T. Barra, S. Goryachkin, S. Texturas",
+                isopoda: "A. Quadros, G. Montesanto, D. Thombs, A. Murray",
+                myriapoda: "I.H. Tuf, F. Trnka",
+                oligochaeta: "P. Lavelle, S. James, S. Miller, T. Decaëns",
+                coleoptera: "Y. Awoki, T. Komatsu, M. Nagano",
+                apoidea: "J. Benton",
+                araneae: "S. McCann, M. Hedin",
+                scorpiones: "M. Hedin, T. Iwane, F. Krohn",
+                gastropoda: "B. Lo, S. Jeffery"
+            };
+            function creditoImagem(id) {
+                if (PAGINA_ATLAS[id]) return `${FOTOGRAFOS_ATLAS[id]} — Global Soil Biodiversity Atlas (2016), p. ${PAGINA_ATLAS[id]}`;
+                return FONTE_EXTRA[id] || "";
+            }
             const PAGINA_ATLAS = { archaea: 32, bacteria: 34, amoebozoa: 36, sar: 36, metamonada: 37, ascomycota: 38, basidiomycota: 38, glomeromycota: 40, mucoromycota: 41, zoopagomycota: 41, chytridiomycota: 41, tardigrada: 44, rotifera: 45, nematoda: 46, enchytraeidae: 48, acari: 49, collembola: 50, pseudoscorpiones: 53, formicidae: 54, isoptera: 55, isopoda: 56, myriapoda: 57, oligochaeta: 58, coleoptera: 59, apoidea: 61, araneae: 61, scorpiones: 61, gastropoda: 61 };
 
             function montarAcervo(dados) {
@@ -1946,8 +1984,7 @@
                     `;
                     // Fundo opcional: so aplica se a imagem existir (evita circulo quebrado).
                     const src = `imagens/grupos/${banco.id}.jpg`;
-                    if (PAGINA_ATLAS[banco.id]) el.title = `${banco.nome} · Global Soil Biodiversity Atlas (2016), p. ${PAGINA_ATLAS[banco.id]}`;
-                    else if (FONTE_EXTRA[banco.id]) el.title = `${banco.nome} · ${FONTE_EXTRA[banco.id]}`;
+                    if (creditoImagem(banco.id)) el.title = `${banco.nome} · ${t('acervo.foto')}: ${creditoImagem(banco.id)}`;
                     const img = new Image();
                     img.onload = () => el.style.setProperty("--fundo", `url("${src}")`);
                     img.src = src;
@@ -1965,6 +2002,8 @@
                 document.querySelectorAll(".banco-chip").forEach(c => c.classList.toggle("active", c.dataset.id === banco.id));
                 bancoAberto = banco;
                 painelNome.textContent = banco.nome;
+                const credito = creditoImagem(banco.id);
+                document.getElementById("painel-credito").textContent = credito ? `📷 ${t('acervo.foto')}: ${credito}` : "";
                 painelContagem.textContent = `${banco.genomas.toLocaleString(localeAtual())} ${t('acervo.genomasLabel')}`;
                 organismosAtuais = banco.organismos || [];
                 buscaEl.value = "";
