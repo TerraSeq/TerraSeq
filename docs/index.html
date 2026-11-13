@@ -411,6 +411,9 @@
         .carousel-wrap {
             position: relative;
             overflow: hidden;
+            cursor: grab;
+            touch-action: pan-y;      /* rolagem vertical da pagina continua no celular; o arrasto lateral e nosso */
+            user-select: none;
             -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%);
                     mask-image: linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%);
         }
@@ -418,17 +421,14 @@
             display: flex;
             gap: 22px;
             width: max-content;
-            animation: scroll-left 60s linear infinite;
+            will-change: transform;    /* movido por JS (iniciarCarrossel): passa sozinho e aceita arrastar */
             padding: 6px 0 18px 0;
         }
-        .carousel-wrap:hover .carousel-track { animation-play-state: paused; }
-        @keyframes scroll-left {
-            from { transform: translateX(0); }
-            to   { transform: translateX(-50%); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .carousel-track { animation: none; }
-        }
+        .carousel-wrap.arrastando { cursor: grabbing; }
+        .carousel-wrap.arrastando .banco-chip { pointer-events: none; }
+        /* Tabela da vitrine: arrastar com o mouse rola para os lados (no celular ja e nativo). */
+        .tabela-arrastavel { cursor: grab; }
+        .tabela-arrastavel.arrastando { cursor: grabbing; user-select: none; }
         .banco-chip {
             flex: 0 0 auto;
             width: 128px;
@@ -456,7 +456,9 @@
         }
         .banco-chip.active {
             border-color: var(--primary-color);
-            background: var(--accent-color);
+            border-width: 3px;
+            box-shadow: 0 0 0 4px var(--accent-color), 0 14px 26px rgba(15,76,117,0.25);
+            transform: scale(1.06);
         }
         /* Imagem quase sem veu: contorno branco garante a leitura do numero e do nome. */
         .banco-chip .contagem, .banco-chip .genomas-label, .banco-chip .rotulo {
@@ -615,7 +617,7 @@
         <div class="carousel-wrap">
             <div class="carousel-track" id="acervo-carousel-track"></div>
         </div>
-        <p class="carousel-hint" data-i18n="acervo.hint">Hover to pause · click a database to see its catalogued organisms</p>
+        <p class="carousel-hint" data-i18n="acervo.hint">Hover to pause · drag to scroll · click a database to see its catalogued organisms</p>
 
         <div id="painel-banco">
             <div class="painel-header">
@@ -659,7 +661,7 @@
             </select>
         </div>
 
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto;" class="tabela-arrastavel" id="tabela-scroll">
             <table class="results-table">
                 <colgroup>
                     <col style="width:190px">
@@ -1366,7 +1368,7 @@
                 "acervo.intro": "Os bancos de referência curados que sustentam cada busca <em>in silico</em> da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.",
                 "acervo.carregando": "Carregando acervo...",
                 "acervo.indisponivel": "Acervo em atualização — volte em breve.",
-                "acervo.hint": "Passe o mouse pra pausar · clique num banco pra ver os organismos catalogados",
+                "acervo.hint": "Passe o mouse pra pausar · arraste pra rolar · clique num banco pra ver os organismos catalogados",
                 "acervo.fechar": "Fechar ✕",
                 "acervo.buscarPlaceholder": "Buscar organismo neste banco...",
                 "acervo.semOrganismo": "Nenhum organismo encontrado.",
@@ -1432,7 +1434,7 @@
                 "acervo.intro": "The curated reference databases behind every <em>in silico</em> search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.",
                 "acervo.carregando": "Loading archive...",
                 "acervo.indisponivel": "Archive being updated — check back soon.",
-                "acervo.hint": "Hover to pause · click a database to see its catalogued organisms",
+                "acervo.hint": "Hover to pause · drag to scroll · click a database to see its catalogued organisms",
                 "acervo.fechar": "Close ✕",
                 "acervo.buscarPlaceholder": "Search organisms in this database...",
                 "acervo.semOrganismo": "No organisms found.",
@@ -2004,11 +2006,84 @@
 
                 // Duplica a lista pra loop contínuo do carrossel
                 [...bancos, ...bancos].forEach(b => track.appendChild(montarChip(b)));
+                iniciarCarrossel(track.parentElement, track);
 
                 atualizarTextosAcervo();
             }
 
+            // Carrossel: passa sozinho; para com o mouse em cima ou com um grupo aberto;
+            // arrastar (mouse ou dedo) move para frente/tras e, ao soltar, segue com inercia.
+            function iniciarCarrossel(wrap, track) {
+                const reduzirMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                const metade = () => track.scrollWidth / 2;          // a lista vem duplicada
+                const velocidadeBase = () => metade() / 60;          // uma volta a cada 60 s, como antes
+                let deslocamento = 0, ultimoQuadro = null, mouseEmCima = false;
+                let pressionado = false, arrastou = false, inicioX = 0, xAnterior = 0, tAnterior = 0;
+                let inercia = 0, ignorarClique = false;
+
+                function quadro(t) {
+                    const dt = ultimoQuadro === null ? 0 : Math.min(0.05, (t - ultimoQuadro) / 1000);
+                    ultimoQuadro = t;
+                    if (!arrastou) {
+                        if (Math.abs(inercia) > 5) {
+                            deslocamento += inercia * dt;
+                            inercia *= Math.pow(0.05, dt);          // desacelera ate parar
+                        } else {
+                            inercia = 0;
+                            const parado = mouseEmCima || wrap.classList.contains("pausado") || reduzirMovimento;
+                            if (!parado) deslocamento += velocidadeBase() * dt;
+                        }
+                    }
+                    const m = metade();
+                    if (m > 0) deslocamento = ((deslocamento % m) + m) % m;
+                    track.style.transform = `translateX(${-deslocamento}px)`;
+                    requestAnimationFrame(quadro);
+                }
+                requestAnimationFrame(quadro);
+
+                wrap.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") mouseEmCima = true; });
+                wrap.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") mouseEmCima = false; });
+
+                wrap.addEventListener("pointerdown", e => {
+                    if (e.button !== 0) return;
+                    pressionado = true; arrastou = false; inercia = 0;
+                    inicioX = xAnterior = e.clientX; tAnterior = performance.now();
+                });
+                wrap.addEventListener("pointermove", e => {
+                    if (!pressionado) return;
+                    // So vira arrasto depois de 6 px: um toque/clique simples continua abrindo o grupo.
+                    if (!arrastou && Math.abs(e.clientX - inicioX) > 6) {
+                        arrastou = true;
+                        wrap.classList.add("arrastando");
+                        wrap.setPointerCapture(e.pointerId);
+                    }
+                    if (!arrastou) return;
+                    const agora = performance.now(), dx = e.clientX - xAnterior;
+                    deslocamento -= dx;
+                    const dt = Math.max(0.008, (agora - tAnterior) / 1000);
+                    inercia = Math.max(-3000, Math.min(3000, 0.7 * inercia + 0.3 * (-dx / dt)));
+                    xAnterior = e.clientX; tAnterior = agora;
+                });
+                const soltar = () => {
+                    if (!pressionado) return;
+                    pressionado = false;
+                    if (arrastou) {
+                        // Soltou parado: sem inercia.
+                        if (performance.now() - tAnterior > 80) inercia = 0;
+                        ignorarClique = true;
+                        setTimeout(() => { ignorarClique = false; }, 60);
+                    }
+                    arrastou = false;
+                    wrap.classList.remove("arrastando");
+                };
+                wrap.addEventListener("pointerup", soltar);
+                wrap.addEventListener("pointercancel", soltar);
+                // O clique que termina um arrasto nao abre o grupo.
+                wrap.addEventListener("click", e => { if (ignorarClique) { e.stopPropagation(); e.preventDefault(); } }, true);
+            }
+
             function abrirPainel(banco) {
+                track.parentElement.classList.add("pausado");
                 document.querySelectorAll(".banco-chip").forEach(c => c.classList.toggle("active", c.dataset.id === banco.id));
                 bancoAberto = banco;
                 painelNome.textContent = banco.nome;
@@ -2041,8 +2116,45 @@
                 renderLista(organismosAtuais.filter(n => n.toLowerCase().includes(q)));
             });
 
+            // Tabela da vitrine: no PC, clicar e arrastar rola para os lados (no celular o arrasto ja e nativo).
+            // Links, botoes, campos e o redimensionador de colunas continuam funcionando normalmente.
+            (function tabelaArrastavel() {
+                const caixa = document.getElementById("tabela-scroll");
+                if (!caixa) return;
+                let pressionado = false, arrastou = false, inicioX = 0, rolagemInicial = 0, ignorarClique = false;
+                caixa.addEventListener("pointerdown", e => {
+                    if (e.pointerType !== "mouse" || e.button !== 0) return;
+                    if (e.target.closest("a, button, input, select, textarea, .col-resizer")) return;
+                    if (caixa.scrollWidth <= caixa.clientWidth) return;
+                    pressionado = true; arrastou = false;
+                    inicioX = e.clientX; rolagemInicial = caixa.scrollLeft;
+                });
+                caixa.addEventListener("pointermove", e => {
+                    if (!pressionado) return;
+                    if (!arrastou && Math.abs(e.clientX - inicioX) > 6) {
+                        arrastou = true;
+                        caixa.classList.add("arrastando");
+                        caixa.setPointerCapture(e.pointerId);
+                        window.getSelection().removeAllRanges();
+                    }
+                    if (arrastou) caixa.scrollLeft = rolagemInicial - (e.clientX - inicioX);
+                });
+                const soltar = () => {
+                    if (!pressionado) return;
+                    pressionado = false;
+                    if (arrastou) { ignorarClique = true; setTimeout(() => { ignorarClique = false; }, 60); }
+                    arrastou = false;
+                    caixa.classList.remove("arrastando");
+                };
+                caixa.addEventListener("pointerup", soltar);
+                caixa.addEventListener("pointercancel", soltar);
+                caixa.addEventListener("selectstart", e => { if (arrastou) e.preventDefault(); });
+                caixa.addEventListener("click", e => { if (ignorarClique) { e.stopPropagation(); e.preventDefault(); } }, true);
+            })();
+
             document.getElementById("painel-fechar-btn").addEventListener("click", () => {
                 painel.classList.remove("aberto");
+                track.parentElement.classList.remove("pausado");
                 bancoAberto = null;
                 document.querySelectorAll(".banco-chip").forEach(c => c.classList.remove("active"));
             });
