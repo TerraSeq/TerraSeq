@@ -616,7 +616,7 @@
             <div class="carousel-track" id="acervo-carousel-track"></div>
         </div>
         <p class="carousel-hint" data-i18n="acervo.hint">Hover to pause · click a database to see its catalogued organisms</p>
-        <p class="carousel-hint" style="font-size:0.75rem; opacity:0.8;" data-i18n="acervo.creditoImagens">Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Platyhelminthes and Discoba: Wikimedia Commons. Click a circle to see the photographer of each image.</p>
+        <p class="carousel-hint" style="font-size:0.75rem; opacity:0.8;" data-i18n="acervo.creditoImagens">Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Discoba: <a href='https://commons.wikimedia.org/wiki/File:Euglena_sp.jpg' target='_blank' rel='noopener'>Euglena sp.</a> by Deuterostome, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, cropped. Platyhelminthes: Wikimedia Commons. Click a circle to see the photographer of each image.</p>
 
         <div id="painel-banco">
             <div class="painel-header">
@@ -1363,7 +1363,7 @@
                 "submeter.issues.btn": "Abrir Nova Issue",
                 "acervo.titulo": "Acervo de Genomas",
                 "acervo.foto": "Foto",
-                "acervo.creditoImagens": "Imagens: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, capítulo II. Comissão Europeia, Serviço das Publicações da União Europeia, Luxemburgo. Platyhelminthes e Discoba: Wikimedia Commons. Clique em um círculo para ver o fotógrafo de cada imagem.",
+                "acervo.creditoImagens": "Imagens: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, capítulo II. Comissão Europeia, Serviço das Publicações da União Europeia, Luxemburgo. Discoba: <a href='https://commons.wikimedia.org/wiki/File:Euglena_sp.jpg' target='_blank' rel='noopener'>Euglena sp.</a>, de Deuterostome, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, recortada. Platyhelminthes: Wikimedia Commons. Clique em um círculo para ver o fotógrafo de cada imagem.",
                 "acervo.intro": "Os bancos de referência curados que sustentam cada busca <em>in silico</em> da TerraSeq — organizados pelos mesmos grupos taxonômicos do Atlas Global da Biodiversidade do Solo.",
                 "acervo.carregando": "Carregando acervo...",
                 "acervo.indisponivel": "Acervo em atualização — volte em breve.",
@@ -1429,7 +1429,7 @@
                 "submeter.issues.btn": "Open New Issue",
                 "acervo.titulo": "Genome Archive",
                 "acervo.foto": "Photo",
-                "acervo.creditoImagens": "Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Platyhelminthes and Discoba: Wikimedia Commons. Click a circle to see the photographer of each image.",
+                "acervo.creditoImagens": "Images: Orgiazzi, A. et al. (Eds.), 2016. <em>Global Soil Biodiversity Atlas</em>, chapter II. European Commission, Publications Office of the European Union, Luxembourg. Discoba: <a href='https://commons.wikimedia.org/wiki/File:Euglena_sp.jpg' target='_blank' rel='noopener'>Euglena sp.</a> by Deuterostome, <a href='https://creativecommons.org/licenses/by-sa/3.0/' target='_blank' rel='noopener'>CC BY-SA 3.0</a>, cropped. Platyhelminthes: Wikimedia Commons. Click a circle to see the photographer of each image.",
                 "acervo.intro": "The curated reference databases behind every <em>in silico</em> search on TerraSeq — organized by the same taxonomic groups as the Global Soil Biodiversity Atlas.",
                 "acervo.carregando": "Loading archive...",
                 "acervo.indisponivel": "Archive being updated — check back soon.",
@@ -1928,7 +1928,7 @@
             let organismosAtuais = [];
 
             // Pagina do Global Soil Biodiversity Atlas de onde veio a imagem de cada grupo.
-            const FONTE_EXTRA = { platyhelminthes: "Wikimedia Commons", discoba: "Wikimedia Commons" };
+            const FONTE_EXTRA = { platyhelminthes: "Wikimedia Commons", discoba: "Deuterostome, CC BY-SA 3.0, via Wikimedia Commons (cropped)" };
             // Fotografo(s) de cada imagem, como listado na pagina 3 do Atlas ("Images and graphic
             // credits"). Quando a legenda do Atlas cobre varias fotos, cita o conjunto.
             const FOTOGRAFOS_ATLAS = {

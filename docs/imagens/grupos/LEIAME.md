@@ -72,6 +72,6 @@ Recortadas do *Global Soil Biodiversity Atlas* (Orgiazzi et al., 2016, Comissão
 - `scorpiones.jpg` (M. Hedin, T. Iwane, F. Krohn): p. 61 (Escorpião)
 - `gastropoda.jpg` (B. Lo, S. Jeffery): p. 61 (Caracóis (Helix spp.))
 
-`platyhelminthes.jpg` (planária terrestre) e `discoba.jpg` (Euglena): Wikimedia Commons (autor e licença a completar).
+`platyhelminthes.jpg` (planária terrestre) (autor e licença a completar) e `discoba.jpg` (Euglena sp., de Deuterostome, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Euglena_sp.jpg, recortada): Wikimedia Commons.
 
 Uso permitido pelo Atlas (p. 2): fins educacionais, científicos e de divulgação, citando o Atlas e o nome de quem forneceu a imagem (lista na p. 3).
