@@ -103,7 +103,7 @@
 
         /* Navegador SILVA/Taxonômico */
         .silva-browser { display: flex; overflow-x: auto; gap: 0; height: 380px; background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; }
-        .silva-col { min-width: 260px; max-width: 300px; background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .silva-col { min-width: 320px; max-width: 360px; background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .silva-col-header { background: #f8fafc; padding: 12px 15px; font-weight: 700; font-size: 0.85rem; color: var(--primary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; text-transform: uppercase;}
         .silva-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
         .silva-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; transition: background 0.1s; }
@@ -114,6 +114,12 @@
         .taxon-name { color: var(--text-main); }
         .stat-rel { color: var(--text-light); margin-right: 5px; font-size: 0.8rem; }
         .stat-glob { color: var(--success); font-weight: 700; font-size: 0.8rem;}
+        /* As duas porcentagens sempre lado a lado; quem quebra linha é o nome. */
+        .taxon-stats { white-space: nowrap; flex-shrink: 0; margin-left: 10px; }
+        /* Árvores: arrastar com o mouse rola para os lados (e a coluna para cima/baixo). */
+        .silva-browser { cursor: grab; }
+        .silva-browser .silva-item { cursor: pointer; }
+        .silva-browser.arrastando, .silva-browser.arrastando .silva-item { cursor: grabbing; user-select: none; }
         .legenda-arvore { margin-top: 12px; padding: 12px 14px; background: #f4f5f7; border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; color: var(--text-main); }
         .legenda-arvore .leg-titulo { font-weight: 700; margin-bottom: 8px; }
         .legenda-arvore .leg-item { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
@@ -147,7 +153,7 @@
            propósito (mesma especificidade, então a ordem no arquivo decide
            qual vale). */
         @media (max-width: 600px) {
-            .silva-col { min-width: 220px; }
+            .silva-col { min-width: 260px; }
             .silva-browser { height: 320px; }
             /* Legenda do gráfico passa para embaixo (ver renderPieChart),
                então o canvas precisa de mais altura pra caber os dois. */
@@ -1716,6 +1722,47 @@
                 banco: nomeGrupoBanco
             });
         }
+
+        // Árvores: no PC, clicar e arrastar rola para os lados (e a coluna
+        // embaixo do mouse para cima/baixo), como a tabela da vitrine. Um
+        // clique simples (menos de 6 px de movimento) continua abrindo o item.
+        function arvoreArrastavel(caixa) {
+            let pressionado = false, arrastou = false, inicioX = 0, inicioY = 0, rolagemX = 0, rolagemY = 0, lista = null, ignorarClique = false;
+            caixa.addEventListener('pointerdown', e => {
+                if (e.pointerType !== 'mouse' || e.button !== 0) return;
+                pressionado = true; arrastou = false;
+                inicioX = e.clientX; inicioY = e.clientY;
+                lista = e.target.closest('.silva-list');
+                rolagemX = caixa.scrollLeft; rolagemY = lista ? lista.scrollTop : 0;
+            });
+            caixa.addEventListener('pointermove', e => {
+                if (!pressionado) return;
+                const dx = e.clientX - inicioX, dy = e.clientY - inicioY;
+                if (!arrastou && Math.hypot(dx, dy) > 6) {
+                    arrastou = true;
+                    caixa.classList.add('arrastando');
+                    caixa.setPointerCapture(e.pointerId);
+                    window.getSelection().removeAllRanges();
+                }
+                if (arrastou) {
+                    caixa.scrollLeft = rolagemX - dx;
+                    if (lista) lista.scrollTop = rolagemY - dy;
+                }
+            });
+            const soltar = () => {
+                if (!pressionado) return;
+                pressionado = false;
+                if (arrastou) { ignorarClique = true; setTimeout(() => { ignorarClique = false; }, 60); }
+                arrastou = false;
+                caixa.classList.remove('arrastando');
+            };
+            caixa.addEventListener('pointerup', soltar);
+            caixa.addEventListener('pointercancel', soltar);
+            caixa.addEventListener('selectstart', e => { if (arrastou) e.preventDefault(); });
+            caixa.addEventListener('click', e => { if (ignorarClique) { e.stopPropagation(); e.preventDefault(); } }, true);
+        }
+        arvoreArrastavel(document.getElementById('silva-browser'));
+        arvoreArrastavel(document.getElementById('functional-browser'));
 
         fetch('result.json').then(r => r.json()).then(data => {
             fullData = data.taxonomy_tree; 
