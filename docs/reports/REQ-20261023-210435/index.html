@@ -477,6 +477,7 @@
                 "side.dataSim": "Data da Simulação",
                 "side.pesquisador": "Pesquisador",
                 "side.marcadores": "Marcadores (5' → 3')",
+                "legenda.genomas": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-cor cinza'></span><span>Genomas capturados / genomas que o banco tem deste grupo</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Cobertura do grupo no banco</span></div>",
                 "legenda.taxa": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-cor cinza'></span><span>Percentual dos acertos do grupo selecionado na coluna à esquerda</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Percentual de todos os acertos desta análise</span></div>",
                 "side.parNome": "Par de Primers",
                 "side.fwd": "Primer Forward",
@@ -582,6 +583,7 @@
                 "side.dataSim": "Simulation Date",
                 "side.pesquisador": "Researcher",
                 "side.marcadores": "Markers (5' → 3')",
+                "legenda.genomas": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-cor cinza'></span><span>Genomes captured / genomes the database holds for this group</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Coverage of the group in the database</span></div>",
                 "legenda.taxa": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-cor cinza'></span><span>Share of the hits of the group selected in the column to the left</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Share of all hits in this analysis</span></div>",
                 "side.parNome": "Primer Pair",
                 "side.fwd": "Forward Primer",
@@ -1091,7 +1093,7 @@
                 browserFunc.style.display = 'none';
                 viewToggles.style.display = 'none';
                 document.getElementById('chart-title').innerHTML = t('js.composicaoTax');
-                definirLegendaArvore('legenda.taxa');
+                definirLegendaArvore(chaveLegendaArvore());
                 updateChart(fullData); 
             } else {
                 btnFunc.classList.add('active');
@@ -1100,9 +1102,75 @@
                 browserFunc.style.display = 'flex';
                 viewToggles.style.display = 'flex';            
                 document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? t('js.papeisEcologicos') : t('js.gruposBiologicos');
-                definirLegendaArvore('legenda.taxa');
+                definirLegendaArvore(chaveLegendaArvore());
                 renderFunctionalBrowser(); 
             }
+        }
+
+        // Percentuais das árvores em relação aos genomas do banco (pedido do
+        // orientador). O denominador vem de docs/dados/arvore/<grupo>.json,
+        // gerado no servidor por scripts_auxiliares/exportar_arvore_acervo.py;
+        // o numerador é "genomas_capturados" de cada espécie do result.json.
+        // Sem esses arquivos (ou em relatórios antigos, sem genomas_capturados)
+        // as árvores continuam com os percentuais sobre os acertos da análise.
+        let arvoreBanco = null;   // {taxons: {nome: genomas}, funcional: [[funcao, grupo, tamanho, genomas]]}
+
+        function chaveLegendaArvore() { return arvoreBanco ? 'legenda.genomas' : 'legenda.taxa'; }
+
+        function genomasDasEspecies(nomes) {
+            let soma = 0;
+            new Set(nomes).forEach(n => {
+                const g = leafMetadata[n] && leafMetadata[n].genomas_capturados;
+                if (typeof g === 'number') soma += g;
+            });
+            return soma;
+        }
+
+        function genomasDoNo(node) {
+            if (node._genomas === undefined) {
+                node._genomas = (!node.children || node.children.length === 0)
+                    ? genomasDasEspecies([node.name])
+                    : node.children.reduce((s, c) => s + genomasDoNo(c), 0);
+            }
+            return node._genomas;
+        }
+
+        function totalFuncional(filtro) {
+            return arvoreBanco.funcional.reduce((s, [f, g, tam, n]) => s + (filtro(f, g, tam) ? n : 0), 0);
+        }
+
+        // Cinza/verde de cada linha das árvores. relHits/globHits são as
+        // frações antigas (acertos), usadas enquanto não houver arvoreBanco.
+        function statsHtml(relHits, globHits, capturados, totalBanco) {
+            if (!arvoreBanco) {
+                return `<span class="stat-rel">${formatPercent(relHits)}</span><span class="stat-glob">(${formatPercent(globHits)})</span>`;
+            }
+            if (!totalBanco) return `<span class="stat-rel">${capturados.toLocaleString(localeAtual())}/–</span>`;
+            const loc = localeAtual();
+            return `<span class="stat-rel">${capturados.toLocaleString(loc)}/${totalBanco.toLocaleString(loc)}</span><span class="stat-glob">(${formatPercent(capturados / totalBanco)})</span>`;
+        }
+
+        function carregarArvoreDoBanco(data) {
+            const banco = data.metadata && data.metadata.database;
+            const temGenomas = Object.values(leafMetadata).some(v => typeof v.genomas_capturados === 'number');
+            if (!banco || !temGenomas) return;
+            fetch('../../dados/acervo_genomas.json').then(r => r.json()).then(acervo => {
+                const grupos = gruposDoBanco(banco, (acervo.bancos || []).map(b => b.id)) || [];
+                if (!grupos.length) return null;
+                return Promise.all(grupos.map(g => fetch(`../../dados/arvore/${g}.json`).then(r => r.ok ? r.json() : null).catch(() => null)));
+            }).then(arquivos => {
+                // Só troca se todos os grupos do banco tiverem arquivo -- com
+                // algum faltando o total do banco sairia menor que o real.
+                if (!arquivos || !arquivos.length || arquivos.some(a => !a)) return;
+                const taxons = {}, funcional = [];
+                arquivos.forEach(a => {
+                    Object.entries(a.taxons || {}).forEach(([nome, n]) => { taxons[nome] = (taxons[nome] || 0) + n; });
+                    (a.funcional || []).forEach(linha => funcional.push(linha));
+                });
+                arvoreBanco = { taxons, funcional };
+                definirLegendaArvore(chaveLegendaArvore());
+                refrescarDinamico();
+            }).catch(() => {});
         }
 
         function definirLegendaArvore(chave) {
@@ -1150,13 +1218,14 @@
                 if (node.matches === 0) li.classList.add('empty');
                 if (currentPath[depth] === node.name) li.classList.add('active');
 
-                let relPerc = parentCount > 0 ? formatPercent(node.matches / parentCount) : "0.0%";
-                let globPerc = globalTotal > 0 ? formatPercent(node.matches / globalTotal) : "0.0%";
                 const isLeaf = !node.children || node.children.length === 0;
+                const stats = arvoreBanco
+                    ? statsHtml(0, 0, genomasDoNo(node), arvoreBanco.taxons[node.name])
+                    : statsHtml(parentCount > 0 ? node.matches / parentCount : 0, globalTotal > 0 ? node.matches / globalTotal : 0);
 
                 li.innerHTML = `
                     <div class="taxon-name">${isLeaf && node.matches > 0 ? '<span style="color:#d97706; margin-right:5px;">🦠</span>' : ''}${node.name}</div>
-                    <div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>
+                    <div class="taxon-stats">${stats}</div>
                 `;
 
                 if (node.matches > 0) {
@@ -1207,13 +1276,15 @@
                     li.className = 'silva-item';
                     if (totalMatchesFuncao === 0) li.classList.add('empty');
                     
-                    let relPerc = globalTotal > 0 ? formatPercent(totalMatchesFuncao / globalTotal) : "0.0%";
-                    let globPerc = relPerc;
-                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${functionIcon(funcao)}</span>${tr(funcao)}</div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
+                    const fracFuncao = globalTotal > 0 ? totalMatchesFuncao / globalTotal : 0;
+                    const stats = arvoreBanco
+                        ? statsHtml(0, 0, genomasDasEspecies(Object.values(gruposNessaFuncao).flatMap(d => d.especies.map(e => e.especie))), totalFuncional(f => f === funcao))
+                        : statsHtml(fracFuncao, fracFuncao);
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${functionIcon(funcao)}</span>${tr(funcao)}</div><div class="taxon-stats">${stats}</div>`;
                     
                     if (totalMatchesFuncao > 0) {
                         li.onclick = () => {
-                            renderFunctionalGroups(gruposNessaFuncao, totalMatchesFuncao, browser);
+                            renderFunctionalGroups(gruposNessaFuncao, totalMatchesFuncao, browser, funcao);
                             Array.from(ul1.children).forEach(c => c.classList.remove('active'));
                             li.classList.add('active');
                             document.getElementById('species-card').style.display = 'none';
@@ -1255,10 +1326,12 @@
 
                     const li = document.createElement('li');
                     li.className = 'silva-item';
-                    let relPerc = globalTotal > 0 ? formatPercent(totalMatchesTamanho / globalTotal) : "0.0%";
-                    let globPerc = relPerc;
-                    
-                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${sizeIcon(tamanho)}</span>${tr(tamanho)}</div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
+                    const fracTamanho = globalTotal > 0 ? totalMatchesTamanho / globalTotal : 0;
+                    const stats = arvoreBanco
+                        ? statsHtml(0, 0, genomasDasEspecies(gruposPorTamanho[tamanho].flatMap(g => g.especies.map(e => e.especie))), totalFuncional((f, g, tam) => tam === tamanho))
+                        : statsHtml(fracTamanho, fracTamanho);
+
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${sizeIcon(tamanho)}</span>${tr(tamanho)}</div><div class="taxon-stats">${stats}</div>`;
                     
                     li.onclick = () => {
                         renderTamanhoGroups(gruposPorTamanho[tamanho], totalMatchesTamanho, browser);
@@ -1276,7 +1349,7 @@
             renderPieChart(labelsFunc, dataFunc);
         }
 
-        function renderFunctionalGroups(gruposData, parentMatches, browserRef) {
+        function renderFunctionalGroups(gruposData, parentMatches, browserRef, funcao) {
             while (browserRef.children.length > 1) { browserRef.removeChild(browserRef.lastChild); }
             
             const col2 = document.createElement('div');
@@ -1292,9 +1365,10 @@
 
                 const li = document.createElement('li');
                 li.className = 'silva-item';
-                let relPerc = parentMatches > 0 ? formatPercent(totalMatchesGrupo / parentMatches) : "0.0%";
-                let globPerc = globalTotal > 0 ? formatPercent(totalMatchesGrupo / globalTotal) : "0.0%";
-                li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${groupIcon(grupo)}</span>${tr(grupo)}</div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
+                const stats = arvoreBanco
+                    ? statsHtml(0, 0, genomasDasEspecies(especiesData.map(e => e.especie)), totalFuncional((f, g) => f === funcao && g === grupo))
+                    : statsHtml(parentMatches > 0 ? totalMatchesGrupo / parentMatches : 0, globalTotal > 0 ? totalMatchesGrupo / globalTotal : 0);
+                li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${groupIcon(grupo)}</span>${tr(grupo)}</div><div class="taxon-stats">${stats}</div>`;
                 
                 li.onclick = () => {
                      renderFunctionalSpecies(especiesData, totalMatchesGrupo, browserRef);
@@ -1321,9 +1395,10 @@
             listaGrupos.sort((a,b) => b.matches - a.matches).forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'silva-item';
-                let relPerc = parentMatches > 0 ? formatPercent(item.matches / parentMatches) : "0.0%";
-                let globPerc = globalTotal > 0 ? formatPercent(item.matches / globalTotal) : "0.0%";
-                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;"><span class="icon-badge">${groupIcon(item.grupo)}</span>${tr(item.grupo)}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal; margin-left:34px;">${functionIcon(item.funcao)} ${tr(item.funcao)}</span></div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
+                const stats = arvoreBanco
+                    ? statsHtml(0, 0, genomasDasEspecies(item.especies.map(e => e.especie)), totalFuncional((f, g) => f === item.funcao && g === item.grupo))
+                    : statsHtml(parentMatches > 0 ? item.matches / parentMatches : 0, globalTotal > 0 ? item.matches / globalTotal : 0);
+                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;"><span class="icon-badge">${groupIcon(item.grupo)}</span>${tr(item.grupo)}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal; margin-left:34px;">${functionIcon(item.funcao)} ${tr(item.funcao)}</span></div><div class="taxon-stats">${stats}</div>`;
 
                 li.onclick = () => {
                      renderFunctionalSpecies(item.especies, item.matches, browserRef);
@@ -1359,9 +1434,10 @@
             listaFinal.sort((a,b) => b.matches - a.matches).forEach(esp => {
                 const li = document.createElement('li');
                 li.className = 'silva-item';
-                let relPerc = parentMatches > 0 ? formatPercent(esp.matches / parentMatches) : "0.0%";
-                let globPerc = globalTotal > 0 ? formatPercent(esp.matches / globalTotal) : "0.0%";
-                li.innerHTML = `<div class="taxon-name"><span style="color:#d97706; margin-right:5px;">🦠</span>${esp.especie}</div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
+                const stats = arvoreBanco
+                    ? statsHtml(0, 0, genomasDasEspecies([esp.especie]), arvoreBanco.taxons[esp.especie])
+                    : statsHtml(parentMatches > 0 ? esp.matches / parentMatches : 0, globalTotal > 0 ? esp.matches / globalTotal : 0);
+                li.innerHTML = `<div class="taxon-name"><span style="color:#d97706; margin-right:5px;">🦠</span>${esp.especie}</div><div class="taxon-stats">${stats}</div>`;
                 
                 li.onclick = () => {
                      showSpeciesCard(esp.especie); 
@@ -1790,6 +1866,7 @@
             // nada -- só pra relatórios de antes do campo metadata.database
             // existir que a seção fica indisponível (ver carregarCoberturaPorGrupo).
             carregarCoberturaPorGrupo(data, leafMetadata);
+            carregarArvoreDoBanco(data);
 
             renderBrowser();
             updateChart(fullData);
