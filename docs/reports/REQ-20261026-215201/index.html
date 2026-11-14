@@ -901,6 +901,11 @@
         function showGroupIllustration(nome) {
             currentGroupName = nome;
             document.getElementById('species-card').style.display = 'none';
+            // Grupos de "Função Indefinida" (ex.: "Não Classificado") não têm ilustração.
+            if (functionalData && functionalData['Função Indefinida'] && functionalData['Função Indefinida'][nome]) {
+                document.getElementById('group-illustration-box').style.display = 'none';
+                return;
+            }
             document.getElementById('group-illustration-img').src = GROUP_ILLUSTRATIONS[nome] || placeholderIllustration(nome, groupIcon(nome));
             document.getElementById('group-illustration-caption').textContent = tr(nome);
             const credito = GROUP_ILLUSTRATION_CREDITS[nome];
