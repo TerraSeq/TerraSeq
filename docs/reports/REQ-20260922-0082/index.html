@@ -478,7 +478,6 @@
                 "side.pesquisador": "Pesquisador",
                 "side.marcadores": "Marcadores (5' → 3')",
                 "legenda.taxa": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-cor cinza'></span><span>Percentual dos acertos do grupo selecionado na coluna à esquerda</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Percentual de todos os acertos desta análise</span></div>",
-                "legenda.func": "<div class='leg-titulo'>Legenda</div><div class='leg-item'><span class='leg-cor verde'></span><span>Primeira coluna: percentual de todos os acertos desta análise</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Demais colunas: percentual dos acertos do item selecionado à esquerda</span></div>",
                 "side.parNome": "Par de Primers",
                 "side.fwd": "Primer Forward",
                 "side.rev": "Primer Reverse",
@@ -584,7 +583,6 @@
                 "side.pesquisador": "Researcher",
                 "side.marcadores": "Markers (5' → 3')",
                 "legenda.taxa": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-cor cinza'></span><span>Share of the hits of the group selected in the column to the left</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Share of all hits in this analysis</span></div>",
-                "legenda.func": "<div class='leg-titulo'>Legend</div><div class='leg-item'><span class='leg-cor verde'></span><span>First column: share of all hits in this analysis</span></div><div class='leg-item'><span class='leg-cor verde'></span><span>Other columns: share of the hits of the item selected on the left</span></div>",
                 "side.parNome": "Primer Pair",
                 "side.fwd": "Forward Primer",
                 "side.rev": "Reverse Primer",
@@ -1102,7 +1100,7 @@
                 browserFunc.style.display = 'flex';
                 viewToggles.style.display = 'flex';            
                 document.getElementById('chart-title').innerHTML = currentFuncView === 'via1' ? t('js.papeisEcologicos') : t('js.gruposBiologicos');
-                definirLegendaArvore('legenda.func');
+                definirLegendaArvore('legenda.taxa');
                 renderFunctionalBrowser(); 
             }
         }
@@ -1209,8 +1207,9 @@
                     li.className = 'silva-item';
                     if (totalMatchesFuncao === 0) li.classList.add('empty');
                     
-                    let globPerc = globalTotal > 0 ? formatPercent(totalMatchesFuncao / globalTotal) : "0.0%";
-                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${functionIcon(funcao)}</span>${tr(funcao)}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    let relPerc = globalTotal > 0 ? formatPercent(totalMatchesFuncao / globalTotal) : "0.0%";
+                    let globPerc = relPerc;
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${functionIcon(funcao)}</span>${tr(funcao)}</div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     if (totalMatchesFuncao > 0) {
                         li.onclick = () => {
@@ -1256,9 +1255,10 @@
 
                     const li = document.createElement('li');
                     li.className = 'silva-item';
-                    let globPerc = globalTotal > 0 ? formatPercent(totalMatchesTamanho / globalTotal) : "0.0%";
+                    let relPerc = globalTotal > 0 ? formatPercent(totalMatchesTamanho / globalTotal) : "0.0%";
+                    let globPerc = relPerc;
                     
-                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${sizeIcon(tamanho)}</span>${tr(tamanho)}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                    li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${sizeIcon(tamanho)}</span>${tr(tamanho)}</div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
                     
                     li.onclick = () => {
                         renderTamanhoGroups(gruposPorTamanho[tamanho], totalMatchesTamanho, browser);
@@ -1292,8 +1292,9 @@
 
                 const li = document.createElement('li');
                 li.className = 'silva-item';
-                let globPerc = parentMatches > 0 ? formatPercent(totalMatchesGrupo / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${groupIcon(grupo)}</span>${tr(grupo)}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                let relPerc = parentMatches > 0 ? formatPercent(totalMatchesGrupo / parentMatches) : "0.0%";
+                let globPerc = globalTotal > 0 ? formatPercent(totalMatchesGrupo / globalTotal) : "0.0%";
+                li.innerHTML = `<div class="taxon-name"><span class="icon-badge">${groupIcon(grupo)}</span>${tr(grupo)}</div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
                 
                 li.onclick = () => {
                      renderFunctionalSpecies(especiesData, totalMatchesGrupo, browserRef);
@@ -1320,8 +1321,9 @@
             listaGrupos.sort((a,b) => b.matches - a.matches).forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'silva-item';
-                let globPerc = parentMatches > 0 ? formatPercent(item.matches / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;"><span class="icon-badge">${groupIcon(item.grupo)}</span>${tr(item.grupo)}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal; margin-left:34px;">${functionIcon(item.funcao)} ${tr(item.funcao)}</span></div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                let relPerc = parentMatches > 0 ? formatPercent(item.matches / parentMatches) : "0.0%";
+                let globPerc = globalTotal > 0 ? formatPercent(item.matches / globalTotal) : "0.0%";
+                li.innerHTML = `<div class="taxon-name" style="line-height:1.2;"><span class="icon-badge">${groupIcon(item.grupo)}</span>${tr(item.grupo)}<br><span style="font-size:0.75em; color:var(--text-light); font-weight:normal; margin-left:34px;">${functionIcon(item.funcao)} ${tr(item.funcao)}</span></div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
 
                 li.onclick = () => {
                      renderFunctionalSpecies(item.especies, item.matches, browserRef);
@@ -1357,8 +1359,9 @@
             listaFinal.sort((a,b) => b.matches - a.matches).forEach(esp => {
                 const li = document.createElement('li');
                 li.className = 'silva-item';
-                let globPerc = parentMatches > 0 ? formatPercent(esp.matches / parentMatches) : "0.0%";
-                li.innerHTML = `<div class="taxon-name"><span style="color:#d97706; margin-right:5px;">🦠</span>${esp.especie}</div><div class="taxon-stats"><span class="stat-glob">(${globPerc})</span></div>`;
+                let relPerc = parentMatches > 0 ? formatPercent(esp.matches / parentMatches) : "0.0%";
+                let globPerc = globalTotal > 0 ? formatPercent(esp.matches / globalTotal) : "0.0%";
+                li.innerHTML = `<div class="taxon-name"><span style="color:#d97706; margin-right:5px;">🦠</span>${esp.especie}</div><div class="taxon-stats"><span class="stat-rel">${relPerc}</span><span class="stat-glob">(${globPerc})</span></div>`;
                 
                 li.onclick = () => {
                      showSpeciesCard(esp.especie); 
