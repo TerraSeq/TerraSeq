@@ -468,9 +468,9 @@ def atualizar_vitrine_html(req, req_id, resultado_json=None):
                         <td>{nome_par}</td>
                         <td>{alvo}</td>
                         <td>{banco}</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> {fwd}<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> {rev}
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> {fwd}<br>
+                            <span class="rotulo-fita">R:</span> {rev}
                         </td>
                         <td>{amplicon_display}</td>
                         <td>{data_hoje_br}</td>
@@ -481,8 +481,7 @@ def atualizar_vitrine_html(req, req_id, resultado_json=None):
                         </td>
                         <td>
                             <a href="reports/{req_id}/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>

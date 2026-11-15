@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("idioma-alterado", aplicarFiltro);
 
     const avisoVazio = document.getElementById("results-empty");
-    if (avisoVazio) avisoVazio.style.display = rows.length === 0 ? "" : "none";
+    if (avisoVazio) avisoVazio.hidden = rows.length !== 0;
 
     if (rows.length > 0) {
         // Rankeia inicialmente pelos maiores amplicons

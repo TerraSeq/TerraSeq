@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         if (bancoAberto) {
+            mostrarCredito(bancoAberto);
             painelContagem.textContent = `${bancoAberto.genomas.toLocaleString(localeAtual())} ${t('acervo.genomasLabel')}`;
             renderLista(organismosAtuais.filter(n => n.toLowerCase().includes(buscaEl.value.toLowerCase().trim())));
         }
@@ -159,14 +160,18 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll(".banco-chip").forEach(c => c.classList.toggle("active", c.dataset.id === banco.id));
         bancoAberto = banco;
         painelNome.textContent = banco.nome;
-        const credito = creditoImagem(banco.id);
-        document.getElementById("painel-credito").innerHTML = credito ? `📷 ${t('acervo.foto')}: ${creditoImagemHtml(banco.id)}` : "";
+        mostrarCredito(banco);
         painelContagem.textContent = `${banco.genomas.toLocaleString(localeAtual())} ${t('acervo.genomasLabel')}`;
         organismosAtuais = banco.organismos || [];
         buscaEl.value = "";
         renderLista(organismosAtuais);
         painel.classList.add("aberto");
         painel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function mostrarCredito(banco) {
+        const temCredito = creditoImagem(banco.id) !== "";
+        document.getElementById("painel-credito").innerHTML = temCredito ? `📷 ${t('acervo.foto')}: ${creditoImagemHtml(banco.id)}` : "";
     }
 
     function renderLista(itens) {

@@ -6,13 +6,13 @@
     <title>TerraSeq | Primer Validation</title>
     <link rel="icon" type="image/png" href="imagens/favicon.png">
     <link rel="apple-touch-icon" href="imagens/apple-touch-icon.png">
-    <link rel="stylesheet" href="css/vitrine.css?v=2.0">
+    <link rel="stylesheet" href="css/vitrine.css?v=2.1">
 </head>
 <body>
 
     <nav>
-        <a href="#inicio" style="display:flex; align-items:center; text-decoration:none;">
-            <img src="imagens/Logo2.png" alt="TerraSeq" style="max-height: 100px; width:auto; display:block; filter: brightness(1.05);">
+        <a href="#inicio" class="logo-link">
+            <img src="imagens/Logo2.png" alt="TerraSeq" class="logo-cabecalho">
         </a>
         <ul>
             <li><a href="#inicio" data-i18n="nav.inicio">Home</a></li>
@@ -69,8 +69,8 @@
 
         <div id="painel-banco">
             <div class="painel-header">
-                <div><h3 id="painel-nome">—</h3><small id="painel-credito" style="color:#5b6470; font-size:0.75rem;"></small></div>
-                <div style="display:flex; align-items:center; gap:14px;">
+                <div><h3 id="painel-nome">—</h3><small id="painel-credito"></small></div>
+                <div class="painel-acoes">
                     <span class="contagem-total" id="painel-contagem"></span>
                     <button class="painel-fechar" id="painel-fechar-btn" data-i18n="acervo.fechar">Close ✕</button>
                 </div>
@@ -109,18 +109,18 @@
             </select>
         </div>
 
-        <div style="overflow-x: auto;" class="tabela-arrastavel" id="tabela-scroll">
+        <div class="tabela-scroll tabela-arrastavel" id="tabela-scroll">
             <table class="results-table">
                 <colgroup>
-                    <col style="width:190px">
-                    <col style="width:110px">
-                    <col style="width:110px">
-                    <col style="width:260px">
-                    <col style="width:110px">
-                    <col style="width:80px">
-                    <col style="width:80px">
-                    <col style="width:130px">
-                    <col style="width:150px">
+                    <col class="col-nome">
+                    <col class="col-alvo">
+                    <col class="col-banco">
+                    <col class="col-primers">
+                    <col class="col-amplicon">
+                    <col class="col-data">
+                    <col class="col-status">
+                    <col class="col-acao">
+                    <col class="col-id">
                 </colgroup>
                 <thead>
                     <tr>
@@ -142,9 +142,9 @@
                         <td>V4_Brate_F/D9_2741R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGCAAGTCTGGTGCCAG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GCTCAAHARGGTCTTCTT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> GGCAAGTCTGGTGCCAG<br>
+                            <span class="rotulo-fita">R:</span> GCTCAAHARGGTCTTCTT
                         </td>
                         <td>5104 bp</td>
                         <td>21/09/2026</td>
@@ -155,8 +155,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260921-0079/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -167,9 +166,9 @@
                         <td>V4_Brate_F/D9_2593R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGCAAGTCTGGTGCCAG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GAGAGTCATAGTTACBYC
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> GGCAAGTCTGGTGCCAG<br>
+                            <span class="rotulo-fita">R:</span> GAGAGTCATAGTTACBYC
                         </td>
                         <td>5015 bp</td>
                         <td>21/09/2026</td>
@@ -180,8 +179,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260921-0076/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -192,9 +190,9 @@
                         <td>V4_Balzano_F/D9_2742R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> AGCTYAAHAGGGTCTTCT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span class="rotulo-fita">R:</span> AGCTYAAHAGGGTCTTCT
                         </td>
                         <td>5077 bp</td>
                         <td>21/09/2026</td>
@@ -205,8 +203,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260921-0072/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -217,9 +214,9 @@
                         <td>V4_Balzano_F/D9_2593R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GAGAGTCATAGTTACBYC
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span class="rotulo-fita">R:</span> GAGAGTCATAGTTACBYC
                         </td>
                         <td>4990 bp</td>
                         <td>21/09/2026</td>
@@ -230,8 +227,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260921-0075/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -242,9 +238,9 @@
                         <td>V4_Balzano_F/22R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCATTCATGCRCGTCACWART
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span class="rotulo-fita">R:</span> CCATTCATGCRCGTCACWART
                         </td>
                         <td>5039 bp</td>
                         <td>21/09/2026</td>
@@ -255,8 +251,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260921-0078/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -267,9 +262,9 @@
                         <td>V4_Balzano_F/21R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GACGAGGCATTTGGCTACCTT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span class="rotulo-fita">R:</span> GACGAGGCATTTGGCTACCTT
                         </td>
                         <td>4886 bp</td>
                         <td>21/09/2026</td>
@@ -280,8 +275,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260921-0073/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -292,9 +286,9 @@
                         <td>3NDf/21R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGCAAGTCTGGTGCCAG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GACGAGGCATTTGGCTACCTT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> GGCAAGTCTGGTGCCAG<br>
+                            <span class="rotulo-fita">R:</span> GACGAGGCATTTGGCTACCTT
                         </td>
                         <td>4898 bp</td>
                         <td>21/09/2026</td>
@@ -305,8 +299,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260921-0081/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -317,9 +310,9 @@
                         <td>V4_Hugerth_F/D11_3143R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CGGTAAYTCCAGCTCYAV<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> CGGTAAYTCCAGCTCYAV<br>
+                            <span class="rotulo-fita">R:</span> RCCACAAGCYARTTATCC
                         </td>
                         <td>5455 bp</td>
                         <td>22/09/2026</td>
@@ -330,8 +323,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260922-0085/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -342,9 +334,9 @@
                         <td>V4_Brate_F/D11_3143R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGCAAGTCTGGTGCCAG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> GGCAAGTCTGGTGCCAG<br>
+                            <span class="rotulo-fita">R:</span> RCCACAAGCYARTTATCC
                         </td>
                         <td>5459 bp</td>
                         <td>22/09/2026</td>
@@ -355,8 +347,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260922-0082/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -367,9 +358,9 @@
                         <td>V4_Brate_F/22R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> GGCAAGTCTGGTGCCAG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CCATTCATGCRCGTCACWART
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> GGCAAGTCTGGTGCCAG<br>
+                            <span class="rotulo-fita">R:</span> CCATTCATGCRCGTCACWART
                         </td>
                         <td>5059 bp</td>
                         <td>22/09/2026</td>
@@ -380,8 +371,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260922-0083/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -392,9 +382,9 @@
                         <td>V4_Balzano_F/D11_3143R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> CCAGCASCYGCGGTAATTCC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> CCAGCASCYGCGGTAATTCC<br>
+                            <span class="rotulo-fita">R:</span> RCCACAAGCYARTTATCC
                         </td>
                         <td>5450 bp</td>
                         <td>24/09/2026</td>
@@ -405,8 +395,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20260921-114311/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -424,9 +413,9 @@
                         <td>V6-V8_new_F/D11_3143R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> AATTYGAHTCAACRCGGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> RCCACAAGCYARTTATCC
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> AATTYGAHTCAACRCGGG<br>
+                            <span class="rotulo-fita">R:</span> RCCACAAGCYARTTATCC
                         </td>
                         <td>4957 bp</td>
                         <td>23/10/2026</td>
@@ -437,8 +426,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20261023-210435/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -450,9 +438,9 @@
                         <td>V6-V8_new_F/D9_2593R</td>
                         <td>18S-ITS-28S</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> AATTYGAHTCAACRCGGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> GAGAGTCATAGTTACBYC
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> AATTYGAHTCAACRCGGG<br>
+                            <span class="rotulo-fita">R:</span> GAGAGTCATAGTTACBYC
                         </td>
                         <td>4449 bp</td>
                         <td>23/10/2026</td>
@@ -463,8 +451,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20261023-214749/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -477,9 +464,9 @@
                         <td>ITS1/ITS4</td>
                         <td>18S-ITS-28S</td>
                         <td>Fungi</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> TCCGTAGGTGAACCTGCGG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TCCTCCGCTTATTGATATGC
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> TCCGTAGGTGAACCTGCGG<br>
+                            <span class="rotulo-fita">R:</span> TCCTCCGCTTATTGATATGC
                         </td>
                         <td>628 bp</td>
                         <td>26/10/2026</td>
@@ -490,8 +477,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20261026-104830/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -503,9 +489,9 @@
                         <td>27F/1492R</td>
                         <td>16S</td>
                         <td>procariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> AGAGTTTGATCMTGGCTCAG<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> CGGTTACCTTGTTACGACTT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> AGAGTTTGATCMTGGCTCAG<br>
+                            <span class="rotulo-fita">R:</span> CGGTTACCTTGTTACGACTT
                         </td>
                         <td>1481 bp</td>
                         <td>26/10/2026</td>
@@ -516,8 +502,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20261026-182546/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -529,9 +514,9 @@
                         <td>Arch21F/Arch1492R</td>
                         <td>16S</td>
                         <td>procariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> TTCCGGTTGATCCTGCCGGA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TACGGWTACCTTGTTACGACTT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> TTCCGGTTGATCCTGCCGGA<br>
+                            <span class="rotulo-fita">R:</span> TACGGWTACCTTGTTACGACTT
                         </td>
                         <td>1449 bp</td>
                         <td>26/10/2026</td>
@@ -542,8 +527,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20261026-182711/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -555,9 +539,9 @@
                         <td>Arch21F/Arch1492R</td>
                         <td>16S</td>
                         <td>archaea</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> TTCCGGTTGATCCTGCCGGA<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TACGGWTACCTTGTTACGACTT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> TTCCGGTTGATCCTGCCGGA<br>
+                            <span class="rotulo-fita">R:</span> TACGGWTACCTTGTTACGACTT
                         </td>
                         <td>1449 bp</td>
                         <td>26/10/2026</td>
@@ -568,8 +552,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20261026-191323/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -581,9 +564,9 @@
                         <td>LR0R/LR7</td>
                         <td>LSU</td>
                         <td>eucariotos</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> ACCCGCTGAACTTAAGC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TACTACCACCAAGATCT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> ACCCGCTGAACTTAAGC<br>
+                            <span class="rotulo-fita">R:</span> TACTACCACCAAGATCT
                         </td>
                         <td>1478 bp</td>
                         <td>26/10/2026</td>
@@ -594,8 +577,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20261026-193550/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -607,9 +589,9 @@
                         <td>LR0R/LR7</td>
                         <td>LSU</td>
                         <td>Fungi</td>
-                        <td style="font-family: monospace; color: var(--primary-color); line-height: 1.5;">
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">F:</span> ACCCGCTGAACTTAAGC<br>
-                            <span style="color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif;">R:</span> TACTACCACCAAGATCT
+                        <td class="celula-primers">
+                            <span class="rotulo-fita">F:</span> ACCCGCTGAACTTAAGC<br>
+                            <span class="rotulo-fita">R:</span> TACTACCACCAAGATCT
                         </td>
                         <td>1449 bp</td>
                         <td>26/10/2026</td>
@@ -620,8 +602,7 @@
                         </td>
                         <td>
                             <a href="reports/REQ-20261026-215201/"
-                               class="btn btn-primary"
-                               style="padding: 6px 12px; font-size: 0.85em;">
+                               class="btn btn-primary btn-relatorio">
                                View Report
                             </a>
                         </td>
@@ -634,7 +615,7 @@
             </table>
         </div>
 
-        <p id="results-empty" data-i18n="resultados.vazio" style="display:none; text-align:center; color:#666; font-style:italic; margin:30px 0;">No analyses published yet. New reports will appear here as soon as they are completed.</p>
+        <p id="results-empty" class="resultados-vazio" data-i18n="resultados.vazio" hidden>No analyses published yet. New reports will appear here as soon as they are completed.</p>
 
         <div class="pagination-bar" id="pagination-container">
             <!-- Os botões serão inseridos pelo JavaScript -->
@@ -642,13 +623,13 @@
     </section>
 
     <!-- Nova Seção: Equipe & Sobre -->
-    <section class="container" id="sobre" style="margin-top: 40px;">
+    <section class="container" id="sobre">
         <div class="center-text">
             <h2 class="section-title" data-i18n="sobre.titulo">About the Project</h2>
             <p data-i18n="sobre.intro">Meet the research team and the institutions that support the platform.</p>
         </div>
 
-        <h3 style="color: var(--primary-color); text-align: center; margin-top: 20px;" data-i18n="sobre.nossaEquipe">Our Team</h3>
+        <h3 class="titulo-secao titulo-secao-inicial" data-i18n="sobre.nossaEquipe">Our Team</h3>
         <div class="sobre-grid">
             
             <div class="equipe-card">
@@ -720,11 +701,11 @@
 
         </div>
 
-        <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;" data-i18n="sobre.institEnvolvidas">Institutions Involved</h3>
+        <h3 class="titulo-secao" data-i18n="sobre.institEnvolvidas">Institutions Involved</h3>
         <div class="sobre-grid">
             <div class="inst-box">
                 <h4 data-i18n="sobre.institExecutora">Lead Institution</h4>
-                <p style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">Universidade Federal do Espírito Santo - UFES</p>
+                <p class="instituicao-nome">Universidade Federal do Espírito Santo - UFES</p>
             </div>
 
             <div class="inst-box">
@@ -747,7 +728,7 @@
             </div>
         </div>
 
-        <h3 style="color: var(--primary-color); text-align: center; margin-top: 40px;" data-i18n="sobre.agenciasFomento">Funding Agencies (Support)</h3>
+        <h3 class="titulo-secao" data-i18n="sobre.agenciasFomento">Funding Agencies (Support)</h3>
         <div>
             <div class="fomento-card">
                 <div class="fomento-text">
@@ -773,21 +754,21 @@
 
 
     <footer>
-        <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
-            <img src="imagens/Logo3.png" alt="TerraSeq" style="height:22px; width:auto; display:block; opacity:0.95;">
+        <div class="rodape-marca">
+            <img src="imagens/Logo3.png" alt="TerraSeq" class="rodape-logo">
             <span><strong>TerraSeq</strong></span>
-            <span style="margin-left:2px;">- <em>In silico</em> primer optimization for Earth biodiversity assessment</span>
+            <span class="rodape-slogan">- <em>In silico</em> primer optimization for Earth biodiversity assessment</span>
         </div>
         <small>© 2026 Developed by the TerraSeq Team</small>
     </footer>
 
     <!-- JavaScript da vitrine, nesta ordem (scripts comuns, não módulos: cada
          arquivo usa as funções dos anteriores, como t() e localeAtual()). -->
-    <script src="js/vitrine/traducoes.js?v=2.0"></script>
-    <script src="js/vitrine/idioma.js?v=2.0"></script>
-    <script src="js/vitrine/tabela-resultados.js?v=2.0"></script>
-    <script src="js/vitrine/creditos-imagens.js?v=2.0"></script>
-    <script src="js/vitrine/acervo.js?v=2.0"></script>
+    <script src="js/vitrine/traducoes.js?v=2.1"></script>
+    <script src="js/vitrine/idioma.js?v=2.1"></script>
+    <script src="js/vitrine/tabela-resultados.js?v=2.1"></script>
+    <script src="js/vitrine/creditos-imagens.js?v=2.1"></script>
+    <script src="js/vitrine/acervo.js?v=2.1"></script>
 
 </body>
 </html>
