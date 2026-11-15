@@ -25,6 +25,7 @@ from unittest import mock
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 import arvore_taxonomica  # noqa: E402
+import bancos  # noqa: E402
 import pipeline  # noqa: E402
 
 PEDIDO = {
@@ -91,6 +92,7 @@ class TestRunPipeline(unittest.TestCase):
         with mock.patch.object(pipeline.subprocess, "run", side_effect=registrar), \
              mock.patch.object(pipeline, "taxonomia_local", tax), \
              mock.patch.object(arvore_taxonomica, "taxonomia_local", tax), \
+             mock.patch.object(bancos, "taxonomia_local", tax), \
              contextlib.redirect_stdout(io.StringIO()) as log:
             cls.caminho, cls.resultado = pipeline.run_pipeline(dict(PEDIDO), cls.req_id, origem="TESTE")
         cls.log = log.getvalue()
