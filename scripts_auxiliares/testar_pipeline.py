@@ -161,9 +161,8 @@ def conferir_opcoes_do_formulario(m):
     """Toda opção dos menus do formulário precisa virar um banco/tipo válido no código."""
     print("\n🔎 Conferindo as opções dos menus do formulário × código ...")
     erros = 0
-    fonte = open(os.path.join(RAIZ, "src", "pipeline.py"), encoding="utf-8").read()
-    bloco = fonte[fonte.index("BANCOS_DISPONIVEIS = {"):fonte.index("BANCOS_GRUPOS = {")]
-    chaves = set(re.findall(r'^\s*"(\w+)":\s*\(', bloco, re.M))
+    import bancos
+    chaves = bancos.nomes()
     oferecidos = set()
     for opcao in opcoes_dropdown("banco_dados"):
         req = m.parse_issue_body(f"### Database\n\n{opcao}")
