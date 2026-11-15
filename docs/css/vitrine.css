@@ -1,0 +1,556 @@
+/* Estilos da vitrine (docs/index.html).
+   Separado do HTML na reorganização 2.0; o conteúdo é o mesmo da versão 1.0. */
+
+:root {
+    --primary-color: #0f4c75;
+    --secondary-color: #3282b8;
+    --accent-color: #bbe1fa;
+    --bg-color: #f8f9fa;
+    --text-color: #2b2b2b;
+}
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+nav { background-color: var(--primary-color); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 12px; }
+nav h2 { margin: 0; font-weight: 600; font-size: 1.5rem; letter-spacing: 1px; }
+nav ul { list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; flex-wrap: wrap; align-items: center; }
+nav a { color: var(--accent-color); text-decoration: none; font-weight: 500; transition: 0.3s; }
+nav a:hover { color: white; }
+.lang-toggle { display: inline-flex; border: 1px solid rgba(255,255,255,0.35); border-radius: 20px; padding: 3px; background: rgba(255,255,255,0.08); }
+.lang-toggle button { border: none; background: transparent; color: var(--accent-color); font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.4px; padding: 5px 13px; border-radius: 16px; cursor: pointer; transition: 0.2s; }
+.lang-toggle button.active { background: white; color: var(--primary-color); }
+.lang-toggle button:hover:not(.active) { color: white; }
+.brand-logo { display: flex; align-items: center; height: 44px; overflow: hidden; }
+.brand-logo img { height: 44px; width: auto; max-width: 220px; object-fit: contain; display: block; filter: brightness(1.05); transform: scale(1.2); transform-origin: left center; }
+.hero { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; text-align: center; padding: 60px 20px; }
+.hero h1 { font-size: 2.8rem; margin-bottom: 10px; }
+.hero p { font-size: 1.2rem; max-width: 800px; margin: 0 auto 30px auto; opacity: 0.9; }
+.container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+.section-title { text-align: center; color: var(--primary-color); font-size: 2rem; margin-bottom: 40px; border-bottom: 3px solid var(--secondary-color); display: inline-block; padding-bottom: 10px; }
+.center-text { text-align: center; }
+.submission-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 20px; }
+.card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center; transition: transform 0.3s; border-top: 5px solid var(--secondary-color); }
+.card:hover { transform: translateY(-5px); }
+.card h3 { color: var(--primary-color); font-size: 1.5rem; }
+.card p { color: #666; margin-bottom: 25px; }
+.btn { display: inline-block; padding: 12px 25px; border-radius: 6px; font-weight: 600; text-decoration: none; transition: 0.3s; }
+.btn-primary { background-color: var(--secondary-color); color: white; }
+.btn-primary:hover { background-color: var(--primary-color); }
+.btn-outline { border: 2px solid var(--secondary-color); color: var(--secondary-color); }
+.btn-outline:hover { background-color: var(--secondary-color); color: white; }
+.results-table { width: 100%; min-width: 1220px; table-layout: fixed; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 20px; }
+.results-table th, .results-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; overflow-wrap: break-word; }
+.results-table th { background-color: var(--primary-color); color: white; font-weight: 600; position: relative; }
+.results-table tr:hover { background-color: #f1f7fa; }
+
+/* Alça de redimensionar coluna (arrasta a borda direita do th) */
+.col-resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 100%;
+    cursor: col-resize;
+    user-select: none;
+    touch-action: none;
+}
+.col-resizer:hover, .col-resizer.resizing {
+    background: rgba(255,255,255,0.35);
+}
+.results-table th.resizing-active {
+    cursor: col-resize;
+}
+.status-badge { background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
+footer { background: #222; color: #aaa; text-align: center; padding: 30px 20px; margin-top: 40px; font-size: 0.9em; }
+
+/* Estilos da Nova Aba 'Sobre' - Estilo SILVA/DSMZ */
+.sobre-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 30px;}
+
+.equipe-card { 
+    display: flex; 
+    background: white; 
+    border-radius: 4px; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    border: 1px solid #ddd;
+    overflow: hidden;
+    height: 140px;
+    position: relative;
+}
+
+.equipe-info {
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.equipe-info h4 { color: var(--primary-color); margin: 0 0 5px 0; font-size: 1.1rem;}
+.equipe-info p.cargo { color: #555; font-size: 0.85rem; margin: 0;}
+.equipe-info p.data { color: #999; font-size: 0.8rem; font-style: italic; margin: 2px 0 10px 0;}
+.equipe-info a.perfil-link { color: var(--secondary-color); font-size: 0.85rem; text-decoration: none; font-weight: 600;}
+.equipe-info a.perfil-link:hover { text-decoration: underline;}
+
+.equipe-foto-container {
+    width: 120px;
+    height: 100%;
+    position: relative;
+    background-color: #eee;
+    clip-path: polygon(25% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.equipe-foto-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.no-photo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: #ddd;
+    color: #888;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+.no-photo svg {
+    width: 50px;
+    height: 50px;
+    fill: #aaa;
+    margin-bottom: 5px;
+}
+.inst-box { background: white; padding: 25px; border-radius: 8px; border: 1px solid #eee; text-align: center;}
+.inst-box h4 { color: var(--secondary-color); margin-top: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;}
+
+/* Estilos para o alinhamento das Instituições e Logos */
+.colab-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    margin-top: 15px;
+    gap: 10px;
+}
+.colab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.colab-item p {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+}
+.inst-logo {
+    max-width: 130px;
+    max-height: 70px;
+    object-fit: contain;
+    margin-top: 5px;
+}
+/* Estilos dos Cards de Fomento (Com suporte a Logo) */
+.fomento-card { 
+    background: #f1f7fa; 
+    padding: 20px; 
+    border-left: 4px solid var(--primary-color); 
+    border-radius: 4px; 
+    margin-bottom: 20px; 
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+.fomento-text {
+    flex: 1;
+}
+.fomento-card h4 { margin: 0 0 10px 0; color: var(--primary-color);}
+.fomento-card p { margin: 5px 0; font-size: 0.95rem; color: #444;}
+
+.fomento-logo {
+    max-width: 140px;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+/* Ajuste para telas pequenas (Celular) */
+@media (max-width: 768px) {
+    .fomento-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .fomento-logo {
+        margin-top: 15px;
+    }
+}
+
+/* Estilos da Faixa de Logos do Rodapé (Logo Banner) */
+/* Estilos do Acordeão (Collapsible) para a seção Sobre */
+.sobre-accordion {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+.sobre-accordion summary {
+    background-color: white;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 18px 25px;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+.sobre-accordion summary::-webkit-details-marker {
+    display: none; 
+}
+.sobre-accordion summary::after {
+    content: '▼';
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    transition: transform 0.3s ease;
+}
+.sobre-accordion[open] summary {
+    border-bottom: 1px solid #ddd;
+    background-color: #f1f7fa;
+}
+.sobre-accordion[open] summary::after {
+    transform: rotate(180deg);
+}
+.accordion-content {
+    padding: 25px;
+    background-color: white;
+}
+
+.footer-logo-banner {
+    background-color: #e5e5e5;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    border-top: 1px solid #d1d5db;
+}
+
+.footer-logo-item {
+    max-width: 140px;
+    max-height: 65px;
+    object-fit: contain;
+    filter: grayscale(100%) opacity(0.7);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.footer-logo-item:hover {
+    filter: grayscale(0%) opacity(1);
+    transform: scale(1.05);
+}
+
+footer { 
+    background: #222; 
+    color: #aaa; 
+    text-align: center; 
+    padding: 20px; 
+    font-size: 0.9em; 
+    margin-top: 0;
+}
+.footer-logos { display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; flex-wrap: wrap;}
+
+/* Estilos da Paginação (Integrado ao visual do site) */
+.pagination-bar {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 0 0 8px 8px;
+    gap: 5px;
+    border-top: 1px solid #eee;
+}
+.page-btn {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid transparent;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: 0.2s;
+}
+.page-btn:hover {
+    background-color: #f1f7fa;
+    border: 1px solid var(--accent-color);
+}
+.page-btn.active {
+    background-color: var(--secondary-color);
+    color: white;
+    border: 1px solid var(--secondary-color);
+}
+.page-btn.arrow {
+    font-size: 1.2rem;
+    padding: 6px 12px;
+}
+.page-info {
+    margin-left: auto;
+    color: #666;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Barra de filtros da tabela de resultados */
+.filter-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+.filter-search {
+    flex: 1 1 260px;
+    padding: 9px 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+}
+.filter-select {
+    padding: 9px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: white;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.filter-clear-btn {
+    padding: 9px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--accent-color);
+    background: white;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.filter-clear-btn:hover {
+    background: #f1f7fa;
+}
+.filter-result-count {
+    width: 100%;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Barra de ferramentas da tabela (Resultados por página) */
+.table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+.page-size-label {
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 600;
+}
+.page-size-select {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: white;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* Cabeçalhos ordenáveis da tabela de resultados */
+.results-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+.results-table th.sortable:hover {
+    background-color: var(--secondary-color);
+}
+.sort-arrow {
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 0.75em;
+    opacity: 0.5;
+}
+.results-table th.sortable.sort-asc .sort-arrow::after { content: "▲"; opacity: 1; }
+.results-table th.sortable.sort-desc .sort-arrow::after { content: "▼"; opacity: 1; }
+.results-table th.sortable:not(.sort-asc):not(.sort-desc) .sort-arrow::after { content: "⇅"; }
+
+/* ---- Acervo de Genomas (carrossel de bancos + busca de organismos) ---- */
+.stat-line {
+    text-align: center;
+    color: var(--secondary-color);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin: 4px 0 40px 0;
+    font-size: 0.95rem;
+}
+.carousel-wrap {
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y;      /* rolagem vertical da pagina continua no celular; o arrasto lateral e nosso */
+    user-select: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%);
+}
+.carousel-track {
+    display: flex;
+    gap: 22px;
+    width: max-content;
+    will-change: transform;    /* movido por JS (iniciarCarrossel): passa sozinho e aceita arrastar */
+    padding: 6px 0 18px 0;
+}
+.carousel-wrap.arrastando { cursor: grabbing; }
+.carousel-wrap.arrastando .banco-chip { pointer-events: none; }
+/* Tabela da vitrine: arrastar com o mouse rola para os lados (no celular ja e nativo). */
+.tabela-arrastavel { cursor: grab; }
+.tabela-arrastavel.arrastando { cursor: grabbing; user-select: none; }
+.banco-chip {
+    flex: 0 0 auto;
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    /* Imagem do grupo (docs/imagens/grupos/<id>.jpg) clareada por cima, so como fundo. */
+    background: linear-gradient(rgba(255,255,255,0.10), rgba(255,255,255,0.10)), var(--fundo, none) center / cover no-repeat, white;
+    border: 2px solid #e3e7ea;
+    box-shadow: 0 10px 20px rgba(15,76,117,0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    text-align: center;
+    padding: 8px;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.banco-chip:hover, .banco-chip:focus-visible {
+    transform: translateY(-4px) scale(1.04);
+    border-color: var(--secondary-color);
+    box-shadow: 0 14px 26px rgba(15,76,117,0.16);
+    outline: none;
+}
+.banco-chip.active {
+    border-color: var(--primary-color);
+    border-width: 3px;
+    box-shadow: 0 0 0 4px var(--accent-color), 0 14px 26px rgba(15,76,117,0.25);
+    transform: scale(1.06);
+}
+/* Imagem quase sem veu: contorno branco garante a leitura do numero e do nome. */
+.banco-chip .contagem, .banco-chip .genomas-label, .banco-chip .rotulo {
+    text-shadow: 0 0 3px #fff, 0 0 6px #fff, 0 0 10px rgba(255,255,255,0.9);
+}
+.banco-chip .genomas-label, .banco-chip .rotulo { color: #2f3a45 !important; }
+.banco-chip .contagem {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+.banco-chip .rotulo {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #5b6470;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.25;
+    max-width: 100px;
+}
+.banco-chip .genomas-label {
+    font-size: 0.62rem;
+    color: #5b6470;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.carousel-hint {
+    text-align: center;
+    color: #5b6470;
+    font-size: 0.85rem;
+    margin-top: -8px;
+    margin-bottom: 8px;
+}
+#painel-banco {
+    margin-top: 28px;
+    background: white;
+    border: 1px solid #e3e7ea;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(15,76,117,0.07);
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.35s ease;
+}
+#painel-banco.aberto { max-height: 640px; opacity: 1; padding: 28px; }
+.painel-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 1px solid #e3e7ea;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+.painel-header h3 { margin: 0; color: var(--primary-color); font-size: 1.4rem; }
+.painel-header .contagem-total { color: var(--secondary-color); font-weight: 700; font-variant-numeric: tabular-nums; }
+.painel-fechar {
+    background: none;
+    border: 1px solid #e3e7ea;
+    color: #5b6470;
+    border-radius: 6px;
+    padding: 5px 11px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.painel-fechar:hover { border-color: var(--secondary-color); color: var(--secondary-color); }
+.busca-organismo {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #e3e7ea;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: var(--bg-color);
+    color: var(--text-color);
+    margin-bottom: 14px;
+}
+.busca-organismo:focus { outline: none; border-color: var(--secondary-color); }
+.lista-organismos {
+    max-height: 340px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 4px 16px;
+}
+.organismo-item { padding: 7px 4px; border-bottom: 1px solid #e3e7ea; font-size: 0.92rem; font-style: italic; }
+.sem-resultado, .aviso-amostra { color: #5b6470; font-size: 0.88rem; padding: 10px 4px; }
+.aviso-amostra {
+    background: var(--bg-color);
+    border: 1px dashed #e3e7ea;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-style: normal;
+}
