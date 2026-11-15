@@ -1,71 +1,31 @@
-import gspread
-from google.oauth2.service_account import Credentials
-import time
-import re
-import json
+"""
+Monitor do formulário: lê os pedidos da planilha do Google Forms
+("Submissoes_Primers_Pipeline") e, para cada pedido novo, roda a análise,
+publica o relatório e avisa o pesquisador por e-mail.
+
+    python3 src/main.py
+
+A análise em si está em pipeline.py (a mesma do main_issues.py); a
+publicação (vitrine, git, e-mail), em publicacao.py.
+"""
 import os
 import shutil
 import subprocess
-from datetime import datetime
-import csv
 import sys
-from Bio import Entrez
-import taxonomia_local
-import notificacoes
-import bloqueios
-import vitrine
-from ecologia import REGRAS_CLASSIFICACAO_ECOLOGICA, FUNCOES_ECOLOGICAS, classificar_ecologia  # noqa: F401
-from arvore_taxonomica import construir_arvore_aninhada, descobrir_rank  # noqa: F401
-import pipeline
-from pipeline import validate_primer, extrair_campo_flexivel, calcular_organismos_nao_capturados  # noqa: F401
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import time
 import traceback
-import resource
-from dotenv import load_dotenv
+from datetime import datetime
 
-# --- CONFIGURAÇÕES INICIAIS ---
+import gspread
+from google.oauth2.service_account import Credentials
 
-# Eleva o limite de arquivos abertos do processo (ulimit -n). O banco
-# "eucariotos" combina dezenas de bancos BLAST numa busca só, e os maiores
-# (bacteria, ascomycota, sar...) são divididos em vários volumes -- a soma
-# de arquivos que o blastn precisa abrir ao mesmo tempo passou do padrão do
-# Linux (1024) depois que os grupos novos foram indexados, causando
-# "BLAST Database error: Cannot memory map ... Number of files opened: 1020".
-# Isso sobe o limite do processo (não precisa de sudo nem mexer no shell),
-# até o teto que o sistema permitir.
-try:
-    limite_atual, limite_maximo = resource.getrlimit(resource.RLIMIT_NOFILE)
-    novo_limite = 65536 if limite_maximo == resource.RLIM_INFINITY else min(65536, limite_maximo)
-    if limite_atual < novo_limite:
-        resource.setrlimit(resource.RLIMIT_NOFILE, (novo_limite, limite_maximo))
-        print(f"🔧 Limite de arquivos abertos elevado de {limite_atual} para {novo_limite}.")
-except (ValueError, OSError) as e:
-    print(f"⚠️ Não foi possível elevar o limite de arquivos abertos automaticamente ({e}).")
-    print("   Se o erro 'Cannot memory map ... .nhr' persistir, rode antes: ulimit -n 65536")
-# Carrega variáveis do arquivo .env (que NÃO é versionado no Git).
-# Veja .env.example para o modelo com as chaves esperadas.
-load_dotenv()
+import bloqueios
+import configuracao
+import notificacoes
+import pipeline
+from publicacao import atualizar_vitrine_html, enviar_email_notificacao, publicar_no_github  # noqa: F401
 
-def _obter_env_obrigatoria(nome):
-    valor = os.environ.get(nome)
-    if not valor:
-        print(f"❌ Erro fatal: variável de ambiente '{nome}' não encontrada.")
-        print("   Verifique se o arquivo .env existe na raiz do projeto e está preenchido.")
-        print("   Use .env.example como modelo.")
-        sys.exit(1)
-    return valor
-
-Entrez.email = _obter_env_obrigatoria("ENTREZ_EMAIL")
-
-SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
-SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
-EMAIL_REMETENTE = _obter_env_obrigatoria("EMAIL_REMETENTE")
-EMAIL_SENHA = _obter_env_obrigatoria("EMAIL_SENHA")
-
-GITHUB_REPO_OWNER = os.environ.get("GITHUB_REPO_OWNER", "TerraSeq")
-GITHUB_REPO_NAME = os.environ.get("GITHUB_REPO_NAME", "pipeline_genoma")
+configuracao.iniciar()
 
 # TERRASEQ_SEM_PLANILHA=1 permite importar este módulo só pra reaproveitar
 # run_pipeline (ex: scripts_auxiliares/reprocessar_relatorios.py) sem conectar
@@ -83,57 +43,6 @@ if not SEM_PLANILHA:
 
     NOME_DA_PLANILHA = os.environ.get("NOME_DA_PLANILHA", "Submissoes_Primers_Pipeline")
     planilha = client.open(NOME_DA_PLANILHA).sheet1
-
-
-def enviar_email_notificacao(email_destino, req_id):
-    link_pages = f"https://{GITHUB_REPO_OWNER}.github.io/{GITHUB_REPO_NAME}/reports/{req_id}/"
-    notificacoes.enviar_email_sucesso(email_destino, req_id, link_pages)
-
-def publicar_no_github(req_id):
-    print("🚀 Iniciando publicação no GitHub Pages...")
-    raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-    try:
-        # Só a lista da vitrine e a pasta DESTE relatório: um "git add docs/" levaria
-        # junto a pasta pela metade de outra análise que está rodando ao mesmo tempo.
-        subprocess.run(["git", "add", vitrine.CAMINHO_VITRINE_GIT, f"docs/reports/{req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
-        subprocess.run(["git", "commit", "-m", f"Report {req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
-        print(f"   ⚠️ Erro ao commitar as mudanças: {e}")
-        return
-
-    try:
-        subprocess.run(["git", "push"], cwd=raiz_projeto, check=True, capture_output=True, text=True)
-        print("   🌐 Relatório pushado com sucesso!")
-        return
-    except subprocess.CalledProcessError:
-        # Push rejeitado (branch remota avançou, ex: outra pessoa ou o
-        # próprio Claude publicando algo direto no main). Tenta sincronizar
-        # sozinho em vez de deixar o relatório preso localmente.
-        print("   ⚠️ Push rejeitado (remoto avançou). Tentando sincronizar automaticamente...")
-
-    try:
-        subprocess.run(["git", "pull", "--no-edit"], cwd=raiz_projeto, check=True, capture_output=True, text=True)
-        subprocess.run(["git", "push"], cwd=raiz_projeto, check=True, capture_output=True, text=True)
-        print("   🌐 Sincronizado com o GitHub e relatório pushado com sucesso!")
-    except subprocess.CalledProcessError as e:
-        print(f"   🔥 Falha ao sincronizar automaticamente com o GitHub (exit code {e.returncode}):")
-        print(e.stdout or "")
-        print(e.stderr or "")
-        print("   ⚠️ O relatório está salvo localmente (commitado), mas precisa de um 'git pull'/merge manual para ir ao ar.")
-        
-        
-def atualizar_vitrine_html(req, req_id, resultado_json=None):
-    """Põe a análise na vitrine do site (docs/dados/vitrine.json).
-
-    O nome ficou da época em que a vitrine era escrita direto no HTML; hoje só
-    repassa para vitrine.adicionar_analise (scripts_auxiliares/rodar_pedidos.py
-    também chama esta função).
-    """
-    try:
-        vitrine.adicionar_analise(req, req_id, resultado_json)
-    except Exception as e:
-        print(f"   ⚠️ Erro ao atualizar vitrine: {e}")
 
 
 def run_pipeline(req, req_id):
@@ -356,7 +265,7 @@ def monitorar_planilha():
                 except Exception as e2:
                     print(f"   ⚠️ Ainda sem conexão ({type(e2).__name__}).")
                 continue
-            print(f"\n🔥 ERRO FATAL DETECTADO NA EXECUÇÃO PRINCIPAL:")
+            print("\n🔥 ERRO FATAL DETECTADO NA EXECUÇÃO PRINCIPAL:")
             traceback.print_exc()
             if isinstance(e, subprocess.CalledProcessError):
                 print("\n📋 SAÍDA DO COMANDO QUE FALHOU (stderr):")

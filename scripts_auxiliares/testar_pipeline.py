@@ -68,9 +68,8 @@ def pedido_formulario(args):
         "Tamanho do amplicon: MIN": 2000,
         "Tamanho do amplicon: MAX": 8000,
         "Máximo de Mismatches na extremidade 3": 3,
-        "E-value máximo": 10.0,
+        "E-value máximo": 10,
         "Cobertura mínima": 70,
-        "Limite de hits": 30000,
         "Temperatura de Melting mínima (Tm)": 0,
     }
 
