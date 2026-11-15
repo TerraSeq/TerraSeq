@@ -15,6 +15,7 @@ import notificacoes
 import bloqueios
 import vitrine
 from ecologia import REGRAS_CLASSIFICACAO_ECOLOGICA, FUNCOES_ECOLOGICAS, classificar_ecologia  # noqa: F401
+from arvore_taxonomica import construir_arvore_aninhada, descobrir_rank  # noqa: F401
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -92,18 +93,6 @@ def enviar_email_notificacao(email_destino, req_id):
     link_pages = f"https://{GITHUB_REPO_OWNER}.github.io/{GITHUB_REPO_NAME}/reports/{req_id}/"
     notificacoes.enviar_email_sucesso(email_destino, req_id, link_pages)
 
-def descobrir_rank(taxa, profundidade, tamanho_total):
-    t = taxa.lower()
-    if t in ["bacteria", "archaea", "eukaryota", "viruses"]: return "domain"
-    if t in ["fungi", "metazoa", "viridiplantae"]: return "kingdom"
-    if t.endswith("ota") or t.endswith("mycota") or t.endswith("phyta"): return "phylum"
-    if (t.endswith("ia") and profundidade < 6) or t.endswith("mycetes") or t.endswith("opsida") or t.endswith("phyceae"): return "class"
-    if t.endswith("ales"): return "order"
-    if t.endswith("aceae") or t.endswith("idae"): return "family"
-    if profundidade == tamanho_total - 1: return "species"
-    if profundidade == tamanho_total - 2: return "genus"
-    return "clade"
-
 def extrair_campo_flexivel(dicionario_linha, palavra_chave, padrao="N/A"):
     """ Busca colunas no CSV ignorando maiúsculas/minúsculas """
     for coluna, valor in dicionario_linha.items():
@@ -153,158 +142,6 @@ def calcular_organismos_nao_capturados(raiz_projeto, grupos_do_banco, especies_c
         aviso = f"Lista de organismos do banco conforme acervo_genomas.json (gerado em {gerado_em}) -- pode não refletir genomas adicionados depois dessa data."
     return nao_capturados, aviso
 
-
-def construir_arvore_aninhada(lista_ids, total_matches, hits_data_map, total_sequences_banco):
-    total_organismos = len(lista_ids)
-    print(f"🌳 Consultando NCBI para {total_organismos} organismos únicos...")
-    paths = []
-    meta_dict = {} 
-    
-    # DICIONÁRIO PARA A CLASSIFICAÇÃO FUNCIONAL (Cap. 4, p.112)
-    # Gerado a partir de FUNCOES_ECOLOGICAS, então cobre automaticamente os
-    # 4 grupos do Atlas + "Fora do Escopo do Atlas (Cap.4)" + "Função Indefinida".
-    functional_roles = {funcao: {} for funcao in FUNCOES_ECOLOGICAS}
-    
-    for index, subject_id in enumerate(lista_ids, 1):
-        print(f"   ⏳ Classificando [{index}/{total_organismos}]: {subject_id}...", end="\r")
-        try:
-            # CORREÇÃO: Pega o ID após o último | ou antes do primeiro | se não tiver prefixo.
-            # Se for gb|JBAMJC...| ele pega o item do meio.
-            partes = subject_id.split('|')
-            acc = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
-            acc = acc.split('.')[0]  # Remove a versão do Accession (.1)
-
-            # 1ª tentativa: manifesto local (accession -> taxId), gerado por
-            # scripts_auxiliares/gerar_manifesto_taxid.py -- não consulta o
-            # NCBI pela rede, é instantâneo. Só cai pro Entrez (mais lento,
-            # com limite de taxa) se a sequência não estiver mapeada
-            # localmente (ex: banco novo, ainda sem manifesto gerado).
-            taxid = taxonomia_local.taxid_por_accession(acc)
-            if taxid:
-                linhagem = taxonomia_local.linhagem_por_taxid(taxid)
-                if not linhagem:
-                    raise ValueError("taxId sem linhagem na base de taxonomia local")
-                if linhagem[0].lower() == "cellular organisms":
-                    linhagem.pop(0)
-                especie = linhagem[-1]
-                acc_final = acc
-                desc_local, tamanho_local = taxonomia_local.descricao_e_tamanho_por_accession(acc)
-                desc_final = desc_local or "Descrição indisponível"
-                length_final = tamanho_local if tamanho_local is not None else "N/A"
-            else:
-                handle = Entrez.efetch(db="nucleotide", id=acc, retmode="xml")
-                records = Entrez.read(handle)
-                handle.close()
-                if not records:
-                    raise ValueError("Sequência não encontrada no NCBI")
-                rec = records[0]
-                linhagem = rec["GBSeq_taxonomy"].split("; ")
-                especie = rec["GBSeq_organism"]
-                linhagem.append(especie)
-                if linhagem[0].lower() == "cellular organisms":
-                    linhagem.pop(0)
-                acc_final = rec.get("GBSeq_primary-accession", acc)
-                desc_final = rec.get("GBSeq_definition", "Descrição indisponível")
-                length_final = rec.get("GBSeq_length", "N/A")
-                time.sleep(0.4)  # só precisa respeitar o limite de taxa do NCBI no fallback
-
-            # Peso = quantidade REAL de hits desse accession (pode ser >1 --
-            # ex: gene ribossomal multi-cópia com várias cópias no mesmo
-            # scaffold, cada uma gerando um hit/produto separado). "paths"
-            # tem 1 entrada por accession ÚNICA (pra não reclassificar a
-            # mesma sequência várias vezes, caro), mas a árvore precisa
-            # contar cada hit -- daí o peso, aplicado só na hora de montar
-            # a árvore mais abaixo. Sem isso, "Qtd. Matches" da árvore
-            # taxonômica ficava menor que a quantidade real de produtos
-            # (visível clicando na espécie), porque contava só 1 por
-            # accession visitada, não por hit.
-            peso = len(hits_data_map.get(subject_id, [])) or 1
-            paths.append((linhagem, peso))
-
-            if especie not in meta_dict:
-                meta_dict[especie] = {
-                    "info": {
-                        "acc": acc_final,
-                        "desc": desc_final,
-                        "length": length_final
-                    },
-                    "amplicons": []
-                }
-
-            # ---> INJETAR ESTA PARTE NOVA LOGO ABAIXO DO paths.append <---
-            grupo, tamanho, funcao = classificar_ecologia(linhagem)
-
-            if grupo not in functional_roles[funcao]:
-                # Agora criamos um dicionário que guarda o tamanho e a lista de espécies
-                functional_roles[funcao][grupo] = {"tamanho": tamanho, "especies": []}
-
-            functional_roles[funcao][grupo]["especies"].append({
-                "especie": especie,
-                "id": acc,
-                "matches": len(hits_data_map.get(subject_id, []))
-            })
-
-            if subject_id in hits_data_map:
-                meta_dict[especie]["amplicons"].extend(hits_data_map[subject_id])
-
-        except Exception:
-            # Antes isso virava um nó "Unclassified" sem filhos -- ocupava a
-            # coluna de Domínio mas não dava pra clicar nele pra ver QUAL
-            # genoma falhou a classificação (nem local nem via NCBI). Agora
-            # vira um ramo "Unclassified" > accession, igual a qualquer
-            # outro domínio, clicável do mesmo jeito.
-            partes = subject_id.split('|')
-            acc_desconhecido = partes[1] if len(partes) > 1 and partes[0].lower() in ['gb', 'ref', 'emb', 'dbj', 'gi'] else partes[0]
-            acc_desconhecido = acc_desconhecido.split('.')[0]
-
-            peso_desconhecido = len(hits_data_map.get(subject_id, [])) or 1
-            paths.append((["Unclassified", acc_desconhecido], peso_desconhecido))
-
-            if acc_desconhecido not in meta_dict:
-                meta_dict[acc_desconhecido] = {
-                    "info": {
-                        "acc": acc_desconhecido,
-                        "desc": "Organismo não classificado — falha na resolução taxonômica (local e via NCBI).",
-                        "length": "N/A"
-                    },
-                    "amplicons": []
-                }
-            if subject_id in hits_data_map:
-                meta_dict[acc_desconhecido]["amplicons"].extend(hits_data_map[subject_id])
-
-            if "Não Classificado" not in functional_roles["Função Indefinida"]:
-                functional_roles["Função Indefinida"]["Não Classificado"] = {"tamanho": "Indefinido", "especies": []}
-            functional_roles["Função Indefinida"]["Não Classificado"]["especies"].append({
-                "especie": acc_desconhecido,
-                "id": acc_desconhecido,
-                "matches": len(hits_data_map.get(subject_id, []))
-            })
-
-    print(f"\n   ✅ Árvore construída com sucesso para {total_organismos} organismos!")
-
-    root = {"name": "Root", "rank": "root", "matches": total_matches, "coverage": 1.0, "children": []}
-    for path, peso in paths:
-        current_node = root
-        tamanho_path = len(path)
-        for depth, taxa in enumerate(path):
-            rank_correto = descobrir_rank(taxa, depth, tamanho_path)
-            found_child = None
-            for child in current_node["children"]:
-                if child["name"] == taxa: found_child = child; break
-            if found_child:
-                found_child["matches"] += peso
-                current_node = found_child
-            else:
-                new_node = {"name": taxa, "rank": rank_correto, "matches": peso, "coverage": 0.0, "children": []}
-                current_node["children"].append(new_node)
-                current_node = new_node
-
-    def calc_coverage(node):
-        node["coverage"] = round(node["matches"] / total_matches, 4) if total_matches > 0 else 0.0
-        for child in node["children"]: calc_coverage(child)
-    calc_coverage(root)
-
-    return root, meta_dict, functional_roles
 
 def publicar_no_github(req_id):
     print("🚀 Iniciando publicação no GitHub Pages...")
@@ -742,7 +579,7 @@ def run_pipeline(req, req_id):
     lista_bacterias = list(bacterias_encontradas)
     
     print("⚙️ Preparando montagem taxonômica...")
-    arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map, total_sequencias_banco)
+    arvore_real, meta_dict, papeis_funcionais = construir_arvore_aninhada(lista_bacterias, total_matches, hits_data_map)
 
     # Quantos GENOMAS (sequenciamentos) distintos foram capturados de cada
     # espécie -- o painel "Cobertura por Grupo Taxonômico" do template soma
