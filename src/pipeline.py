@@ -26,13 +26,6 @@ import taxonomia_local
 from arvore_taxonomica import construir_arvore_aninhada
 
 
-def validate_primer(seq):
-    seq = str(seq).strip()
-    if not (10 <= len(seq) <= 40): return False
-    if not re.match(r"^[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+$", seq): return False
-    return True
-
-
 def extrair_campo_flexivel(dicionario_linha, palavra_chave, padrao="N/A"):
     """ Busca colunas no CSV ignorando maiúsculas/minúsculas """
     for coluna, valor in dicionario_linha.items():
