@@ -554,3 +554,46 @@ footer {
     margin-bottom: 14px;
     font-style: normal;
 }
+
+/* ===================================================================
+   Classes que substituíram os style="..." soltos no HTML (etapa 3 da 2.0).
+   Os seletores levam o contexto (nav, .results-table, h3...) para ganhar
+   das regras gerais acima, como o style="" fazia.
+   =================================================================== */
+
+/* Cabeçalho */
+nav .logo-link { display: flex; align-items: center; text-decoration: none; }
+nav .logo-cabecalho { max-height: 100px; width: auto; display: block; filter: brightness(1.05); }
+
+/* Painel do acervo */
+#painel-credito { color: #5b6470; font-size: 0.75rem; }
+.painel-acoes { display: flex; align-items: center; gap: 14px; }
+
+/* Tabela de análises. As larguras das colunas são só o ponto de partida:
+   tabela-resultados.js recalcula pelo conteúdo assim que a página carrega. */
+.tabela-scroll { overflow-x: auto; }
+.results-table col.col-nome { width: 190px; }
+.results-table col.col-alvo { width: 110px; }
+.results-table col.col-banco { width: 110px; }
+.results-table col.col-primers { width: 260px; }
+.results-table col.col-amplicon { width: 110px; }
+.results-table col.col-data { width: 80px; }
+.results-table col.col-status { width: 80px; }
+.results-table col.col-acao { width: 130px; }
+.results-table col.col-id { width: 150px; }
+/* Linhas geradas por main.py / main_issues.py */
+.results-table td.celula-primers { font-family: monospace; color: var(--primary-color); line-height: 1.5; }
+.results-table .rotulo-fita { color: #666; font-weight: 600; font-family: 'Segoe UI', sans-serif; }
+.results-table .btn-relatorio { padding: 6px 12px; font-size: 0.85em; }
+.resultados-vazio { text-align: center; color: #666; font-style: italic; margin: 30px 0; }
+
+/* Sobre */
+#sobre { margin-top: 40px; }
+h3.titulo-secao { color: var(--primary-color); text-align: center; margin-top: 40px; }
+h3.titulo-secao.titulo-secao-inicial { margin-top: 20px; }
+p.instituicao-nome { font-weight: bold; color: var(--primary-color); margin-bottom: 10px; }
+
+/* Rodapé */
+footer .rodape-marca { display: flex; justify-content: center; align-items: center; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+footer .rodape-logo { height: 22px; width: auto; display: block; opacity: 0.95; }
+footer .rodape-slogan { margin-left: 2px; }
