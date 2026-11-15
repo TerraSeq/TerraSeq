@@ -13,6 +13,7 @@ import taxonomia_local
 import notificacoes
 import bloqueios
 import vitrine
+from ecologia import REGRAS_CLASSIFICACAO_ECOLOGICA, FUNCOES_ECOLOGICAS, classificar_ecologia  # noqa: F401
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -68,52 +69,6 @@ HEADERS = {
     "Authorization": f"token {GITHUB_TOKEN}",
     "Accept": "application/vnd.github.v3+json"
 }
-
-# ==========================================
-# MOTOR DE CLASSIFICAÇÃO ECOLÓGICA (Atlas)
-# ==========================================
-REGRAS_CLASSIFICACAO_ECOLOGICA = [
-    # --- Engenheiros do Ecossistema ---
-    ("Enquitreídeos", "Mesofauna / Macrofauna", "Engenheiros do Ecossistema", ["enchytraeidae"]),
-    ("Formigas", "Macrofauna", "Engenheiros do Ecossistema", ["formicidae"]),
-    ("Cupins", "Macrofauna", "Engenheiros do Ecossistema", ["isoptera", "termitoidae", "termitidae", "rhinotermitidae", "termopsidae", "kalotermitidae"]),
-    ("Minhocas", "Macrofauna", "Engenheiros do Ecossistema", ["lumbricina", "lumbricidae", "megascolecidae", "glossoscolecidae", "moniligastridae", "ocnerodrilidae", "acanthodrilidae", "criodrilidae", "oligochaeta"]),
-
-    # --- Decompositores da Serrapilheira ---
-    ("Ácaros", "Mesofauna", "Decompositores da Serrapilheira", ["acari", "acariformes", "parasitiformes", "oribatida", "mesostigmata", "trombidiformes", "sarcoptiformes", "ixodida"]),
-    ("Colêmbolos, Proturos e Dipluros", "Mesofauna", "Decompositores da Serrapilheira", ["collembola", "protura", "diplura"]),
-    ("Isópodes", "Macrofauna", "Decompositores da Serrapilheira", ["isopoda", "oniscidea"]),
-    ("Miriápodes", "Macrofauna", "Decompositores da Serrapilheira", ["myriapoda", "diplopoda", "chilopoda", "symphyla", "pauropoda"]),
-    ("Insetos (Adultos e Larvas)", "Macrofauna", "Decompositores da Serrapilheira", ["coleoptera", "diptera", "lepidoptera", "hexapoda", "insecta"]),
-
-    # --- Micropredadores ---
-    ("Aracnídeos (Aranhas e Escorpiões)", "Macrofauna", "Micropredadores", ["araneae", "pseudoscorpiones", "scorpiones", "opiliones"]),
-    ("Platelmintos", "Macrofauna", "Micropredadores", ["platyhelminthes", "turbellaria", "geoplanidae"]),
-    ("Protistas", "Microfauna", "Micropredadores", ["amoebozoa", "alveolata", "ciliophora", "euglenozoa", "cercozoa", "apicomplexa", "heterolobosea", "foraminifera", "rhizaria", "stramenopiles", "protista"]),
-    ("Nematoides", "Microfauna", "Micropredadores", ["nematoda"]),
-    ("Tardígrados", "Microfauna", "Micropredadores", ["tardigrada"]),
-    ("Rotíferos", "Microfauna", "Micropredadores", ["rotifera"]),
-
-    # --- Microrganismos ---
-    ("Fungos", "Microrganismos", "Microrganismos", ["fungi", "ascomycota", "basidiomycota", "mucoromycota", "chytridiomycota", "zoopagomycota", "glomeromycota"]),
-    ("Archaea", "Microrganismos", "Microrganismos", ["archaea"]),
-    ("Bactérias", "Microrganismos", "Microrganismos", ["bacteria", "cyanobacteria", "proteobacteria", "firmicutes", "actinobacteria"]),
-
-    # --- Fora do Escopo Principal ---
-    ("Moluscos", "Macrofauna / Megafauna", "Fora do Escopo Principal", ["mollusca", "gastropoda"]),
-    ("Plantas (Raízes)", "Flora", "Fora do Escopo Principal", ["viridiplantae", "embryophyta"]),
-    ("Vírus", "Vírus", "Fora do Escopo Principal", ["viruses", "viricota", "riboviria"]),
-    ("Megafauna (Vertebrados)", "Megafauna", "Fora do Escopo Principal", ["mammalia", "reptilia", "amphibia", "vertebrata"]),
-]
-
-FUNCOES_ECOLOGICAS = sorted({f for _, _, f, _ in REGRAS_CLASSIFICACAO_ECOLOGICA} | {"Função Indefinida"})
-
-def classificar_ecologia(linhagem):
-    tax_str = " ".join(linhagem).lower()
-    for grande_grupo, tamanho, funcao_ecologica, termos in REGRAS_CLASSIFICACAO_ECOLOGICA:
-        if any(termo in tax_str for termo in termos):
-            return grande_grupo, tamanho, funcao_ecologica
-    return "Não Classificado", "Indefinido", "Função Indefinida"
 
 # ==========================================
 # FUNÇÕES DE APOIO E E-MAIL
