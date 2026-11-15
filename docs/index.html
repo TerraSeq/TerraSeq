@@ -781,7 +781,13 @@
         <small>© 2026 Developed by the TerraSeq Team</small>
     </footer>
 
-    <script src="js/vitrine.js?v=2.0"></script>
+    <!-- JavaScript da vitrine, nesta ordem (scripts comuns, não módulos: cada
+         arquivo usa as funções dos anteriores, como t() e localeAtual()). -->
+    <script src="js/vitrine/traducoes.js?v=2.0"></script>
+    <script src="js/vitrine/idioma.js?v=2.0"></script>
+    <script src="js/vitrine/tabela-resultados.js?v=2.0"></script>
+    <script src="js/vitrine/creditos-imagens.js?v=2.0"></script>
+    <script src="js/vitrine/acervo.js?v=2.0"></script>
 
 </body>
 </html>
