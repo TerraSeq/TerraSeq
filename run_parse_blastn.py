@@ -390,9 +390,18 @@ def _evaluate_hit_loc(hit_dict, primer_dict, tm_thresh = 45., size_max=9999, siz
         # evita que um genoma fragmentado/multi-cópia (ex: rRNA multi-cópia
         # numa montagem com muitos scaffolds) consuma toda a validação e
         # "afogue" os outros genomas do banco na cota de --max_target_seqs.
+        #
+        # A ORDEM importa: fica o PRIMEIRO par válido de cada genoma, então a
+        # ordem dos contigs decide qual cópia (e qual tamanho de amplicon)
+        # representa o genoma. Usa a ordem em que o BLAST devolveu os alvos do
+        # primer forward (do melhor alinhamento para o pior). Antes era
+        # "fwd.keys() & rev.keys()" -- um set, cuja ordem muda a cada execução
+        # do Python (hash aleatório de str): o mesmo pedido dava amplicon
+        # médio, contig e Tm diferentes a cada rodada.
         sseqids_por_genoma = {}
-        for sseqid in fwd_by_sseqid.keys() & rev_by_sseqid.keys():
-            sseqids_por_genoma.setdefault(genoma_de_sseqid[sseqid], []).append(sseqid)
+        for sseqid in fwd_by_sseqid:
+            if sseqid in rev_by_sseqid:
+                sseqids_por_genoma.setdefault(genoma_de_sseqid[sseqid], []).append(sseqid)
 
         for genoma, sseqids in sseqids_por_genoma.items():
             raw_hits_genoma = raw_hits_por_genoma.get(genoma, 0)
