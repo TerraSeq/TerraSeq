@@ -12,6 +12,7 @@ from Bio import Entrez
 import taxonomia_local
 import notificacoes
 import bloqueios
+import vitrine
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -314,8 +315,8 @@ def publicar_no_github(req_id):
     raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     try:
-        # Só o índice da vitrine e a pasta DESTE relatório (ver main.py).
-        subprocess.run(["git", "add", "docs/index.html", f"docs/reports/{req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
+        # Só a lista da vitrine e a pasta DESTE relatório (ver main.py).
+        subprocess.run(["git", "add", vitrine.CAMINHO_VITRINE_GIT, f"docs/reports/{req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
         subprocess.run(["git", "commit", "-m", f"Report {req_id}"], cwd=raiz_projeto, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as e:
         print(f"   ⚠️ Erro ao commitar as mudanças: {e}")
@@ -343,88 +344,18 @@ def publicar_no_github(req_id):
         
 
 def atualizar_vitrine_html(req, req_id, resultado_json=None):
-    print("🖥️ Atualizando painel de resultados na página inicial...")
+    """Põe a análise na vitrine do site (docs/dados/vitrine.json).
 
-    raiz_projeto = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..')
-    )
-
-    caminho_index = os.path.join(
-        raiz_projeto,
-        "docs/index.html"
-    )
-
-    # Dados
-    fwd = str(req.get('Primer forward', '')).strip().upper()
-    rev = str(req.get('Primer reverse', '')).strip().upper()
-    alvo = str(req.get('Região alvo', 'Não informada')).strip()
-    banco = str(req.get('Banco de Dados', 'Protozoa')).strip()
-    data_hoje = datetime.now()
-    data_hoje_br = data_hoje.strftime("%d/%m/%Y")
-    data_hoje_iso = data_hoje.strftime("%Y-%m-%d")
-
-    resultado_json = resultado_json or {}
-    nome_par = str(resultado_json.get('primers', {}).get('pair_name', '')).strip() or f"Par {alvo}"
-    mean_amp = resultado_json.get('summary', {}).get('mean_amplicon_size')
+    O nome ficou da época em que a vitrine era escrita direto no HTML; hoje só
+    repassa para vitrine.adicionar_analise (scripts_auxiliares/rodar_pedidos.py
+    também chama esta função).
+    """
     try:
-        amplicon_int = int(round(float(mean_amp)))
-    except (TypeError, ValueError):
-        amplicon_int = 0
-    amplicon_display = f"{amplicon_int} bp" if amplicon_int > 0 else "N/D"
-
-    marcador_alvo = "<!-- NOVAS_LINHAS -->"
-
-    nova_linha = f"""
-                    <tr data-amplicon="{amplicon_int}" data-date="{data_hoje_iso}">
-                        <td>{nome_par}</td>
-                        <td>{alvo}</td>
-                        <td>{banco}</td>
-                        <td class="celula-primers">
-                            <span class="rotulo-fita">F:</span> {fwd}<br>
-                            <span class="rotulo-fita">R:</span> {rev}
-                        </td>
-                        <td>{amplicon_display}</td>
-                        <td>{data_hoje_br}</td>
-                        <td>
-                            <span class="status-badge">
-                                Completed
-                            </span>
-                        </td>
-                        <td>
-                            <a href="reports/{req_id}/"
-                               class="btn btn-primary btn-relatorio">
-                               View Report
-                            </a>
-                        </td>
-                        <td><strong>{req_id}</strong></td>
-                    </tr>
-                    """
-
-    try:
-        with open(caminho_index, 'r', encoding='utf-8') as f:
-            conteudo = f.read()
-
-        if marcador_alvo in conteudo:
-
-            novo_conteudo = conteudo.replace(
-                marcador_alvo,
-                nova_linha + "\n" + marcador_alvo
-            )
-
-            with open(caminho_index, 'w', encoding='utf-8') as f:
-                f.write(novo_conteudo)
-
-            print("   ✅ Vitrine atualizada com sucesso!")
-
-        else:
-            print("   ⚠️ Marcador não encontrado no index.html!")
-
+        vitrine.adicionar_analise(req, req_id, resultado_json)
     except Exception as e:
         print(f"   ⚠️ Erro ao atualizar vitrine: {e}")
 
-# ==========================================
-# MOTOR PRINCIPAL (RUN PIPELINE)
-# ==========================================
+
 def run_pipeline(req, req_id):
     # Confere o pedido antes de qualquer BLAST (ver notificacoes.validar_pedido).
     problemas = notificacoes.validar_pedido(req)

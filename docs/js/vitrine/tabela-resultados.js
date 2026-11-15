@@ -2,12 +2,90 @@
 // Faz parte da reorganização 2.0; ordem de carregamento em docs/index.html.
 
 // ---- Tabela de análises: ordenação, filtros, paginação, largura das colunas ----
-// As linhas (<tr>) já vêm no HTML: main.py/main_issues.py inserem cada análise
-// nova antes do marcador <!-- NOVAS_LINHAS --> de docs/index.html.
+// As análises vêm de dados/vitrine.json, que o pipeline (src/vitrine.py) atualiza
+// a cada análise publicada. Linhas <tr> que já estejam no HTML também aparecem:
+// versões antigas do pipeline ainda as inserem no marcador <!-- NOVAS_LINHAS -->.
+// Se a mesma análise estiver nos dois lugares, vale a do JSON.
+
 document.addEventListener("DOMContentLoaded", function() {
     const tableBody = document.getElementById("results-body");
     if (!tableBody) return;
 
+    fetch("dados/vitrine.json")
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+        .then(dados => inserirAnalises(tableBody, dados.analises || []))
+        .catch(erro => console.warn("Vitrine: não foi possível ler dados/vitrine.json --", erro))
+        .finally(() => iniciarTabela(tableBody));
+});
+
+// Texto fixo ("Concluído", "Ver Relatório") no idioma atual; depois disso, a
+// troca de idioma é feita por aplicarIdioma (idioma.js) pelo próprio texto.
+function termoFixo(textoPt) {
+    return idiomaAtual === "en" ? TERMOS_FIXOS_PT_EN[textoPt] : textoPt;
+}
+
+// "2026-09-21" -> "21/09/2026" (a tabela mostra a data assim nos dois idiomas).
+function formatarDataBr(iso) {
+    const [ano, mes, dia] = String(iso || "").split("-");
+    return ano && mes && dia ? `${dia}/${mes}/${ano}` : String(iso || "");
+}
+
+// Põe as análises do JSON no começo da tabela, na ordem do arquivo (as linhas
+// antigas do HTML são as mais novas, então ficam depois, como ficariam no HTML).
+function inserirAnalises(tableBody, analises) {
+    const linhaPorId = {};
+    tableBody.querySelectorAll("tr").forEach(tr => {
+        const id = tr.lastElementChild ? tr.lastElementChild.textContent.trim() : "";
+        if (id) linhaPorId[id] = tr;
+    });
+    const novas = document.createDocumentFragment();
+    analises.forEach(analise => {
+        if (linhaPorId[analise.id]) linhaPorId[analise.id].remove();
+        novas.appendChild(criarLinhaAnalise(analise));
+    });
+    tableBody.insertBefore(novas, tableBody.firstChild);
+}
+
+// Monta a <tr> de uma análise. Usa textContent (nunca innerHTML) com os dados,
+// que vêm do formulário: um nome com "<" ou "&" aparece como texto.
+function criarLinhaAnalise(analise) {
+    const tr = document.createElement("tr");
+    const amplicon = Number(analise.amplicon_bp) || 0;
+    tr.dataset.amplicon = amplicon;
+    tr.dataset.date = analise.data || "";
+
+    const elemento = (tag, classe, texto) => {
+        const el = document.createElement(tag);
+        if (classe) el.className = classe;
+        if (texto !== undefined) el.textContent = texto;
+        return el;
+    };
+    const celula = (...conteudo) => {
+        const td = document.createElement("td");
+        td.append(...conteudo);
+        tr.appendChild(td);
+        return td;
+    };
+
+    celula(analise.nome_par || "");
+    celula(analise.alvo || "");
+    celula(analise.banco || "");
+    celula(
+        elemento("span", "rotulo-fita", "F:"), ` ${analise.forward || ""}`, document.createElement("br"),
+        elemento("span", "rotulo-fita", "R:"), ` ${analise.reverse || ""}`
+    ).className = "celula-primers";
+    celula(amplicon > 0 ? `${amplicon} bp` : "N/D");
+    celula(formatarDataBr(analise.data));
+    celula(elemento("span", "status-badge", termoFixo("Concluído")));
+    const link = elemento("a", "btn btn-primary btn-relatorio", termoFixo("Ver Relatório"));
+    link.href = `reports/${encodeURIComponent(analise.id)}/`;
+    celula(link);
+    celula(elemento("strong", "", analise.id));
+    return tr;
+}
+
+// Ordenação, filtros, paginação e colunas, sobre as linhas que estiverem na tabela.
+function iniciarTabela(tableBody) {
     let rows = Array.from(tableBody.querySelectorAll("tr"));
     let filteredRows = rows.slice();
 
@@ -367,4 +445,4 @@ document.addEventListener("DOMContentLoaded", function() {
         caixa.addEventListener("selectstart", e => { if (arrastou) e.preventDefault(); });
         caixa.addEventListener("click", e => { if (ignorarClique) { e.stopPropagation(); e.preventDefault(); } }, true);
     })();
-});
+}

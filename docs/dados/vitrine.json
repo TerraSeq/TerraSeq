@@ -1,0 +1,194 @@
+{
+  "analises": [
+    {
+      "id": "REQ-20260921-0079",
+      "nome_par": "V4_Brate_F/D9_2741R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "GGCAAGTCTGGTGCCAG",
+      "reverse": "GCTCAAHARGGTCTTCTT",
+      "amplicon_bp": 5104,
+      "data": "2026-09-21"
+    },
+    {
+      "id": "REQ-20260921-0076",
+      "nome_par": "V4_Brate_F/D9_2593R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "GGCAAGTCTGGTGCCAG",
+      "reverse": "GAGAGTCATAGTTACBYC",
+      "amplicon_bp": 5015,
+      "data": "2026-09-21"
+    },
+    {
+      "id": "REQ-20260921-0072",
+      "nome_par": "V4_Balzano_F/D9_2742R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "CCAGCASCYGCGGTAATTCC",
+      "reverse": "AGCTYAAHAGGGTCTTCT",
+      "amplicon_bp": 5077,
+      "data": "2026-09-21"
+    },
+    {
+      "id": "REQ-20260921-0075",
+      "nome_par": "V4_Balzano_F/D9_2593R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "CCAGCASCYGCGGTAATTCC",
+      "reverse": "GAGAGTCATAGTTACBYC",
+      "amplicon_bp": 4990,
+      "data": "2026-09-21"
+    },
+    {
+      "id": "REQ-20260921-0078",
+      "nome_par": "V4_Balzano_F/22R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "CCAGCASCYGCGGTAATTCC",
+      "reverse": "CCATTCATGCRCGTCACWART",
+      "amplicon_bp": 5039,
+      "data": "2026-09-21"
+    },
+    {
+      "id": "REQ-20260921-0073",
+      "nome_par": "V4_Balzano_F/21R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "CCAGCASCYGCGGTAATTCC",
+      "reverse": "GACGAGGCATTTGGCTACCTT",
+      "amplicon_bp": 4886,
+      "data": "2026-09-21"
+    },
+    {
+      "id": "REQ-20260921-0081",
+      "nome_par": "3NDf/21R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "GGCAAGTCTGGTGCCAG",
+      "reverse": "GACGAGGCATTTGGCTACCTT",
+      "amplicon_bp": 4898,
+      "data": "2026-09-21"
+    },
+    {
+      "id": "REQ-20260922-0085",
+      "nome_par": "V4_Hugerth_F/D11_3143R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "CGGTAAYTCCAGCTCYAV",
+      "reverse": "RCCACAAGCYARTTATCC",
+      "amplicon_bp": 5455,
+      "data": "2026-09-22"
+    },
+    {
+      "id": "REQ-20260922-0082",
+      "nome_par": "V4_Brate_F/D11_3143R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "GGCAAGTCTGGTGCCAG",
+      "reverse": "RCCACAAGCYARTTATCC",
+      "amplicon_bp": 5459,
+      "data": "2026-09-22"
+    },
+    {
+      "id": "REQ-20260922-0083",
+      "nome_par": "V4_Brate_F/22R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "GGCAAGTCTGGTGCCAG",
+      "reverse": "CCATTCATGCRCGTCACWART",
+      "amplicon_bp": 5059,
+      "data": "2026-09-22"
+    },
+    {
+      "id": "REQ-20260921-114311",
+      "nome_par": "V4_Balzano_F/D11_3143R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "CCAGCASCYGCGGTAATTCC",
+      "reverse": "RCCACAAGCYARTTATCC",
+      "amplicon_bp": 5450,
+      "data": "2026-09-24"
+    },
+    {
+      "id": "REQ-20261023-210435",
+      "nome_par": "V6-V8_new_F/D11_3143R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "AATTYGAHTCAACRCGGG",
+      "reverse": "RCCACAAGCYARTTATCC",
+      "amplicon_bp": 4957,
+      "data": "2026-10-23"
+    },
+    {
+      "id": "REQ-20261023-214749",
+      "nome_par": "V6-V8_new_F/D9_2593R",
+      "alvo": "18S-ITS-28S",
+      "banco": "eucariotos",
+      "forward": "AATTYGAHTCAACRCGGG",
+      "reverse": "GAGAGTCATAGTTACBYC",
+      "amplicon_bp": 4449,
+      "data": "2026-10-23"
+    },
+    {
+      "id": "REQ-20261026-104830",
+      "nome_par": "ITS1/ITS4",
+      "alvo": "18S-ITS-28S",
+      "banco": "Fungi",
+      "forward": "TCCGTAGGTGAACCTGCGG",
+      "reverse": "TCCTCCGCTTATTGATATGC",
+      "amplicon_bp": 628,
+      "data": "2026-10-26"
+    },
+    {
+      "id": "REQ-20261026-182546",
+      "nome_par": "27F/1492R",
+      "alvo": "16S",
+      "banco": "procariotos",
+      "forward": "AGAGTTTGATCMTGGCTCAG",
+      "reverse": "CGGTTACCTTGTTACGACTT",
+      "amplicon_bp": 1481,
+      "data": "2026-10-26"
+    },
+    {
+      "id": "REQ-20261026-182711",
+      "nome_par": "Arch21F/Arch1492R",
+      "alvo": "16S",
+      "banco": "procariotos",
+      "forward": "TTCCGGTTGATCCTGCCGGA",
+      "reverse": "TACGGWTACCTTGTTACGACTT",
+      "amplicon_bp": 1449,
+      "data": "2026-10-26"
+    },
+    {
+      "id": "REQ-20261026-191323",
+      "nome_par": "Arch21F/Arch1492R",
+      "alvo": "16S",
+      "banco": "archaea",
+      "forward": "TTCCGGTTGATCCTGCCGGA",
+      "reverse": "TACGGWTACCTTGTTACGACTT",
+      "amplicon_bp": 1449,
+      "data": "2026-10-26"
+    },
+    {
+      "id": "REQ-20261026-193550",
+      "nome_par": "LR0R/LR7",
+      "alvo": "LSU",
+      "banco": "eucariotos",
+      "forward": "ACCCGCTGAACTTAAGC",
+      "reverse": "TACTACCACCAAGATCT",
+      "amplicon_bp": 1478,
+      "data": "2026-10-26"
+    },
+    {
+      "id": "REQ-20261026-215201",
+      "nome_par": "LR0R/LR7",
+      "alvo": "LSU",
+      "banco": "Fungi",
+      "forward": "ACCCGCTGAACTTAAGC",
+      "reverse": "TACTACCACCAAGATCT",
+      "amplicon_bp": 1449,
+      "data": "2026-10-26"
+    }
+  ]
+}

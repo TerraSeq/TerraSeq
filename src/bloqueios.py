@@ -6,7 +6,7 @@ estar ocupadas juntas).
 Usam fcntl.flock em arquivos de data/locks/: o próprio sistema operacional
 libera a trava se o processo morrer (nenhum arquivo "preso").
 
-  - "publicacao": só um processo por vez atualiza a vitrine (docs/index.html) e
+  - "publicacao": só um processo por vez atualiza a vitrine (docs/dados/vitrine.json) e
     faz commit/push -- evita index.lock do git, linha perdida na vitrine e um
     `git pull` com arquivo sujo.
   - "blast-pesado": só uma busca em banco grande por vez, em todo o servidor
