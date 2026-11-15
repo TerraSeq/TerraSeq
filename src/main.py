@@ -488,7 +488,10 @@ def run_pipeline(req, req_id):
     arquivo_pass = f"{prefixo_saida}__results.pass.csv"
     total_matches = 0
     soma_amplicon = 0
-    bacterias_encontradas = set()
+    # dict usado como conjunto ORDENADO: guarda a ordem do CSV do BLAST. Um set
+    # mudaria de ordem a cada execução (hash aleatório de str), e com ele a ordem
+    # das árvores e qual accession aparece no card de espécies com várias sequências.
+    bacterias_encontradas = {}
 
     # Limite global (não por espécie) de caracteres de sequência de amplicon
     # guardados DIRETO no result.json. Sem isso, buscas com muitos hits geram
@@ -517,7 +520,7 @@ def run_pipeline(req, req_id):
             for linha in leitor:
                 total_matches += 1
                 sid = linha.get('Subject_ID', 'Desconhecido')
-                bacterias_encontradas.add(sid)
+                bacterias_encontradas[sid] = None
 
                 size_val = extrair_campo_flexivel(linha, "size", "0")
                 try: soma_amplicon += int(size_val)
