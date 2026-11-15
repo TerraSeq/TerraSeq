@@ -2,7 +2,7 @@
 """
 Roda uma lista de pedidos um depois do outro, SEM passar pelo formulario nem
 pelas Issues. Cada pedido faz o mesmo que o main.py faria: BLAST + relatorio,
-linha na vitrine (docs/index.html), commit/push no GitHub e e-mail de
+linha na vitrine (docs/dados/vitrine.json), commit/push no GitHub e e-mail de
 "relatorio pronto". Se um pedido falhar, segue para o proximo e mostra o
 resumo no fim.
 

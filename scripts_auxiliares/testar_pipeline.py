@@ -2,7 +2,7 @@
 """
 Teste de ponta a ponta do pipeline, por cada um dos dois caminhos de entrada,
 SEM mexer em nada de produção: não toca na planilha, nas Issues, na vitrine
-(docs/index.html), não faz commit/push e só manda e-mail se você pedir.
+(docs/dados/vitrine.json), não faz commit/push e só manda e-mail se você pedir.
 
     python3 scripts_auxiliares/testar_pipeline.py formulario        # caminho do main.py
     python3 scripts_auxiliares/testar_pipeline.py issue             # caminho do main_issues.py
@@ -14,10 +14,12 @@ O que ele faz:
   2. roda o run_pipeline de verdade (BLAST + relatório) num banco pequeno;
   3. confere o resultado (primers certos, genomas únicos = soma por espécie,
      cobertura = genomas / banco, index.html = template atual, seletor EN|PT);
-  4. apaga a pasta docs/reports/TESTE-... (use --manter para ficar com ela).
+  4. monta a entrada que iria para a vitrine, num arquivo temporário (a vitrine
+     de verdade não muda);
+  5. apaga a pasta docs/reports/TESTE-... (use --manter para ficar com ela).
 
 Opções:
-  --so-parser     só confere formulário -> parser, sem rodar BLAST (leva 1 segundo)
+  --so-parser     só confere formulário -> parser -> vitrine, sem rodar BLAST (leva 1 segundo)
   --banco NOME    banco do teste (padrão: formigas, ~212 genomas; ex: tardigrada, acari)
   --fwd/--rev     primers (padrão: V4_Balzano_F / D9_2593R)
   --email EMAIL   também testa o envio do e-mail de "relatório pronto" para você
@@ -237,6 +239,35 @@ def conferir_resultado(req_id, req, pasta):
     return erros
 
 
+def conferir_vitrine(req, req_id, resultado_json=None):
+    """Monta a entrada da vitrine como o pipeline faria, mas num arquivo
+    temporário: confere os campos e que a vitrine real não foi tocada."""
+    import tempfile
+    import vitrine
+    erros = 0
+    real = vitrine.CAMINHO_VITRINE
+    antes = open(real, "rb").read() if os.path.exists(real) else None
+    with tempfile.TemporaryDirectory() as pasta:
+        caminho = os.path.join(pasta, "vitrine.json")
+        entrada = vitrine.adicionar_analise(req, req_id, resultado_json, caminho)
+        gravadas = vitrine.ler_analises(caminho)
+    if gravadas == [entrada]:
+        ok(f"vitrine: {entrada['nome_par']} | {entrada['alvo']} | {entrada['banco']} | {entrada['amplicon_bp']} bp | {entrada['data']}")
+    else:
+        erros += falha(f"vitrine: gravou {gravadas!r}, esperado [{entrada!r}]")
+    esperado = {"forward": str(req.get("Primer forward", "")).strip().upper(),
+                "reverse": str(req.get("Primer reverse", "")).strip().upper()}
+    for campo, valor in esperado.items():
+        if entrada[campo] != valor:
+            erros += falha(f"vitrine: {campo} = {entrada[campo]!r}, esperado {valor!r}")
+    if resultado_json and entrada["amplicon_bp"] <= 0:
+        erros += falha("vitrine: amplicon médio 0 com um result.json válido")
+    depois = open(real, "rb").read() if os.path.exists(real) else None
+    if antes != depois:
+        erros += falha("a vitrine real (docs/dados/vitrine.json) mudou durante o teste!")
+    return erros
+
+
 # --------------------------------------------------------------------------- principal
 def main():
     ap = argparse.ArgumentParser(description="Teste de ponta a ponta do pipeline (sem tocar em produção).")
@@ -271,7 +302,10 @@ def main():
     else:
         req = pedido_formulario(args)
     if args.so_parser:
-        print("\n✅ Parser OK (modo --so-parser: BLAST não foi rodado).")
+        if conferir_vitrine(req, "TESTE-PARSER"):
+            print("\n❌ A entrada da vitrine saiu errada.")
+            sys.exit(1)
+        print("\n✅ Parser e vitrine OK (modo --so-parser: BLAST não foi rodado).")
         return
 
     req_id = f"TESTE-{'FORM' if args.entrada == 'formulario' else 'ISSUE'}-{time.strftime('%Y%m%d-%H%M%S')}"
@@ -280,9 +314,10 @@ def main():
     inicio = time.time()
     erros = 0
     try:
-        m.run_pipeline(req, req_id)
+        _, resultado_json = m.run_pipeline(req, req_id)
         print(f"⏱️ pipeline terminou em {(time.time() - inicio) / 60:.1f} min")
         erros += conferir_resultado(req_id, req, pasta)
+        erros += conferir_vitrine(req, req_id, resultado_json)
         if args.email:
             print(f"\n📧 Testando envio de e-mail para {args.email} ...")
             m.enviar_email_notificacao(args.email, req_id)
