@@ -189,6 +189,16 @@
       "reverse": "TACTACCACCAAGATCT",
       "amplicon_bp": 1449,
       "data": "2026-10-26"
+    },
+    {
+      "id": "REQ-20261019-150509-2",
+      "nome_par": "TESTE_V4_Balzano_F/D9_2593R",
+      "alvo": "18S-ITS-28S",
+      "banco": "Formigas",
+      "forward": "CCAGCASCYGCGGTAATTCC",
+      "reverse": "GAGAGTCATAGTTACBYC",
+      "amplicon_bp": 6166,
+      "data": "2026-11-23"
     }
   ]
 }
