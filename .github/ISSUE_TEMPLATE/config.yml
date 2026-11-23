@@ -1,8 +1,5 @@
+# Só o formulário "New Primer Analysis" aparece para quem abre uma Issue.
+# (Quem tem permissão de escrita no repositório ainda vê "Blank issue": o GitHub
+# sempre mostra essa opção aos mantenedores, e ela não pode ser escondida.)
 blank_issues_enabled: false
-contact_links:
-  - name: 📖 Documentação do Pipeline
-    url: https://github.com/TerraSeq/TerraSeq/blob/main/README.md
-    about: Consulte antes de abrir uma issue — pode ser que sua dúvida já esteja respondida aqui.
-  - name: 📧 Suporte por E-mail
-    url: mailto:tiagogabriel3542@gmail.com
-    about: Dúvidas que não sejam sobre submissão de análise, entre em contato diretamente.
+contact_links: []
